@@ -1,50 +1,36 @@
-from django.shortcuts import render
+# encoding=utf8
+from django.http import HttpResponse
+from django.template.response import TemplateResponse
+from django.shortcuts import render_to_response
+from django.contrib.auth.forms import UserCreationForm
+from blogdjango.models import UserDetail
+from django.http import HttpResponseRedirect
+from django.contrib.auth import authenticate,login
+from django.views.decorators.csrf import csrf_protect
+from django.template import RequestContext
 
 # Create your views here.
+
+@csrf_protect
 def userRegister(request):
-    curtime=time.strftime("%Y-%m-%d %H:%M:%S",time.localtime());
-    
-    if request.user.is_authenticated():#a*******************
-        return HttpResponseRedirect("/user")
-    try:
-        if request.method=='POST':
-            username=request.POST.get('name','')
-            password1=request.POST.get('password1','')
-            password2=request.POST.get('password2','')
-            email=request.POST.get('email','')
-            phone=request.POST.get('phone','')
-            errors=[]
-            
-            registerForm=RegisterForm({'username':username,'password1':password1,'password2':password2,'email':email})#b********
-            if not registerForm.is_valid():
-                errors.extend(registerForm.errors.values())
-                return render_to_response("blog/userregister.html",RequestContext(request,{'curtime':curtime,'username':username,'email':email,'errors':errors}))
-            if password1!=password2:
-                errors.append("两次输入的密码不一致!")
-                return render_to_response("blog/userregister.html",RequestContext(request,{'curtime':curtime,'username':username,'email':email,'errors':errors}))
-                
-            filterResult=User.objects.filter(username=username)#c************
-            if len(filterResult)>0:
-                errors.append("用户名已存在")
-                return render_to_response("blog/userregister.html",RequestContext(request,{'curtime':curtime,'username':username,'email':email,'errors':errors}))
-            
-            user=User()#d************************
-            user.username=username
-            user.set_password(password1)
-            user.email=email
-            user.save()
-            #用户扩展信息 profile
-            profile=UserProfile()#e*************************
-            profile.user_id=user.id
-            profile.phone=phone
-            profile.save()
-            #登录前需要先验证
-            newUser=auth.authenticate(username=username,password=password1)#f***************
-            if newUser is not None:
-                auth.login(request, newUser)#g*******************
-                return HttpResponseRedirect("/user")
-    except Exception,e:
-        errors.append(str(e))
-        return render_to_response("blog/userregister.html",RequestContext(request,{'curtime':curtime,'username':username,'email':email,'errors':errors}))
-    
-    return render_to_response("blog/userregister.html",RequestContext(request,{'curtime':curtime}))
+	if request.method == 'POST':
+		form = UserCreationForm(request.POST)
+		if form.is_valid():
+			form.save()
+			user = authenticate(username=request.POST['username'], password=request.POST['password1'])
+			login(request, user)
+			user_detail = UserDetail()
+			user_detail.user = user
+			user_detail.save()
+			return HttpResponseRedirect('/accounts/register/done/')
+	else:
+		form = UserCreationForm()
+	context = {'form': form}
+	return TemplateResponse(request,'registration/register_form.html',context)
+	#return render_to_response('registration/register_form.html',context,context_instance=RequestContext(request))
+	##如果使用render_to_response，就必须要加上context_instance=RequestContext(request)，跟csrf相关，具体原因还不了解
+	
+def userRegister_done(request):
+	username = request.user.username.split('@')[0]
+	return HttpResponse(username + "waitting admin")
+	
