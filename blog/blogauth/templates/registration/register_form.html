@@ -35,7 +35,7 @@
 {% if user.is_authenticated %}
 <p class="errornote">
 {% blocktrans with username=request.user.get_username trimmed %}
-    You are authenticated as {{ username }}, but are not authorized to access this page. 
+    You are authenticated as {{ username }}, no need to register a new account. 
 {% endblocktrans %}
 </p>
 {% endif %}

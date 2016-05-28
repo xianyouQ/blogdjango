@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'blogdjango',
     'blogauth',
+	'blogadmin'
 ]
 
 MIDDLEWARE_CLASSES = [

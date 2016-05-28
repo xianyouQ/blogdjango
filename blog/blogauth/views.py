@@ -13,6 +13,9 @@ from django.template import RequestContext
 
 @csrf_protect
 def userRegister(request):
+	"""
+	用户注册
+	"""
 	if request.method == 'POST':
 		form = UserCreationForm(request.POST)
 		if form.is_valid():

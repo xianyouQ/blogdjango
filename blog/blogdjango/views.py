@@ -2,9 +2,10 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from blogauth.decorators import blog_permission_required
+from blogauth.decorators import account_active_required
 # Create your views here.
 
-@login_required
+@account_active_required()
 def index(request):
 	username = request.user.username.split('@')[0]
 	return HttpResponse(username)
