@@ -56,6 +56,7 @@ class BlogText(models.Model):
 	create_time = models.DateTimeField(auto_now_add=True,verbose_name=u"文档创建日期")
 	context = models.TextField(verbose_name=u"blogText内容")
 	blog_text_title = models.CharField(max_length=400,default="",verbose_name=u"blogText名称")
+	is_publish = models.BooleanField(default=False,verbose_name=u"是否可以展示")
 
 	def __unicode__(self):
 		return self.blog_text_title  

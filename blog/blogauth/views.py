@@ -25,15 +25,10 @@ def userRegister(request):
 			user_detail = UserDetail()
 			user_detail.user = user
 			user_detail.save()
-			return HttpResponseRedirect('/accounts/register/done/')
+			return HttpResponseRedirect(request,'registration/register_done.html',{"username":user.username})
 	else:
 		form = UserCreationForm()
 	context = {'form': form}
 	return TemplateResponse(request,'registration/register_form.html',context)
 	#return render_to_response('registration/register_form.html',context,context_instance=RequestContext(request))
 	##如果使用render_to_response，就必须要加上context_instance=RequestContext(request)，跟csrf相关，具体原因还不了解
-	
-def userRegister_done(request):
-	username = request.user.username.split('@')[0]
-	return HttpResponse(username + "waitting admin")
-	

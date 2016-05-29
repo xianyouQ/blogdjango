@@ -96,11 +96,44 @@ class BlogAction:
 		"""
 		添加新评论
 		"""
-		pass
+		context = {}
+		try:
+			parentComment = Comment.objects.select_related(blogtext).filter(blogtext__blog__userDetail__user__username__exact=username).get(acticleId_exact=acticleId)
+			newComment = Comment()
+			newComment.blogtext = parentComment.blogtext
+			newComment.parent_comment = parentComment
+			newComment.context = message
+			newComment.comment_user = self.user
+			newComment.save()
+		except:
+			context["error"] = 'can't commit comment request'
+		return context
 		
-	def addNewActicle(self,title,message):
+	def addNewActicle(self,title,message,published=False):
 		"""
 		添加新文章
 		"""
-		pass
-			
+		context = {}
+		try:
+			blog = Blog.objects.get(userDetail__user=self.user)
+			acticle = BlogText()
+			acticle.blog = blog
+			acticle.context = message
+			acticle.is_publish = published
+			acticle.save()
+		except:
+			context["error"] = "can't process request"
+		return context
+		
+	def updateActicle(self,acticleId,message=None,published=False)
+		"""
+		更新文章
+		"""
+		context = {}
+		try:
+			updatenum = BlogText.objects.filter(blog__userDetail__user=self.user).filter(id=acticleId).update(context=message,is_publish=published)
+			context["update"] = updatenum
+		except:
+			context["update"] = 0
+		return context
+		
