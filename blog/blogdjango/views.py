@@ -3,7 +3,9 @@ from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from blogauth.decorators import blog_permission_required
 from blogauth.decorators import account_active_required
+from blogdjango.models import UserDetail
 # Create your views here.
+
 
 @account_active_required()
 def index(request):

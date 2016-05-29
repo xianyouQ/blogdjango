@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 
 class UserDetail(models.Model):
 	user = models.OneToOneField(User)
+	nickname = models.CharField(max_length=200,default="",verbose_name=u"昵称")
 	create_time = models.DateTimeField(auto_now_add=True,verbose_name=u"创建时间")
 	is_active = models.BooleanField(default=False,verbose_name=u"是否通过审核")
 	need_confirm = models.BooleanField(default=True,verbose_name=u"需要审核")
@@ -50,6 +51,7 @@ class BlogPermisson(models.Model):
 		ordering = ["ask_time"]
 
 class BlogText(models.Model):
+	id = models.AutoField(primary_key=True)
 	blog = models.ForeignKey(Blog)
 	create_time = models.DateTimeField(auto_now_add=True,verbose_name=u"文档创建日期")
 	context = models.TextField(verbose_name=u"blogText内容")
@@ -70,6 +72,7 @@ class Comment(models.Model):
 	comment_time = models.DateTimeField(auto_now_add=True,verbose_name=u"评论时间")
 
 	class Meta:
-		db_table = "comment"
+		db_table = "blog_comment"
 		verbose_name = "博客评论"
 		ordering = ["comment_time"]
+		
