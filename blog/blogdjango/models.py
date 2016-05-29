@@ -9,7 +9,9 @@ class UserDetail(models.Model):
 	is_active = models.BooleanField(default=False,verbose_name=u"是否通过审核")
 	need_confirm = models.BooleanField(default=True,verbose_name=u"需要审核")
 	askuser = models.ManyToManyField("self",through="BlogPermisson",symmetrical=False)
-
+	contact_user = models.ManyToManyField("self",through="Message",symmetrical=False)  ###对称关系的话，through表会怎么表示
+	signature = models.CharField(max_length=400,default="",verbose_name=u"个性签名")
+	
 	def __unicode__(self):
 		return self.user.username  
 
@@ -76,4 +78,17 @@ class Comment(models.Model):
 		db_table = "blog_comment"
 		verbose_name = "博客评论"
 		ordering = ["comment_time"]
+		
+class Message(models.Model):
+	message = models.CharField(max_length=200,default="",verbose_name=u"聊天消息")
+	contact_time = models.DateTimeField(auto_now_add=True,verbose_name=u"聊天时间")
+	from_user = models.ForeignKey(UserDetail,related_name="sended_message")
+	to_user = models.ForeignKey(UserDetail,related_name="recived_message")
+	is_read = models.BooleanField(default=False,verbose_name=u"是否已读")
+	
+	class Meta:
+		db_table = "blog_message"
+		verbose_name = "聊天记录"
+		ordering = ["contact_time"]
+	
 		
