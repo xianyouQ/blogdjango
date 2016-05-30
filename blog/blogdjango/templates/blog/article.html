@@ -4,11 +4,11 @@
 {{ article.title }}
 {% endblock %}
 
-
+ {% load static %}
 {% block content %}
-<link rel="stylesheet" type="text/css" href="/ueEditor/third-party/SyntaxHighlighter/shCoreDefault.css">
-<script type="text/javascript" src="/ueEditor/third-party/SyntaxHighlighter/shCore.js"></script>
-<script type="text/javascript" src="/js/fengzheng.ajax.js"></script>
+<link rel="stylesheet" type="text/css" href="{% static 'blog/ueEditor/third-party/SyntaxHighlighter/shCoreDefault.css' %}">
+<script type="text/javascript" src="{% static 'blog/ueEditor/third-party/SyntaxHighlighter/shCore.js' %}"></script>
+<script type="text/javascript" src="{% static 'blog/js/fengzheng.ajax.js' %}"></script>
 <script type="text/javascript">
 SyntaxHighlighter.all();
 </script>
@@ -31,13 +31,15 @@ SyntaxHighlighter.all();
 </div>
 </div>
 
-
+{% comment %}
 <div class="rightcontent col-sm-0 col-md-3">
 	<div class="bs-callout-info">所有分类</div>
 	<div class="right_classic">
 		{% include "rightNav.html" %}
 	</div>
 </div>
+
+{% endcomment %}
 
 
 {% endblock %}

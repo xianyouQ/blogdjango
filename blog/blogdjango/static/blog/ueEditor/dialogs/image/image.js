@@ -247,13 +247,16 @@
         },
         setPreview: function(){
             var url = $G('url').value,
-                ow = $G('width').value,
-                oh = $G('height').value,
-                border = $G('border').value,
+                ow = parseInt($G('width').value, 10) || 0,
+                oh = parseInt($G('height').value, 10) || 0,
+                border = parseInt($G('border').value, 10) || 0,
                 title = $G('title').value,
                 preview = $G('preview'),
                 width,
                 height;
+
+            url = utils.unhtmlForUrl(url);
+            title = utils.unhtml(title);
 
             width = ((!ow || !oh) ? preview.offsetWidth:Math.min(ow, preview.offsetWidth));
             width = width+(border*2) > preview.offsetWidth ? width:(preview.offsetWidth - (border*2));
@@ -867,7 +870,6 @@
                     'method': 'get',
                     'onsuccess': function (r) {
                         try {
-                            
                             var json = isJsonp ? r:eval('(' + r.responseText + ')');
                             if (json.state == 'SUCCESS') {
                                 _this.pushData(json.list);
@@ -878,7 +880,6 @@
                                 _this.isLoadingData = false;
                             }
                         } catch (e) {
-                            
                             if(r.responseText.indexOf('ue_separate_ue') != -1) {
                                 var list = r.responseText.split(r.responseText);
                                 _this.pushData(list);

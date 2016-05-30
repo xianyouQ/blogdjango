@@ -1,5 +1,6 @@
 # encoding=utf8
 from blogdjango.models import *
+from blog import settings
 
 priority = {"denied":0,"read":1,"write":2}
 
@@ -24,7 +25,7 @@ class BlogAction:
 			elif self.blog_permission_required(priority["read"],userName):
 				articles = BlogText.objects.select_related('blog__userDetail__user').filter(blog__userDetail__user__username__exact=userName)
 			else:
-				context["denied"] = True
+				context["denied"] = settings.NO_PERMISSON_TO_BLOG_TEMPLATE
 		except Exception:
 			context["error"] = "Internal Server Error"
 			context["err_user"] = userName
@@ -49,7 +50,7 @@ class BlogAction:
 			elif self.blog_permission_required(priority["read"],userName):
 				comments = Comment.objects.select_related(comment_user).filter(blogtext__id__exact=acticleId).filter(blogtext__blog__userDetail__user__username__exact=userName)
 			else:
-				context["denied"] = True
+				context["error"] = {}
 		except DoesNotExist:
 			context["error"] = "Can't get anything comments the user you asked"
 			context["err_user"] = userName
