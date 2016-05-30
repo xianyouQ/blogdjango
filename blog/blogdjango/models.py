@@ -8,8 +8,8 @@ class UserDetail(models.Model):
 	create_time = models.DateTimeField(auto_now_add=True,verbose_name=u"创建时间")
 	is_active = models.BooleanField(default=False,verbose_name=u"是否通过审核")
 	need_confirm = models.BooleanField(default=True,verbose_name=u"需要审核")
-	askuser = models.ManyToManyField("self",through="BlogPermisson",symmetrical=False)
-	contact_user = models.ManyToManyField("self",through="Message",symmetrical=False)  ###对称关系的话，through表会怎么表示
+	askuser = models.ManyToManyField("self",through="BlogPermisson",symmetrical=False,related_name="Permission")
+	contact_user = models.ManyToManyField("self",through="Message",symmetrical=False,related_name="Contact")  ###对称关系的话，through表会怎么表示
 	signature = models.CharField(max_length=400,default="",verbose_name=u"个性签名")
 	
 	def __unicode__(self):

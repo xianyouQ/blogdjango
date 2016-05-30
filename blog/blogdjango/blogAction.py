@@ -1,9 +1,12 @@
+# encoding=utf8
 from blogdjango.models import *
+
+priority = {"denied":0,"read":1,"write":2}
 
 
 class BlogAction:
 	"""
-	blog²Ù×÷²éÑ¯Àà
+	blogæ“ä½œæŸ¥è¯¢ç±»
 	"""
 	def __init__(self,user):
 		self.user = user
@@ -11,34 +14,42 @@ class BlogAction:
 	
 	def queryArticles(self,userName=None):
 		"""
-		¸ù¾ÝÓÃ»§(Ãû)»ñÈ¡Æä²©¿ÍÎÄÕÂÒÔ¼°ÆäËûÐÅÏ¢
+		æ ¹æ®ç”¨æˆ·(å)èŽ·å–å…¶åšå®¢æ–‡ç« ä»¥åŠå…¶ä»–ä¿¡æ¯
 		"""
 		context = {}
+		articles = []
 		try:
-			if userName == None: ##»ñÈ¡×Ô¼ºµÄ²©¿ÍÖ÷Ò³Êý¾Ý
+			if userName == None: ##èŽ·å–è‡ªå·±çš„åšå®¢ä¸»é¡µæ•°æ®
 				articles = BlogText.objects.select_related('blog__userDetail').filter(blog__userDetail__user=self.user)
-			else:
+			elif self.blog_permission_required(priority["read"],userName):
 				articles = BlogText.objects.select_related('blog__userDetail__user').filter(blog__userDetail__user__username__exact=userName)
-		except DoesNotExist:
-			context["error"] = "Can't get anything according the user you asked"
+			else:
+				context["denied"] = True
+		except Exception:
+			context["error"] = "Internal Server Error"
 			context["err_user"] = userName
 			return context
-		
-		context["articles"] = articles
-		context["blog"] = articles[0].blog
-		context["userDetail"] = articles[0].blog.userDetail
+		if len(articles) > 0:
+			context["articles"] = articles
+			context["blog"] = articles[0].blog
+			context["userDetail"] = articles[0].blog.userDetail
+		else:
+			context["error"] = "can't get anything"
+			context["err_user"] = userName
 		return context
 		
 	def queryActicleComment(self,acticleId,userName=None):
 		"""
-		¸ù¾ÝÓÃ»§(Ãû)ÒÔ¼°ËûµÄÎÄÕÂid»ñÈ¡ÆÀÂÛ
+		æ ¹æ®ç”¨æˆ·(å)ä»¥åŠä»–çš„æ–‡ç« idèŽ·å–è¯„è®º
 		"""
 		context = {}
 		try:
-			if userName == None: ##»ñÈ¡×Ô¼ºµÄÆÀÂÛ
+			if userName == None: ##èŽ·å–è‡ªå·±çš„è¯„è®º
 				comments = Comment.objects.select_related(comment_user).filter(blogtext__id__exact=acticleId).filter(blogtext__blog__userDetail__user=self.user)
-			else:
+			elif self.blog_permission_required(priority["read"],userName):
 				comments = Comment.objects.select_related(comment_user).filter(blogtext__id__exact=acticleId).filter(blogtext__blog__userDetail__user__username__exact=userName)
+			else:
+				context["denied"] = True
 		except DoesNotExist:
 			context["error"] = "Can't get anything comments the user you asked"
 			context["err_user"] = userName
@@ -48,12 +59,12 @@ class BlogAction:
 
 	def askBlogPermission(self,userName):
 		"""
-		ÇëÇó²é¿´Ä³¸öblogµÄÈ¨ÏÞ
+		è¯·æ±‚æŸ¥çœ‹æŸä¸ªblogçš„æƒé™
 		"""
 		context = {}
 		try:
 			userDetail = UserDetail.objects.get(user__username__exact=userName)
-			askPermisson = BlogPermisson()   ##¿ÉÄÜÐèÒª¼ì²éÊÇ·ñÔø¾­ÉêÇë¹ý
+			askPermisson = BlogPermisson()   ##å¯èƒ½éœ€è¦æ£€æŸ¥æ˜¯å¦æ›¾ç»ç”³è¯·è¿‡
 			askPermisson.ask_from_user = self.user
 			askPermisson.asked_user = userDetail
 			askPermisson.save()
@@ -64,7 +75,7 @@ class BlogAction:
 		
 	def queryAskedPermission(self):
 		"""
-		²é¿´×Ô¼ºÊÕµ½µÄÈ¨ÏÞÇëÇó
+		æŸ¥çœ‹è‡ªå·±æ”¶åˆ°çš„æƒé™è¯·æ±‚
 		"""
 		context = {}
 		try:
@@ -80,7 +91,7 @@ class BlogAction:
 		
 	def processAskedPermission(self,requestContext):
 		"""
-		´¦ÀíÈ¨ÏÞÇëÇó
+		å¤„ç†æƒé™è¯·æ±‚
 		"""
 		context = {}
 		for priority,usernameList in requestContext.items():
@@ -94,10 +105,14 @@ class BlogAction:
 			
 	def addNewComment(self,username,acticleId,message,parent_id):
 		"""
-		Ìí¼ÓÐÂÆÀÂÛ
+		æ·»åŠ æ–°è¯„è®º
 		"""
+
 		context = {}
 		try:
+			if not self.blog_permission_required(priority["write"],userName):
+				context["denied"] = True
+				return context
 			parentComment = Comment.objects.select_related(blogtext).filter(blogtext__blog__userDetail__user__username__exact=username).get(acticleId_exact=acticleId)
 			newComment = Comment()
 			newComment.blogtext = parentComment.blogtext
@@ -106,12 +121,12 @@ class BlogAction:
 			newComment.comment_user = self.user
 			newComment.save()
 		except:
-			context["error"] = 'can't commit comment request'
+			context["error"] = "can't commit comment request"
 		return context
 		
 	def addNewActicle(self,title,message,published=False):
 		"""
-		Ìí¼ÓÐÂÎÄÕÂ
+		æ·»åŠ æ–°æ–‡ç« 
 		"""
 		context = {}
 		try:
@@ -125,9 +140,9 @@ class BlogAction:
 			context["error"] = "can't process request"
 		return context
 		
-	def updateActicle(self,acticleId,message=None,published=False)
+	def updateActicle(self,acticleId,message=None,published=False):
 		"""
-		¸üÐÂÎÄÕÂ
+		æ›´æ–°æ–‡ç« 
 		"""
 		context = {}
 		try:
@@ -136,4 +151,18 @@ class BlogAction:
 		except:
 			context["update"] = 0
 		return context
-		
+
+	def blog_permission_required(self,permission,username):
+		"""
+		æ£€æŸ¥å¯¹æŸä¸ªè´¦æˆ·blogçš„è®¿é—®æƒé™ï¼Œå¦‚æžœæ²¡æœ‰ä¼šæ ¹æ®redirect_templateè¿”å›žå¯¹åº”é¡µé¢,æˆ–è€…æŠ›å‡ºPermissionDenied
+		"""
+		try:
+			dbpermission = BlogPermisson.objects.filter(asked_user__user=user).filter(from_user__user__username__exact=username).values("blog_priority")
+			print len(dbpermission)
+			if len(dbpermission) > 0 and dbpermission[0] >= permission:
+				return True
+			else:
+				return False
+		except Exception,e:
+				return False
+	

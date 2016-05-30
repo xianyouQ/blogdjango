@@ -9,7 +9,7 @@ from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.utils.six.moves.urllib.parse import urlparse
 from django.shortcuts import resolve_url
 from blog import settings
-
+from blogdjango.models import BlogPermisson
 
 def user_permisson_test(test_func=None, Login_url=None,redirect_template=None,redirect_context={},redirect_field_name=REDIRECT_FIELD_NAME,):
 	"""
@@ -36,22 +36,10 @@ def user_permisson_test(test_func=None, Login_url=None,redirect_template=None,re
 		return _wrapped_view
 	return decorator
 
-
-def blog_permission_required(permission,redirect_template=None):
-	"""
-	检查对某个账户blog的访问权限，如果没有登陆会要求登陆，如果没有权限会重定向到redirect_to 或者抛出PermissionDenied
-	"""
-	def check_perms(user,*args,**kwargs):
-		dbpermission = user.blog_asked_permisson.get(ask_from_user__user__username__exact==username).values("blog_priority")
-		if dbpermission > permission:
-			return True
-		else:
-			return False
-	return user_permisson_test(check_perms,  Login_url="/accounts/login/",redirect_template=redirect_template)
 	
 def account_active_required(redirect_template=None):
 	"""
-	检查账号是否激活，如果没有登陆会要求登陆，如果没有会重定向到redirect_to 或者抛出PermissionDenied
+	检查账号是否激活，如果没有登陆会要求登陆，如果没有会根据redirect_template返回对应页面 或者抛出PermissionDenied
 	"""
 	def check_perms(user,*args,**kwargs):
 		return user.userdetail.is_active
@@ -61,9 +49,9 @@ def account_active_required(redirect_template=None):
 	
 def account_admin_required(redirect_template=None):
 	"""
-	检查账号是否有管理权限，如果没有登陆会要求登陆，如果没有权限会重定向到redirect_to 或者抛出PermissionDenied
+	检查账号是否有管理权限，如果没有登陆会要求登陆，如果没有会根据redirect_template返回对应页面 或者抛出PermissionDenied
 	"""
 	def check_perms(user,*args,**kwargs):
-		return user.is_staff:
+		return user.is_staff
 		
 	return user_permisson_test(check_perms, Login_url="/accounts/login/",redirect_template=redirect_template)

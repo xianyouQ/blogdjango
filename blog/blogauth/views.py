@@ -25,7 +25,7 @@ def userRegister(request):
 			user_detail = UserDetail()
 			user_detail.user = user
 			user_detail.save()
-			return HttpResponseRedirect(request,'registration/register_done.html',{"username":user.username})
+			return TemplateResponse(request,'registration/register_done.html',{"username":user.username,"title":"Register Success"})
 	else:
 		form = UserCreationForm()
 	context = {'form': form}

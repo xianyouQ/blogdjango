@@ -3,7 +3,7 @@
 {% block title %}{{ title }} | {{ site_title|default:_('Blog认证系统') }}{% endblock %}
 
 {% block branding %}
-<h1 id="site-name"><a href="{% url 'blogdjango:index' %}">{{ site_header|default:_('Blog主页') }}</a></h1>
+<h1 id="site-name"><a href="{% url 'blogdjango:selfIndex' %}">{{ site_header|default:_('Blog主页') }}</a></h1>
 {% endblock %}
 
 {% block nav-global %}{% endblock %}

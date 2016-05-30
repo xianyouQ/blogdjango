@@ -2,7 +2,8 @@ from django.conf.urls import url,include
 from blogdjango import views
 
 urlpatterns = [
-	url(r'^index/',views.index,name="index"),
-	url(r'^user/(?P<username>[0-9]+)/',views.userindex),
-	url(r'^user/(?P<username>[0-9]+)/(?P<articalid>[0-9]+)/refreshcomment/',views.usercomment),
+	url(r'^index/$',views.selfIndex,name="selfIndex"),
+	url(r'^user/(?P<username>[a-zA-Z0-9]+)/$',views.userIndex),
+	url(r'^user/(?P<username>[a-zA-Z0-9]+)/(?P<articalid>[0-9]+)/refreshcomment/',views.userComment),
+	url(r'permission/$',views.getAskedPermission,name="getAskedPermission")
 ]

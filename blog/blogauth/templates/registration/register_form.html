@@ -40,7 +40,7 @@
 </p>
 {% endif %}
 
-<form action="/accounts/register/" method="post" id="login-form">{% csrf_token %}
+<form action="{% url 'blogauth:login' %}" method="post" id="login-form">{% csrf_token %}
   <div class="form-row">
     {{ form.username.errors }}
     {{ form.username.label_tag }} {{ form.username }}
