@@ -1,0 +1,22 @@
+﻿{% extends "blog/base.html" %}
+{% block title %}欢迎{% endblock %}
+{% block navmenu %}
+<div class="navbar-collapse collapse" style="height: 1px;">
+<ul class="nav navbar-nav">	
+	<li><a href="{% url 'blogdjango:selfIndex' %}">首页</a></li>
+</ul>
+<ul class="nav navbar-nav" style="float:right">	
+	{% if user.is_authenticated %}
+		<li><a href="#">欢迎,{{request.user.get_username}}</a></li>
+		<li><a href="{% url 'blogauth:logout' %}">退出登录</a></li>
+	{% else %}
+	<li><a href="{% url 'blogauth:login' %}">登陆</a></li>
+	<li><a href="{% url 'blogauth:userRegister' %}">注册</a></li>
+	{% endif %}
+	<li><a href="#">关于本站</a></li>
+	
+</ul>
+</div>
+{% endblock %}
+{% block content %}
+{% endblock %}

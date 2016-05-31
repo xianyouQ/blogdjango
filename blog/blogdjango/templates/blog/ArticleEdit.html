@@ -1,82 +1,23 @@
 {% extends "blog/base.html" %}
-
 {% block title %}
 {% if article.title %}
 {{ article.title }}
 {% endif %}
 {% endblock %}
 {% block jshead %}
-  {{ block.super }}
-  {% load static %}
-<script type="text/javascript" src="{% static 'blog/ueEditor/ueditor.config.js' %}"></script>
-<script type="text/javascript" src="{% static 'blog/ueEditor/ueditor.all.js' %}"></script>
-<script type="text/javascript" src="{% static 'blog/ueEditor/lang/zh-cn/zh-cn.js' %}"></script>
-<script type="text/javascript" src="{% static 'blog/js/xianyouq.js' %}"></script>
-<script type="text/javascript" src="{% static 'blog/jquery/jquery.cookie.js' %}"></script>
-<script type="text/javascript"> 
-    var editor;
-    $(document).ready(function(){
-    		editor = new UE.ui.Editor(); 
-    		editor.render("myEditor");
-	$("#editSubmit").click(function(){
-		if(!editor.hasContents())
-		{
-			alert("没有输入任何内容")
-		}
-		var article;
-		{% if article %}
-			article = {
-			"articleId":{{ article.id }},
-			"message":editor.getContent(),
-			"title":$("#editTitle").val()
-			};
-		{% else %}
-			article = {
-			"message":editor.getContent(),
-			"title":$("#editTitle").val()
-			};
-		{% endif %}
-		function csrfSafeMethod(method) {
-    			// these HTTP methods do not require CSRF protection
-   			 return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
-			}
-		$.ajax({
-			type:"POST",
-			url:"{% url 'blogdjango:addNewActicle' %}",
-			data:article,
-			dataType:"json",
-			beforeSend: function(xhr, settings) {
-				var csrftoken = $.cookie('csrftoken');
-      			if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
-          			xhr.setRequestHeader("X-CSRFToken", csrftoken);
-        				}
-        			$(this).attr({disabled:"disabled"});
-    				},
-			success: function(data, textStatus) {
-				if(data["articleId"])
-				{
-					hubSpotMessenger("success","success");
-					window.location.href="{% url 'blogdjango:selfIndex' %}";
-				}	
-				else
-				{
-					hubSpotMessenger("error","can't get id from server");
-				}
-				
-			},
-			error : function(XMLHttpRequest, textStatus, errorThrown) {
-				if (XMLHttpRequest.status == 404) {
-					hubSpotMessenger("error","can't find article");
-				} else if (XMLHttpRequest.status == 500) {
-					hubSpotMessenger("error","server error");
-		}
-		}
-		});
-		});
-	});
-</script> 
+	{{ block.super }}
+	{% load static %}
+	<link rel="stylesheet" type="text/css" href="{% static 'blog/hubspot/css/messenger-theme-future.css' %}">
+	<link rel="stylesheet" type="text/css" href="{% static 'blog/hubspot/css/messenger.css' %}">
+	<script type="text/javascript" src="{% static 'blog/ueEditor/ueditor.config.js' %}"></script>
+	<script type="text/javascript" src="{% static 'blog/ueEditor/ueditor.all.js' %}"></script>
+	<script type="text/javascript" src="{% static 'blog/ueEditor/lang/zh-cn/zh-cn.js' %}"></script>
+	<script type="text/javascript" src="{% static 'blog/js/xianyouq.js' %}"></script>
+	<script type="text/javascript" src="{% static 'blog/jquery/jquery.cookie.js' %}"></script>
+	<script type="text/javascript" src="{% static 'blog/hubspot/js/messenger.min.js' %}"></script>
+	<script type="text/javascript" src="{% static 'blog/hubspot/js/messenger-theme-future.js' %}"></script>
+	{% include "blog/EditJavaScript.html" %}
 {% endblock %}
-
 {% block content %}
 	<div class="leftcontent col-sm-12 col-md-9">
 		<div class="page-header">
@@ -96,11 +37,6 @@
 	</textarea>  
 		<input type="button"  id="editSubmit" value="提交" />
 	</div>
-
-
-
 {% endblock %}
-
 {% block footer %}
-
 {% endblock %}

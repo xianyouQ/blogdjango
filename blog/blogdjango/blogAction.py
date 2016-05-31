@@ -1,6 +1,7 @@
 # encoding=utf8
 from blogdjango.models import *
 from blog import settings
+import traceback
 
 priority = {"denied":0,"read":1,"write":2}
 

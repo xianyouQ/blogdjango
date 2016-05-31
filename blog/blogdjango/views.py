@@ -12,6 +12,9 @@ import json
 # Create your views here.
 
 
+def welcome(request):
+	return TemplateResponse(request,"blog/welcome.html",{})
+
 @account_active_required()
 def selfIndex(request):
 	mblogAction = BlogAction(request.user)
@@ -62,19 +65,18 @@ def addNewComment(request,username,acticleId):
 @csrf_protect
 @account_active_required()
 def addNewActicle(request):
-	mblogAction = BlogAction(request.user)
-	return_code = 200
-	if "articleId" in request.POST:
-		context = mblogAction.updateActicle(request.POST["title"],request.POST["articleId"],request.POST["message"],True)
+	if request.method == 'POST':
+		mblogAction = BlogAction(request.user)
+		return_code = 200
+		if "articleId" in request.POST:
+			context = mblogAction.updateActicle(request.POST["title"],request.POST["articleId"],request.POST["message"],True)
+		else:
+			context = mblogAction.addNewActicle(request.POST["title"],request.POST["message"],True)
+		if "update" in context and context["update"] == 0:
+			return_code = 404
+		if "error" in context:
+			return_code = 500
+		return HttpResponse(json.dumps(context),content_type="application/json",status=return_code)
 	else:
-		context = mblogAction.addNewActicle(request.POST["title"],request.POST["message"],True)
-	if "update" in context and context["update"] == 0:
-		return_code = 404
-	if "error" in context:
-		return_code = 500
-	return HttpResponse(json.dumps(context),content_type="application/json",status=return_code)
+		return TemplateResponse(request,"blog/ArticleEdit.html",{})
 
-	
-@account_active_required()	
-def requestEdit(request):
-	return TemplateResponse(request,"blog/ArticleEdit.html",{})

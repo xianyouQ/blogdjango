@@ -51,10 +51,20 @@ class BlogPermisson(models.Model):
 		db_table = "blog_permisson"
 		verbose_name = "博客权限"
 		ordering = ["ask_time"]
+		
+class ArticleType(models.Model): ##添加新blog的时候需要插入一个默认的博文类型
+	type_name = models.CharField(max_length=200,default="",verbose_name=u"博文类型")
+	create_time = models.DateTimeField(auto_now_add=True,verbose_name=u"类型创建日期")
+	blog = models.ForeignKey(Blog)
+	class Meta:
+		db_table = "blog_type"
+		verbose_name = "博文类型"
+		ordering = ["create_time"]
 
 class BlogText(models.Model):
 	id = models.AutoField(primary_key=True)
-	blog = models.ForeignKey(Blog)
+	blog = models.ForeignKey(Blog) ##考虑是否删除
+	article_type = models.ForeignKey(ArticleType)
 	create_time = models.DateTimeField(auto_now_add=True,verbose_name=u"文档创建日期")
 	context = models.TextField(verbose_name=u"blogText内容")
 	blog_text_title = models.CharField(max_length=400,default="",verbose_name=u"blogText名称")

@@ -1,0 +1,64 @@
+<script type="text/javascript"> 
+    var editor;
+    $(document).ready(function(){
+    		editor = new UE.ui.Editor(); 
+    		editor.render("myEditor");
+		$("#editSubmit").click(function(){
+			if(!editor.hasContents())
+			{
+				alert("没有输入任何内容")
+				return false;
+			}
+			var article;
+			{% if article %}
+				article = {
+				"articleId":{{ article.id }},
+				"message":editor.getContent(),
+				"title":$("#editTitle").val()
+				};
+			{% else %}
+				article = {
+				"message":editor.getContent(),
+				"title":$("#editTitle").val()
+				};
+			{% endif %}
+			function csrfSafeMethod(method) {
+				// these HTTP methods do not require CSRF protection
+				return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+				}
+			$.ajax({
+				type:"POST",
+				url:"{% url 'blogdjango:addNewActicle' %}",
+				data:article,
+				dataType:"json",
+				beforeSend: function(xhr, settings) {
+					var csrftoken = $.cookie('csrftoken');
+					if (!csrfSafeMethod(settings.type) && !this.crossDomain)
+						{
+						xhr.setRequestHeader("X-CSRFToken", csrftoken);
+						}
+						$(this).attr({disabled:"disabled"});
+					},
+				success: function(data, textStatus) {
+					if(data["articleId"])
+					{
+						hubSpotMessenger("success","success");
+						window.location.href="{% url 'blogdjango:selfIndex' %}";
+					}	
+					else
+					{
+						hubSpotMessenger("error","can't get id from server");
+					}
+				
+				},
+				error : function(XMLHttpRequest, textStatus, errorThrown) {
+					if (XMLHttpRequest.status == 404) {
+						hubSpotMessenger("error","can't find article");
+					} else if (XMLHttpRequest.status == 500) {
+						hubSpotMessenger("error","server error");
+					}
+				}	
+			});
+		});
+	});
+</script> 

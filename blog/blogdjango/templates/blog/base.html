@@ -4,24 +4,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" charset="utf-8">
     <meta property="wb:webmaster" content="07f2d68fd64d7cfe" />
     <title>{% block title %}{% endblock %}</title>
-    <!-- Bootstrap -->
     {% load static %}
     {% block jshead %}
     <link href="{% static 'blog/images/favicon.ico' %}" rel="SHORTCUT ICON">
     <link rel="stylesheet" href="{% static 'blog/css/font-awesome.min.css' %}" />
     <link rel="stylesheet" href="{% static 'blog/css/bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'blog/css/fengzheng.css' %}"> 
-        <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="{% static 'blog/js/jquery-1.11.0.min.js' %}"></script>
-    <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="{% static 'blog/js/bootstrap.min.js' %}"></script>
     {% endblock %}
-    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
-        <script src="/js/html5shiv.min.js"></script>
-        <script src="/js/respond.min.js"></script>
-    <![endif]-->
   </head>
   <body style="padding:50px;">
 <div class="navbar navbar-custom navbar-fixed-top">
@@ -37,26 +28,36 @@
           <a class="navbar-brand hidden-sm" href="{% url 'blogdjango:selfIndex' %}">{{blog.title}}</a>
           {% endif %}
         </div>
-
+		{% block navmenu %}
         <div class="navbar-collapse collapse" style="height: 1px;">
-        <ul class="nav navbar-nav">
+        <ul class="nav navbar-nav">	
             <li><a href="{% url 'blogdjango:selfIndex' %}">首页</a></li>
-            <li><a href="#">所有文章</a></li>
-            <li><a href="#">关于本站</a></li>
+			<li class="dropdown">
+				<a class="dropdown-toggle" data-toggle="dropdown" href="#">
+				博客文章<span class="caret"></span>
+				<ul class="dropdown-menu">
+					<li><a href="#">所有分类</a></li>
+					{% for acrticletype in acrticletypes %}
+						<li><a href="#">{{acrticletype.typename}}</a></li>
+					{% endfor %}
+				</ul>
             {% for othernvaitem in nvaitems %}
                     <li><a href="{{othernvaitem.href}}">{{othernvaitem.title}}<a></li>
             {% endfor %}
-            <li class="dropdown">
-                <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                  blog管理 <span class="caret"></span>
-                </a>
+			</ul>
+			<ul class="nav navbar-nav" style="float:right">
+				<li><a href="#">关于本站</a></li>
+				<li class="dropdown">
+					<a class="dropdown-toggle" data-toggle="dropdown" href="#">blog管理 <span class="caret"></span></a>
                 <ul class="dropdown-menu">
                     <li><a href="{% url 'blogdjango:getAskedPermission' %}">权限管理</a></li>
-                    <!--<li><a href="#">Messages</a></li> -->
+                    <li><a href="#">个人信息修改</a></li>
                 </ul>
-            </li>
-        </ul>
+				</li>
+				<li><a href="{% url 'blogauth:logout' %}">退出登录</a></li>
+			</ul>
         </div>
+		{% endblock %}
     </div>   
 </div>
     <div class="row">
@@ -64,7 +65,6 @@
     {% endblock %}
     </div>
     {% block footer %}
-    
     {% endblock %}
     
     <div class="fengzhengfooter col-sm-12 col-md-12">
@@ -75,9 +75,10 @@
 
     </div>
 
-
+{% comment %}
     <a href="#" class="btn btn-default fix-layout">
         <span class="glyphicon glyphicon-chevron-up"></span>
     </a>
+{% endcomment %}
   </body>
 </html>
