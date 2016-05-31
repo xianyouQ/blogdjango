@@ -137,15 +137,17 @@ class BlogAction:
 			acticle.context = message
 			acticle.is_publish = published
 			acticle.save()
+			context["acticleId"] = acticle.id
 		except:
 			context["error"] = "can't process request"
 		return context
 		
-	def updateActicle(self,acticleId,message=None,published=False):
+	def updateActicle(self,title,acticleId,message=None,published=False):
 		"""
 		更新文章
 		"""
 		context = {}
+		context["acticleId"] = acticleId
 		try:
 			updatenum = BlogText.objects.filter(blog__userDetail__user=self.user).filter(id=acticleId).update(context=message,is_publish=published)
 			context["update"] = updatenum

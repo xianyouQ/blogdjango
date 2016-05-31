@@ -6,11 +6,16 @@
     <title>{% block title %}{% endblock %}</title>
     <!-- Bootstrap -->
     {% load static %}
+    {% block jshead %}
     <link href="{% static 'blog/images/favicon.ico' %}" rel="SHORTCUT ICON">
     <link rel="stylesheet" href="{% static 'blog/css/font-awesome.min.css' %}" />
     <link rel="stylesheet" href="{% static 'blog/css/bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'blog/css/fengzheng.css' %}"> 
-
+        <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="{% static 'blog/js/jquery-1.11.0.min.js' %}"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="{% static 'blog/js/bootstrap.min.js' %}"></script>
+    {% endblock %}
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -70,10 +75,7 @@
 
     </div>
 
-    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="{% static 'blog/js/jquery-1.11.0.min.js' %}"></script>
-    <!-- Include all compiled plugins (below), or include individual files as needed -->
-    <script src="{% static 'blog/js/bootstrap.min.js' %}"></script>
+
     <a href="#" class="btn btn-default fix-layout">
         <span class="glyphicon glyphicon-chevron-up"></span>
     </a>

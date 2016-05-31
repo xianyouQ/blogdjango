@@ -63,15 +63,17 @@ def addNewComment(request,username,acticleId):
 @account_active_required()
 def addNewActicle(request):
 	mblogAction = BlogAction(request.user)
-	#context = mblogAction.addNewActicle() #
-	return HttpResponse("test")
+	return_code = 200
+	if "articleId" in request.POST:
+		context = mblogAction.updateActicle(request.POST["title"],request.POST["articleId"],request.POST["message"],True)
+	else:
+		context = mblogAction.addNewActicle(request.POST["title"],request.POST["message"],True)
+	if "update" in context and context["update"] == 0:
+		return_code = 404
+	if "error" in context:
+		return_code = 500
+	return HttpResponse(json.dumps(context),content_type="application/json",status=return_code)
 
-@csrf_protect
-@account_active_required()
-def updateActicle(request):
-	mblogAction = BlogAction(request.user)
-	#context = mblogAction.updateActicle()
-	return HttpResponse("test")
 	
 @account_active_required()	
 def requestEdit(request):
