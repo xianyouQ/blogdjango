@@ -28,7 +28,7 @@ def userRegister(request):
 			return TemplateResponse(request,'registration/register_done.html',{"username":user.username,"title":"Register Success"})
 	else:
 		form = UserCreationForm()
-	context = {'form': form}
-	return TemplateResponse(request,'registration/register_form.html',context)
+	context = {'form': form,"register":True}
+	return TemplateResponse(request,'blog/welcome.html',context)
 	#return render_to_response('registration/register_form.html',context,context_instance=RequestContext(request))
 	##如果使用render_to_response，就必须要加上context_instance=RequestContext(request)，跟csrf相关，具体原因还不了解
