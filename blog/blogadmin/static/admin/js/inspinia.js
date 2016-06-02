@@ -19,61 +19,17 @@ $(document).ready(function () {
     // MetsiMenu
     $('#side-menu').metisMenu();
 
-    // Collapse ibox function
-    $('.collapse-link').click(function () {
-        var ibox = $(this).closest('div.ibox');
-        var button = $(this).find('i');
-        var content = ibox.find('div.ibox-content');
-        content.slideToggle(200);
-        button.toggleClass('fa-chevron-up').toggleClass('fa-chevron-down');
-        ibox.toggleClass('').toggleClass('border-bottom');
-        setTimeout(function () {
-            ibox.resize();
-            ibox.find('[id^=map-]').resize();
-        }, 50);
-    });
-
-    // Close ibox function
-    $('.close-link').click(function () {
-        var content = $(this).closest('div.ibox');
-        content.remove();
-    });
-
-    // Fullscreen ibox function
-    $('.fullscreen-link').click(function () {
-        var ibox = $(this).closest('div.ibox');
-        var button = $(this).find('i');
-        $('body').toggleClass('fullscreen-ibox-mode');
-        button.toggleClass('fa-expand').toggleClass('fa-compress');
-        ibox.toggleClass('fullscreen');
-        setTimeout(function () {
-            $(window).trigger('resize');
-        }, 100);
-    });
 
     // Close menu in canvas mode
-    $('.close-canvas-menu').click(function () {
-        $("body").toggleClass("mini-navbar");
-        SmoothlyMenu();
-    });
 
     // Run menu of canvas
+	
     $('body.canvas-menu .sidebar-collapse').slimScroll({
         height: '100%',
         railOpacity: 0.9
     });
 
-    // Open close right sidebar
-    $('.right-sidebar-toggle').click(function () {
-        $('#right-sidebar').toggleClass('sidebar-open');
-    });
-
-    // Initialize slimscroll for right sidebar
-    $('.sidebar-container').slimScroll({
-        height: '100%',
-        railOpacity: 0.4,
-        wheelStep: 10
-    });
+	
 
     // Open close small chat
     $('.open-small-chat').click(function () {
@@ -82,26 +38,13 @@ $(document).ready(function () {
     });
 
     // Initialize slimscroll for small chat
+	
     $('.small-chat-box .content').slimScroll({
         height: '234px',
         railOpacity: 0.4
     });
-
+   
     // Small todo handler
-    $('.check-link').click(function () {
-        var button = $(this).find('i');
-        var label = $(this).next('span');
-        button.toggleClass('fa-check-square').toggleClass('fa-square-o');
-        label.toggleClass('todo-completed');
-        return false;
-    });
-
-    // Append config box / Only for demo purpose
-    // Uncomment on server mode to enable XHR calls
-    $.get("skin-config.html", function (data) {
-        if (!$('body').hasClass('no-skin-config'))
-            $('body').append(data);
-    });
 
     // Minimalize menu
     $('.navbar-minimalize').click(function () {
@@ -111,14 +54,9 @@ $(document).ready(function () {
     });
 
     // Tooltips demo
-    $('.tooltip-demo').tooltip({
-        selector: "[data-toggle=tooltip]",
-        container: "body"
-    });
 
     // Move modal to body
     // Fix Bootstrap backdrop issu with animation.css
-    $('.modal').appendTo("body");
 
     // Full height of sidebar
     function fix_height() {
@@ -173,8 +111,7 @@ $(document).ready(function () {
         }
     });
 
-    $("[data-toggle=popover]")
-        .popover();
+
 
     // Add slimscroll to element
     $('.full-height-scroll').slimscroll({
@@ -194,57 +131,7 @@ $(window).bind("resize", function () {
 
 // Local Storage functions
 // Set proper body class and plugins based on user configuration
-$(document).ready(function () {
-    if (localStorageSupport) {
 
-        var collapse = localStorage.getItem("collapse_menu");
-        var fixedsidebar = localStorage.getItem("fixedsidebar");
-        var fixednavbar = localStorage.getItem("fixednavbar");
-        var boxedlayout = localStorage.getItem("boxedlayout");
-        var fixedfooter = localStorage.getItem("fixedfooter");
-
-        var body = $('body');
-
-        if (fixedsidebar == 'on') {
-            body.addClass('fixed-sidebar');
-            $('.sidebar-collapse').slimScroll({
-                height: '100%',
-                railOpacity: 0.9
-            });
-        }
-
-        if (collapse == 'on') {
-            if (body.hasClass('fixed-sidebar')) {
-                if (!body.hasClass('body-small')) {
-                    body.addClass('mini-navbar');
-                }
-            } else {
-                if (!body.hasClass('body-small')) {
-                    body.addClass('mini-navbar');
-                }
-
-            }
-        }
-
-        if (fixednavbar == 'on') {
-            $(".navbar-static-top").removeClass('navbar-static-top').addClass('navbar-fixed-top');
-            body.addClass('fixed-nav');
-        }
-
-        if (boxedlayout == 'on') {
-            body.addClass('boxed-layout');
-        }
-
-        if (fixedfooter == 'on') {
-            $(".footer").addClass('fixed');
-        }
-    }
-});
-
-// check if browser support HTML5 local storage
-function localStorageSupport() {
-    return (('localStorage' in window) && window['localStorage'] !== null)
-}
 
 // For demo purpose - animation css script
 function animationHover(element, animation) {

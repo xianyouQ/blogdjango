@@ -6,4 +6,4 @@ from django.template.response import TemplateResponse
 @account_admin_required()
 def adminIndex(request):
 	username = request.user.username.split('@')[0]
-	return TemplateResponse(request,"admin/base.bak.html",{})
+	return TemplateResponse(request,"admin/base.html",{})

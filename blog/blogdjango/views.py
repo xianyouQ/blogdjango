@@ -78,5 +78,5 @@ def addNewActicle(request):
 			return_code = 500
 		return HttpResponse(json.dumps(context),content_type="application/json",status=return_code)
 	else:
-		return TemplateResponse(request,"blog/ArticleEdit.html",{})
+		return TemplateResponse(request,"blog/ArticleEdit.html",{"title":"haha"})
 
