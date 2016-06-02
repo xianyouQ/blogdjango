@@ -6,8 +6,8 @@
 {% block jshead %}
 	{{ block.super }}
 	<script src="http://cdn.bootcss.com/jquery-backstretch/2.0.4/jquery.backstretch.min.js"></script>
-	<link rel="stylesheet" type="text/css" href="http://www.gbtags.com/gb/networks/uploads/76bd0870-eff6-4bfd-91c9-f1aa2d2d3122/bootstrap-login-forms/form-1/assets/css/style.css" />
-	<link rel="stylesheet" type="text/css" href="http://www.gbtags.com/gb/networks/uploads/76bd0870-eff6-4bfd-91c9-f1aa2d2d3122/bootstrap-login-forms/form-1/assets/css/form-elements.css" />
+	<link rel="stylesheet" type="text/css" href="{% static 'blog/css/style.css' %}" />
+	<link rel="stylesheet" type="text/css" href="{% static 'blog/css/form-elements.css' %}" />
 	<script>
 	$(document).ready(function(){
 		$.backstretch([
@@ -25,7 +25,9 @@
 <div class="navbar-collapse collapse" style="height: 1px;">
 <ul class="nav navbar-nav navbar-right">	
 	<li><a href="#">关于本站</a></li>
-	
+	{% if user.is_authenticated %}
+	<li><a href="{% url 'blogauth:logout' %}">退出登录</a></li>
+	{% endif %}
 </ul>
 </div>
 {% endblock %}
@@ -91,6 +93,7 @@
 										<input type="hidden" name="next" value="{{ next }}" />
 			                        </div>
 			                        <button type="submit" class="btn">注册</button>
+			                        <p>已经有帐号？<a href="{% url 'blogauth:login' %}">登录</a></p>
 									{% else %}
 									<div class="form-group">
 			                        	<label class="sr-only" for="form-password">Password</label>
@@ -98,6 +101,7 @@
 										<input type="hidden" name="next" value="{{ next }}" />
 			                        </div>
 									<button type="submit" class="btn">登陆</button>
+									<p>没有帐号？<a href="{% url 'blogauth:userRegister' %}">注册</a></p>
 									{% endif %}
 			                    </form>
 		                    </div>
