@@ -18,8 +18,9 @@ def welcome(request):
 @account_active_required()
 def selfIndex(request):
 	mblogAction = BlogAction(request.user)
-	context = mblogAction.queryArticles()
-	return TemplateResponse(request,"blog/index.html",context)
+	#context = mblogAction.queryArticles()
+	context = {}
+	return TemplateResponse(request,"blog/base_nemu.html",context)
 
 @account_active_required()
 def userIndex(request,username):

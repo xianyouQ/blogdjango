@@ -17,20 +17,20 @@ $(document).ready(function () {
     }
 
     // MetsiMenu
-    $('#side-menu').metisMenu();
+    //$('#side-menu').metisMenu();
 
 
 
     // Close menu in canvas mode
 
     // Run menu of canvas
-	
+    
     $('body.canvas-menu .sidebar-collapse').slimScroll({
         height: '100%',
         railOpacity: 0.9
     });
 
-	  $('.right-sidebar-toggle').click(function () {
+      $('.right-sidebar-toggle').click(function () {
         $('#right-sidebar').toggleClass('sidebar-open');
     });
 
@@ -43,7 +43,7 @@ $(document).ready(function () {
     });
 
     // Initialize slimscroll for small chat
-	
+    
     $('.small-chat-box .content').slimScroll({
         height: '234px',
         railOpacity: 0.4
@@ -58,21 +58,12 @@ $(document).ready(function () {
 
     });
 
-        $('.check-link').click(function () {
-        var button = $(this).find('i');
-        var label = $(this).next('span');
-        button.toggleClass('fa-check-square').toggleClass('fa-square-o');
-        label.toggleClass('todo-completed');
-        return false;
-    });
-
     // Tooltips demo
 
     // Move modal to body
     // Fix Bootstrap backdrop issu with animation.css
 
     // Full height of sidebar
-       $('.modal').appendTo("body");
     function fix_height() {
         var heightWithoutNavbar = $("body > #wrapper").height() - 61;
         $(".sidebard-panel").css("min-height", heightWithoutNavbar + "px");
@@ -98,7 +89,7 @@ $(document).ready(function () {
 
     }
 
-    fix_height();
+    //fix_height();
 
     // Fixed Sidebar
     $(window).bind("load", function () {
@@ -130,20 +121,18 @@ $(document).ready(function () {
     // Add slimscroll to element
     $('.full-height-scroll').slimscroll({
         height: '100%'
-    });
+    })
+});
 
-    $(window).bind("resize", function () {
+
+// Minimalize menu when screen is less than 768px
+$(window).bind("resize", function () {
     if ($(this).width() < 769) {
         $('body').addClass('body-small')
     } else {
         $('body').removeClass('body-small')
     }
-    });
 });
-
-
-// Minimalize menu when screen is less than 768px
-
 
 // Local Storage functions
 // Set proper body class and plugins based on user configuration
@@ -185,7 +174,11 @@ function SmoothlyMenu() {
     }
 }
 
-
+function getNowtime()
+    {
+        var myDate = new Date();
+         return myDate.getDate()+"."+(myDate.getMonth()+1)+"."+myDate.getFullYear();  
+    }
 // Dragable panels
 function WinMove() {
     var element = "[class*=col]";
@@ -208,18 +201,13 @@ function WinMove() {
 
 
 function Message(type,message) {
-    toastr.options = {
-        closeButton: true,
-        progressBar: true,
-        //showMethod: 'slideDown',
-        timeOut: 1000,
-        positionClass:'toast-top-center'
-        };
-        toastr[type](message);
+                toastr.options = {
+                    closeButton: true,
+                    progressBar: true,
+                    //showMethod: 'slideDown',
+                    timeOut: 1000,
+                    positionClass:'toast-top-center'
+                };
+                toastr[type](message);
 
-    }
-function getNowtime()
-    {
-        var myDate = new Date();
-         return myDate.getDate()+"."+(myDate.getMonth()+1)+"."+myDate.getFullYear();  
-    }
+            }

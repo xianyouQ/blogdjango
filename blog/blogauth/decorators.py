@@ -10,6 +10,7 @@ from django.utils.six.moves.urllib.parse import urlparse
 from django.shortcuts import resolve_url
 from blog import settings
 from blogdjango.models import BlogPermisson
+from django.template.response import TemplateResponse
 
 def user_permisson_test(test_func=None, Login_url=None,redirect_template=None,redirect_context={},redirect_field_name=REDIRECT_FIELD_NAME,):
 	"""
@@ -37,7 +38,7 @@ def user_permisson_test(test_func=None, Login_url=None,redirect_template=None,re
 	return decorator
 
 	
-def account_active_required(redirect_template=None):
+def account_active_required(redirect_template="registration/accounts_no_active.html"):
 	"""
 	检查账号是否激活，如果没有登陆会要求登陆，如果没有会根据redirect_template返回对应页面 或者抛出PermissionDenied
 	"""

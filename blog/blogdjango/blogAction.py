@@ -98,7 +98,7 @@ class BlogAction:
 		context = {}
 		for priority,usernameList in requestContext.items():
 			try:
-				changenum = BlogPermisson.objects.filter(asked_user=self.user).filter(ask_from_user__user__name__in=usernameList).update(blog_priority=priority,need_confirm=False)
+				changenum = BlogPermisson.objects.filter(asked_user=self.user).filter(ask_from_user__user__username__in=usernameList).update(blog_priority=priority,need_confirm=False)
 				context[priority]=changenum
 			except Exception:
 				context[priority] = 0

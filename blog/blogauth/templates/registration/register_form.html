@@ -1,62 +1,73 @@
-{% extends "registration/base_site.html" %}
-{% load i18n static %}
+<!DOCTYPE html>
+<html>
 
-{% block extrastyle %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% static "registration/css/login.css" %}" />
-{{ form.media }}
-{% endblock %}
+<head>
 
-{% block bodyclass %}{{ block.super }} login{% endblock %}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-{% block usertools %}{% endblock %}
+    <title>BLOG | Register</title>
+    {% load static %}
+    <link href="http://libs.baidu.com/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
+    <link href="http://libs.baidu.com/fontawesome/4.0.3/css/font-awesome.min.css" rel="stylesheet">
+    <link href="{% static 'registration/css/iCheckcustom.css' %}" rel="stylesheet">
+    <link href="http://libs.cdnjs.net/files/toastr/2.1.2/toastr.min.css" rel="stylesheet">
+    <link href="{% static 'admin/css/animate.css' %}" rel="stylesheet">
+    <link href="{% static 'admin/css/style.css' %}" rel="stylesheet">
 
-{% block nav-global %}{% endblock %}
+    <script src="http://libs.cdnjs.net/files/jquery/2.2.4/jquery.min.js"></script>
+    <script src="http://libs.baidu.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
+    <script src="http://cdn.cdnjs.net/files/icheck/1.0.2/icheck.min.js"></script>
+    <script src="http://libs.cdnjs.net/files/toastr/2.1.2/toastr.min.js"></script>
+    <script src="{% static 'blog/js/xianyouq.js' %}"></script>
 
-{% block content_title %}{% endblock %}
+    <script type="text/javascript">
+    $(document).ready(function () {
+      {% if user.is_authenticated %}
+      Message("error","你已经以 {{ user.username }}登陆，请勿重复注册",4000);
+      {% endif %}
 
-{% block breadcrumbs %}{% endblock %}
 
-{% block content %}
-{% if form.errors and not form.non_field_errors %}
-<p class="errornote">
-{% if form.errors.items|length == 1 %}{% trans "Please correct the error below." %}{% else %}{% trans "Please correct the errors below." %}{% endif %}
-</p>
-{% endif %}
+      {% for error in errors %}
+      Message("error","{{ error }}",4000);
+      {% endfor %}
+    });
+    </script>
+</head>
 
-{% if form.non_field_errors %}
-{% for error in form.non_field_errors %}
-<p class="errornote">
-    {{ error }}
-</p>
-{% endfor %}
-{% endif %}
+<body class="gray-bg">
 
-<div id="content-main">
+    <div class="middle-box text-center loginscreen   animated fadeInDown">
+        <div>
+            <div>
 
-{% if user.is_authenticated %}
-<p class="errornote">
-{% blocktrans with username=request.user.get_username trimmed %}
-    You are authenticated as {{ username }}, no need to register a new account. 
-{% endblocktrans %}
-</p>
-{% endif %}
+                <h1 class="logo-name">BLOG</h1>
 
-<form action="{% url 'blogauth:userRegister' %}" method="post" id="login-form">{% csrf_token %}
-  <div class="form-row">
-    {{ form.username.errors }}
-    {{ form.username.label_tag }} {{ form.username }}
-  </div>
-  <div class="form-row">
-    {{ form.password1.errors }}
-    {{ form.password1.label_tag }} {{ form.password1 }}
-  </div>
-  <div class="form-row">
-    {{ form.password2.errors }}
-    {{ form.password2.label_tag }} {{ form.password2 }}
-  </div>
-  <div class="submit-row">
-    <label>&nbsp;</label><input type="submit" value="{% trans 'Register' %}" />
-  </div>
-</form>
+            </div>
+            <h3>注册BLOG</h3>
+            <p>Create account to see it in action.</p>
+            <form class="m-t" role="form" action="{% url 'blogauth:userRegister' %}" method="post">{% csrf_token %}
+                <div class="form-group">
+                    <input type="text" class="form-control" placeholder="Username" id="username" name="username">
+                </div>
+                <div class="form-group">
+                    <input type="password" class="form-control" placeholder="Password" required="" id="password1" name="password1" >
+                </div>
+                <div class="form-group">
+                    <input type="password" class="form-control" placeholder="Confirm Password" required="" id="password2" name="password2" >
+                </div>
 
-</div>
-{% endblock %}
+                <button type="submit" class="btn btn-primary block full-width m-b">注册</button>
+
+                <p class="text-muted text-center"><small>已经有帐号?</small></p>
+                <a class="btn btn-sm btn-white btn-block" href="{% url 'blogauth:login' %}">登录</a>
+            </form>
+        </div>
+    </div>
+
+    <!-- Mainly scripts -->
+    <!-- iCheck -->
+
+</body>
+
+</html>
