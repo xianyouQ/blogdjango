@@ -1,0 +1,71 @@
+{% extends 'admin/base.html' %}
+{% block content %}
+{% load static %}
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-sm-4">
+        <h2>新用户列表</h2>
+        <ol class="breadcrumb">
+            <li>
+                <a href="#">Home</a>
+            </li>
+            <li class="active">
+                <strong>userlist</strong>
+            </li>
+        </ol>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="wrapper wrapper-content animated fadeInUp">
+
+            <div class="ibox">
+
+                <div class="ibox-content">
+                    <div class="project-list">
+                        <table class="table table-hover">
+                            <tbody>
+							<tr>
+								    <th>用户名</th>
+									<th>注册时间</th>
+									<th>是否激活</th>
+							</tr>
+							{% for account in accounts %}
+                            <tr>
+                                <td class="project-title">
+                                    <a href="#">{{account.user.username}}</a>
+                                </td>
+								 <td class="project-title">
+                                    <small>{{account.create_time}}</small>
+                                </td>
+                                <td class="project-actions">
+									<div class="switch">
+										<div class="onoffswitch">
+											<input type="checkbox" class="onoffswitch-checkbox" id="{{account.user.username}}">
+											<label class="onoffswitch-label" for="{{account.user.username}}">
+												<span class="onoffswitch-inner"></span>
+												<span class="onoffswitch-switch"></span>
+											</label>
+										</div>
+									</div>
+                                </td>
+                            </tr>
+							{% endfor %}
+                            </tbody>
+                        </table>
+					</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="col-lg-12">
+    <div class="ibox float-e-margins">
+        <div class="ibox-content">
+            <div class="text-center">
+            <a data-toggle="modal" class="btn btn-primary" href="#modal-form">提交</a>
+            </div>
+		</div>
+	</div>
+</div>
+{% endblock %}

@@ -5,12 +5,15 @@
             <ul class="nav metismenu" id="side-menu">
                 <li class="nav-header">
                       <div class="logo-element">
-                         IN+
+                         BLOG
                        </div>
                  </li>
                  {% block menulist %}
                     <li class="active">
                         <a href="#"><i class="fa fa-home"></i> <span class="nav-label">首页</span> <span class="fa arrow"></span></a>
+                    </li>
+					<li>
+                        <a href="#"><i class="fa fa-file-text-o"></i> <span class="nav-label">短篇博文</span> <span class="fa arrow"></span></a>
                     </li>
                     <li>
                         <a href="#"><i class="fa fa-file-text-o"></i> <span class="nav-label">博客文章</span> <span class="fa arrow"></span></a>
@@ -18,6 +21,7 @@
                         {% for acrticletype in acrticletypes %}
                         <li><a href="#">{{acrticletype.typename}}</a></li>
                         {% endfor %}
+						<li><a href="#">新建博文</a></li>
                         </ul>
                     </li>
                     <li>
@@ -39,10 +43,13 @@
             <a class="navbar-minimalize minimalize-styl-2 btn btn-primary " href="#"><i class="fa fa-bars"></i> </a>
         </div>
             <ul class="nav navbar-top-links navbar-right">
-                <li>
-                    <span class="m-r-sm text-muted welcome-message">欢迎您，{{user.username}},</span>
-                </li>
-
+				{% if username != username %}
+				<li>
+					<a href="{% url 'blogdjango:selfIndex' %}">
+					<span class="m-r-sm text-muted">返回自己的主页</span>
+					</a>
+				</li>
+				{% endif %}
                 <li>
                     <a href="{% url 'blogauth:logout' %}">
                         <i class="fa fa-sign-out"></i> Log out
@@ -60,7 +67,6 @@
 
             <div class="heading" draggable="true">
                 <small id="chat-timer" class="chat-date pull-right">
-                    02.19.2015
                 </small>
                 聊天工具
             </div>

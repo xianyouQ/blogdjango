@@ -76,7 +76,20 @@ class BlogText(models.Model):
 		db_table = "blog_text"
 		verbose_name = "博客文档"
 		ordering = ["create_time"]
-
+		
+class ShortArticle(models.Model):
+	id = models.AutoField(primary_key=True)
+	blog = models.ForeignKey(Blog)
+	create_time = models.DateTimeField(auto_now_add=True,verbose_name=u"文档创建日期")
+	context = models.TextField(verbose_name=u"内容")
+	short_text_title = models.CharField(max_length=400,default="",verbose_name=u"名称")
+	def __unicode__(self):
+		return self.blog_text_title  
+	class Meta:
+		db_table = "short_article"
+		verbose_name = "短博文"
+		ordering = ["create_time"]
+		
 class Comment(models.Model):
 	blogtext = models.ForeignKey(BlogText)
 	parent_comment = models.ForeignKey("self",blank=True,null=True,related_name="children_comments")

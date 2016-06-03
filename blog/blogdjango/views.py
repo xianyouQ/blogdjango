@@ -12,15 +12,18 @@ import json
 # Create your views here.
 
 
-def welcome(request):
-	return TemplateResponse(request,"blog/welcome.html",{})
 
 @account_active_required()
 def selfIndex(request):
 	mblogAction = BlogAction(request.user)
 	#context = mblogAction.queryArticles()
+	firstimgs = ["http://127.0.0.1/static/blog/test.jpg","http://127.0.0.1/static/blog/test.jpg","http://127.0.0.1/static/blog/test.jpg","http://127.0.0.1/static/blog/test.jpg"]
+	secondimgs = ["http://127.0.0.1/static/blog/test.jpg","http://127.0.0.1/static/blog/test.jpg","http://127.0.0.1/static/blog/test.jpg","http://127.0.0.1/static/blog/test.jpg"]
 	context = {}
-	return TemplateResponse(request,"blog/base_nemu.html",context)
+	context["firstimgs"] = firstimgs
+	context["secondimgs"] = secondimgs
+	context["title"] = "醉饮千觞"
+	return TemplateResponse(request,"blog/index.html",context)
 
 @account_active_required()
 def userIndex(request,username):

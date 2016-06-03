@@ -1,50 +1,159 @@
-﻿{% extends "blog/base.html" %}
-{% block title %}
-Blog
-{% endblock %}
-{% block jshead %}
-	{{ block.super }}
-	 <script>
-	   $(document).ready(function(){
-		   $("#myCarousel").carousel('cycle');
-	   });
-	</script>
-{% block jshead %}
+{% extends 'blog/base_menu.html' %}
 {% block content %}
-
-<div id="myCarousel" class="leftcontent col-sm-12 col-md-9 carousel slide">
-   <div class="carousel-inner">
-   
-      <div class="active item">
-         <img src="/wp-content/uploads/2014/07/slide1.png" alt="First slide">
-      </div>
-      <div class="item">
-         <img src="/wp-content/uploads/2014/07/slide2.png" alt="Second slide">
-      </div>
-      <div class="item">
-         <img src="/wp-content/uploads/2014/07/slide3.png" alt="Third slide">
-      </div>
-   </div>
-</div>
-{ % comment %}
-<div class="leftcontent col-sm-12 col-md-9">
-	{% if error %}
-		{{error}}
-	{% else %}
-		{% include "blog/ArticleSummary.html" %}
+{% load static %}
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-sm-4">
+	{% if title%}
+        <h2>{{title}}</h2>
+		<small>诗万卷，酒千觞</small>
 	{% endif %}
-	}
+    </div>
 </div>
-{ % endcomment %}
-<div class="rightcontent col-sm-0 col-md-3">
-	<div class="bs-callout-info">所有分类</div>
-	<div class="right_classic">
-		{% include "rightNav.html" %}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>最近图片</h5>
+                <div class="ibox-tools">
+                    <a class="collapse-link">
+                        <i class="fa fa-chevron-up"></i>
+                    </a>
+                    <a class="close-link">
+                        <i class="fa fa-times"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="ibox-content">
+                <div class="carousel slide" id="carousel3">
+                    <div class="carousel-inner">
+                        <div class="item gallery active left">
+                            <div class="row">
+								{% for img in firstimgs %}
+                                <div class="col-sm-6">
+                                    <img alt="image" class="img-responsive" src="{{img}}">
+                                </div>
+								{% endfor %}
+                                
+                            </div>
+                        </div>
+                        <div class="item gallery next left">
+								{% for img in secondimgs %}
+                                <div class="col-sm-6">
+                                    <img alt="image" class="img-responsive" src="{{img}}">
+                                </div>
+								{% endfor %}
+                        </div>
+                    </div>
+                    <a data-slide="prev" href="#carousel3" class="left carousel-control">
+                        <span class="icon-prev"></span>
+                    </a>
+                    <a data-slide="next" href="#carousel3" class="right carousel-control">
+                        <span class="icon-next"></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="wrapper wrapper-content  animated fadeInRight blog">
+    <div class="row">
+	{% if not shortArticles %}
+	    <div class="col-lg-12">
+            <div class="ibox">
+			<div class="ibox-title">
+                <div class="ibox-tools">
+					<h5>最近短博文</h5>
+                    <a class="collapse-link">
+                        <i class="fa fa-chevron-up"></i>
+                    </a>
+                    <a class="close-link">
+                        <i class="fa fa-times"></i>
+                    </a>
+                </div>
+            </div>
+                <div class="ibox-content">
+                    <p>
+                        这个人很懒，暂时没有什么可以展示的
+                    </p>
+                </div>
+            </div>
+		</div>
+	{% endif %}
+	{% for shortArticle in shortArticles %}
+        <div class="col-lg-4">
+            <div class="ibox">
+			<div class="ibox-title">
+                <div class="ibox-tools">
+                    <a class="collapse-link">
+                        <i class="fa fa-chevron-up"></i>
+                    </a>
+                    <a class="close-link">
+                        <i class="fa fa-times"></i>
+                    </a>
+                </div>
+            </div>
+                <div class="ibox-content">
+                    <a href="#" class="btn-link">
+                        <h2>
+                            {{shortArticle.titile}}
+                        </h2>
+                    </a>
+                    <div class="small m-b-xs">
+                        <span class="text-muted"><i class="fa fa-clock-o"></i> {{shortArticle.create_time}}</span>
+                    </div>
+                    <p>
+                        {{shortArticle.content}}
+                    </p>
+                </div>
+            </div>
+		</div>
+	{% endfor %}
 	</div>
 </div>
-{% endblock %}
 
 
-{% block footer %}
+<div class="wrapper wrapper-content  animated fadeInRight article">
+    <div class="row">
+        <div class="col-lg-10 col-lg-offset-1">
+            <div class="ibox">
+				<div class="ibox-title">
+					<h5>最近一篇文章</h5>
+					<div class="ibox-tools">
+						<a class="collapse-link">
+							<i class="fa fa-chevron-up"></i>
+						</a>
+						<a class="close-link">
+							<i class="fa fa-times"></i>
+						</a>
+					</div>
+				</div>
+				{% if not lastArticle %}
+				<div class="ibox-content">
+					<p>
+						这个人很懒，暂时没有什么可以展示的
+					</p>
+				</div>
+				{% else %}
+                <div class="ibox-content">
+                    <div class="pull-right">
+                        <button class="btn btn-white btn-xs" type="button">{{ lastArticle.type }}</button>
+                    </div>
+                    <div class="text-center article-title">
+                    <span class="text-muted"><i class="fa fa-clock-o"></i> {{ lastArticle.create_time }}</span>
+                        <h1>
+                            {{ lastArticle.title }}
+                        </h1>
+						    {{ lastArticle.content }}
+                    </div>
+  
+                    <hr>
+                </div>
+			{% endif %}
+            </div>
+        </div>
+    </div>
 
+
+</div>
 {% endblock %}

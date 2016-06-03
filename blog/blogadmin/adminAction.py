@@ -8,7 +8,7 @@ class adminAction:
 	def __init__(self):
 		pass
 
-	def queryNeedConfirmAccounts():
+	def queryNeedConfirmAccounts(self):
 		"""
 		查询当前需要审核的帐号
 		"""
@@ -19,12 +19,7 @@ class adminAction:
 			context["error"] = "Internal Server Error"
 			return context
 		accounts = []
-		context["accounts"] = {}
-		for queryaccount in queryaccounts:
-			account = {}
-			account["username"] = queryaccount.user.username
-			account["account"] = queryaccount
-			context["accounts"].append(account)
+		context["accounts"] = queryaccounts
 		return context
 
 	def processConfirmAsk(self,requestContext):
