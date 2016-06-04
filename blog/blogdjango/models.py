@@ -84,7 +84,7 @@ class ShortArticle(models.Model):
 	context = models.TextField(verbose_name=u"内容")
 	short_text_title = models.CharField(max_length=400,default="",verbose_name=u"名称")
 	def __unicode__(self):
-		return self.blog_text_title  
+		return self.short_text_title  
 	class Meta:
 		db_table = "short_article"
 		verbose_name = "短博文"
@@ -100,6 +100,18 @@ class Comment(models.Model):
 	class Meta:
 		db_table = "blog_comment"
 		verbose_name = "博客评论"
+		ordering = ["comment_time"]
+		
+class ShortComment(models.Model):
+	shortarticle = models.ForeignKey(ShortArticle)
+	parent_comment = models.ForeignKey("self",blank=True,null=True,related_name="children_comments")
+	context = models.TextField()
+	comment_user = models.ForeignKey(UserDetail,blank=True,null=True,on_delete=models.SET_NULL)
+	comment_time = models.DateTimeField(auto_now_add=True,verbose_name=u"评论时间")
+
+	class Meta:
+		db_table = "short_comment"
+		verbose_name = "短博文评论"
 		ordering = ["comment_time"]
 		
 class Message(models.Model):

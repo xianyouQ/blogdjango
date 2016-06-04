@@ -14,9 +14,9 @@ class BlogAction:
 		self.user = user
 
 	
-	def queryArticles(self,userName=None):
+	def queryIndexData(self,userName=None):
 		"""
-		根据用户(名)获取其博客文章以及其他信息
+		根据用户(名)获取其主页数据
 		"""
 		context = {}
 		articles = []
@@ -169,4 +169,43 @@ class BlogAction:
 				return False
 		except Exception,e:
 				return False
-	
+				
+	def addNewShortArticle(self,requestContext):
+		"""
+		添加新的短博文
+		"""
+		context = {}
+		try:
+			if not requestContext["content"].strip():
+				context["code"] = 404
+				return context
+			blog = Blog.objects.get(userDetail__user=self.user)
+			mShortArticle = ShortArticle()
+			mShortArticle.blog = blog
+			mShortArticle.context = requestContext["content"]
+			mShortArticle.save()
+		except KeyError:
+			context["code"] = 400
+		except:
+			context["code"] = 500
+		context["code"] = 200
+		return  context
+		
+	def queryShortArticle(self,username=None):
+		"""
+		查询所有的短博文，后续加上分页功能
+		"""
+		context = {}
+		try:
+			if username == None:
+				shortArticles = ShortArticle.objects.filter(blog__userDetail__user=self.user)
+			else:
+				shortArticles = ShortArticle.objects.filter(blog__userDetail__user__username__exact=username)
+			context["code"] = 200
+			context["shortArticles"] = shortArticles
+			print shortArticles[0].context
+		except:
+			context["code"] = 500
+			traceback.print_exc()
+
+		return context

@@ -82,5 +82,15 @@ def addNewActicle(request):
 			return_code = 500
 		return HttpResponse(json.dumps(context),content_type="application/json",status=return_code)
 	else:
-		return TemplateResponse(request,"blog/ArticleEdit.html",{"title":"haha"})
+		return TemplateResponse(request,"blog/ArticleEditor.html",{"title":"haha"})
+		
+@account_active_required()
+def shortArticle(request):
+	mblogAction = BlogAction(request.user)
+	if request.method == 'POST':
+		context = mblogAction.addNewShortArticle(request.POST)
+		return HttpResponse(json.dumps(context),content_type="application/json",status=context["code"])
+	else:
+		context = mblogAction.queryShortArticle()
+		return TemplateResponse(request,"blog/shortArticleEditor.html",context,status=context["code"])
 

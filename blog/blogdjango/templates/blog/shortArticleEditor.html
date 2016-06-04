@@ -1,12 +1,76 @@
-{% extends 'blog/base_menu.html' %}
+﻿{% extends 'blog/base_menu.html' %}
+{% load static %}
+{% block jshead %}
+{{ block.super  }}
+<link href="http://cdn.bootcss.com/summernote/0.8.1/summernote.css" rel="stylesheet">
+
+<script src="http://cdn.bootcss.com/summernote/0.8.1/summernote.min.js"></script>
+
+<script>
+
+function saveShortArticle() 
+	{
+        var aHTML = $('.summernote').summernote('code'); //save HTML If you need(aHTML: array).
+		if(aHTML.length == 0)
+		{
+			Message("warning","您尚未输入任何内容");
+			return void(0)
+		}
+		var json = {
+		 "content":aHTML
+		}
+		$.ajax({
+		type:"POST",
+		url:"{% url 'blogdjango:shortArticle' %}",
+		data:json,
+		dataType:"json",
+		beforeSend: function(xhr, settings) {
+			var csrftoken = $.cookie('csrftoken');
+			if (!csrfSafeMethod(settings.type) && !this.crossDomain)
+				{
+				xhr.setRequestHeader("X-CSRFToken", csrftoken);
+				}
+				$(this).attr({disabled:"disabled"});
+			},
+		success: function(data, textStatus) {
+			if(data)
+			{
+				Message("success","成功提交");
+				$('.summernote').summernote('destroy');
+				$('.summernote').empty();
+			}	
+		
+		},
+		error : function(XMLHttpRequest, textStatus, errorThrown) {
+			if (XMLHttpRequest.status == 404) {
+				Message("warning","您尚未输入任何内容");
+			} else if (XMLHttpRequest.status == 500) {
+				Message("error","哎呀，服务器出错了");
+			} else if (XMLHttpRequest.status == 400) {
+				Message("error","提交的数据有错");
+			}
+		}	
+	});
+    }
+function startEditor()
+{
+	$('.summernote').summernote();
+}
+function cancel()
+{
+	$('.summernote').summernote('destroy');
+}
+</script>
+
+{% endblock %}
 {% block menulist %}
-<li class="active">
+<li>
     <a href="#"><i class="fa fa-home"></i> <span class="nav-label">首页</span> <span class="fa arrow"></span></a>
 </li>
-<li>
+<li class="active">
     <a href="#"><i class="fa fa-file-text-o"></i> <span class="nav-label">短篇博文</span> <span class="fa arrow"></span></a>
 	<ul class="nav nav-second-level collapse">
-		<li><a href="{% url 'blogdjango:shortArticle' %}">全部博文</a></li>
+		<li><a href="#">全部博文</a></li>
 	</ul>
 </li>
 <li>
@@ -27,7 +91,23 @@
 </li>
 {% endblock %}
 {% block content %}
-{% load static %}
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-lg-10">
+        <h2>Blog</h2>
+        <ol class="breadcrumb">
+            <li>
+                <a href="#">Blog</a>
+            </li>
+
+            <li class="active">
+                <strong>ShortArticle</strong>
+            </li>
+        </ol>
+    </div>
+    <div class="col-lg-2">
+
+    </div>
+</div>
 <div class="row wrapper border-bottom white-bg page-heading">
     <div class="col-sm-4">
 	{% if title%}
@@ -36,12 +116,17 @@
 	{% endif %}
     </div>
 </div>
-<div class="row">
-    <div class="col-lg-12">
+
+<div class="wrapper wrapper-content ">
+    <div class="row">
+        <div class="col-lg-12">
         <div class="ibox float-e-margins">
             <div class="ibox-title">
-                <h5>最近图片</h5>
+                <h5>新建短博文</h5>
                 <div class="ibox-tools">
+				<button id="new" class="btn btn-primary  btn-xs" onclick="startEditor()" type="button">新建</button>
+				<button id="save" class="btn btn-primary  btn-xs" onclick="saveShortArticle()" type="button">保存</button>
+				<button id="cancel" class="btn btn-primary  btn-xs" onclick="cancel()" type="button">取消</button>
                     <a class="collapse-link">
                         <i class="fa fa-chevron-up"></i>
                     </a>
@@ -50,36 +135,12 @@
                     </a>
                 </div>
             </div>
-            <div class="ibox-content">
-                <div class="carousel slide" id="carousel3">
-                    <div class="carousel-inner">
-                        <div class="item gallery active left">
-                            <div class="row">
-								{% for img in firstimgs %}
-                                <div class="col-sm-6">
-                                    <img alt="image" class="img-responsive" src="{{img}}">
-                                </div>
-								{% endfor %}
-                                
-                            </div>
-                        </div>
-                        <div class="item gallery next left">
-								{% for img in secondimgs %}
-                                <div class="col-sm-6">
-                                    <img alt="image" class="img-responsive" src="{{img}}">
-                                </div>
-								{% endfor %}
-                        </div>
-                    </div>
-                    <a data-slide="prev" href="#carousel3" class="left carousel-control">
-                        <span class="icon-prev"></span>
-                    </a>
-                    <a data-slide="next" href="#carousel3" class="right carousel-control">
-                        <span class="icon-next"></span>
-                    </a>
-                </div>
+            <div class="ibox-content no-padding summernote">
+
             </div>
+			
         </div>
+    </div>
     </div>
 </div>
 
@@ -90,7 +151,7 @@
             <div class="ibox">
 			<div class="ibox-title">
                 <div class="ibox-tools">
-					<h5>最近短博文</h5>
+					<h5>全部短博文</h5>
                     <a class="collapse-link">
                         <i class="fa fa-chevron-up"></i>
                     </a>
@@ -108,6 +169,9 @@
 		</div>
 	{% endif %}
 	{% for shortArticle in shortArticles %}
+		{% if forloop.counter0|divisibleby:"3" %}
+		<div class="row">
+		{% endif %}
         <div class="col-lg-4">
             <div class="ibox">
 			<div class="ibox-title">
@@ -124,58 +188,19 @@
                     <div class="small m-b-xs">
                         <span class="text-muted"><i class="fa fa-clock-o"></i> {{shortArticle.create_time}}</span>
                     </div>
-                    <p>
-                        {{shortArticle.content}}
-                    </p>
+                    <div>
+					{% autoescape off %} 
+                        {{shortArticle.context}}
+					{% endautoescape %}
+                    </div>
                 </div>
             </div>
 		</div>
+		{% if forloop.counter|divisibleby:"3" %}
+		</div>
+		{% endif %}
 	{% endfor %}
 	</div>
 </div>
 
-
-<div class="wrapper wrapper-content  animated fadeInRight article">
-    <div class="row">
-        <div class="col-lg-10 col-lg-offset-1">
-            <div class="ibox">
-				<div class="ibox-title">
-					<h5>最近一篇文章</h5>
-					<div class="ibox-tools">
-						<a class="collapse-link">
-							<i class="fa fa-chevron-up"></i>
-						</a>
-						<a class="close-link">
-							<i class="fa fa-times"></i>
-						</a>
-					</div>
-				</div>
-				{% if not lastArticle %}
-				<div class="ibox-content">
-					<p>
-						这个人很懒，暂时没有什么可以展示的
-					</p>
-				</div>
-				{% else %}
-                <div class="ibox-content">
-                    <div class="pull-right">
-                        <button class="btn btn-white btn-xs" type="button">{{ lastArticle.type }}</button>
-                    </div>
-                    <div class="text-center article-title">
-                    <span class="text-muted"><i class="fa fa-clock-o"></i> {{ lastArticle.create_time }}</span>
-                        <h1>
-                            {{ lastArticle.title }}
-                        </h1>
-						    {{ lastArticle.content }}
-                    </div>
-  
-                    <hr>
-                </div>
-			{% endif %}
-            </div>
-        </div>
-    </div>
-
-
-</div>
 {% endblock %}

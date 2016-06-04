@@ -22,10 +22,7 @@
 				"title":$("#editTitle").val()
 				};
 			{% endif %}
-			function csrfSafeMethod(method) {
-				// these HTTP methods do not require CSRF protection
-				return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
-				}
+
 			$.ajax({
 				type:"POST",
 				url:"{% url 'blogdjango:addNewActicle' %}",

@@ -67,10 +67,14 @@ function WinMove() {
         .disableSelection();
 }
 
-
+function csrfSafeMethod(method) {
+	// these HTTP methods do not require CSRF protection
+	return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+	}
 
 function getNowtime()
     {
         var myDate = new Date();
          return myDate.getDate()+"."+(myDate.getMonth()+1)+"."+myDate.getFullYear();  
     }
+	

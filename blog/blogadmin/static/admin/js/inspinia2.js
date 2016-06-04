@@ -176,7 +176,50 @@ $(document).ready(function () {
     // Add slimscroll to element
     $('.full-height-scroll').slimscroll({
         height: '100%'
-    })
+    });
+	$('#useractivesubmit').click(function(){
+		var obj=document.getElementsByName('useractivecheckbox');
+		var able = "";
+		var disable = ""
+		for(var i=0; i<obj.length; i++){    
+		if(obj[i].checked) able+=obj[i].value+',';
+		else {
+			disable+=obj[i].value+',';
+		}
+	} 
+	 var json = {
+		 "1":able,
+		 "0":disable,
+	 };
+	$.ajax({
+	type:"POST",
+	url:"/admin/users/",
+	data:json,
+	dataType:"json",
+	beforeSend: function(xhr, settings) {
+		var csrftoken = $.cookie('csrftoken');
+		if (!csrfSafeMethod(settings.type) && !this.crossDomain)
+			{
+			xhr.setRequestHeader("X-CSRFToken", csrftoken);
+			}
+			$(this).attr({disabled:"disabled"});
+		},
+	success: function(data, textStatus) {
+		if(data)
+		{
+			Message("success","test");
+		}	
+	
+	},
+	error : function(XMLHttpRequest, textStatus, errorThrown) {
+		if (XMLHttpRequest.status == 404) {
+			Message("error","can't find article");
+		} else if (XMLHttpRequest.status == 500) {
+			Message("error","server error");
+		}
+	}	
+});
+	});
 });
 
 

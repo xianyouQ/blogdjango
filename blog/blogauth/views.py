@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from django.template.response import TemplateResponse
 from django.shortcuts import render_to_response
 from django.contrib.auth.forms import UserCreationForm
-from blogdjango.models import UserDetail
+from blogdjango.models import UserDetail,Blog
 from django.http import HttpResponseRedirect
 from django.contrib.auth import authenticate,login
 from django.views.decorators.csrf import csrf_protect
@@ -27,6 +27,9 @@ def userRegister(request):
 			user_detail = UserDetail()
 			user_detail.user = user
 			user_detail.save()
+			new_blog = Blog()
+			new_blog.userDetail = user_detail
+			new_blog.save()
 			return TemplateResponse(request,'registration/register_done.html',{"username":user.username,"title":"Register Success"})
 		else:
 			for messagelist in json.loads(form.errors.as_json()).itervalues():

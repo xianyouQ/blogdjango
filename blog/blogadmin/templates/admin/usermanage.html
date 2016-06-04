@@ -1,4 +1,24 @@
 {% extends 'admin/base.html' %}
+{% block menulist %}
+   <li>
+       <a href="#"><i class="fa fa-th-large"></i> <span class="nav-label">主面板</span> <span class="fa arrow"></span></a>
+   </li>
+	<li class="active">
+       <a href="#"><i class="fa fa-th-large"></i> <span class="nav-label">用户管理</span> <span class="fa arrow"></span></a>
+	    <ul class="nav nav-second-level collapse">
+           <li><a href="{% url 'blogadmin:NewAccounts'%}">新用户审核</a></li>
+           <li><a href="#">被拒用户</a></li>
+		   <li><a href="#">允许用户</a></li>
+       </ul>
+   </li>
+   <li>
+       <a href="#"><i class="fa fa-bar-chart-o"></i> <span class="nav-label">站点管理</span><span class="fa arrow"></span></a>
+       <ul class="nav nav-second-level collapse">
+           <li><a href="#">欢迎界面自定义</a></li>
+           <li><a href="#">待用</a></li>
+       </ul>
+   </li>
+{% endblock %}
 {% block content %}
 {% load static %}
 <div class="row wrapper border-bottom white-bg page-heading">
@@ -41,7 +61,7 @@
                                 <td class="project-actions">
 									<div class="switch">
 										<div class="onoffswitch">
-											<input type="checkbox" class="onoffswitch-checkbox" id="{{account.user.username}}">
+											<input type="checkbox" class="onoffswitch-checkbox" id="{{account.user.username}}" value="{{account.user.username}}" name="useractivecheckbox">
 											<label class="onoffswitch-label" for="{{account.user.username}}">
 												<span class="onoffswitch-inner"></span>
 												<span class="onoffswitch-switch"></span>
@@ -63,7 +83,7 @@
     <div class="ibox float-e-margins">
         <div class="ibox-content">
             <div class="text-center">
-            <a data-toggle="modal" class="btn btn-primary" href="#modal-form">提交</a>
+            <a data-toggle="modal" class="btn btn-primary" href="#" id="useractivesubmit">提交</a>
             </div>
 		</div>
 	</div>
