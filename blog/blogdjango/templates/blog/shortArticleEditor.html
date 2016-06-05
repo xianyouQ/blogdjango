@@ -55,10 +55,12 @@ function saveShortArticle()
 function startEditor()
 {
 	$('.summernote').summernote();
+	$('#summernoteibox').removeClass('collapsed');
 }
 function cancel()
 {
 	$('.summernote').summernote('destroy');
+	$('#summernoteibox').addClass('collapsed');
 }
 </script>
 
@@ -120,7 +122,7 @@ function cancel()
 <div class="wrapper wrapper-content ">
     <div class="row">
         <div class="col-lg-12">
-        <div class="ibox float-e-margins">
+        <div class="ibox collapsed float-e-margins" id="summernoteibox">
             <div class="ibox-title">
                 <h5>新建短博文</h5>
                 <div class="ibox-tools">
@@ -136,7 +138,6 @@ function cancel()
                 </div>
             </div>
             <div class="ibox-content no-padding summernote">
-
             </div>
 			
         </div>

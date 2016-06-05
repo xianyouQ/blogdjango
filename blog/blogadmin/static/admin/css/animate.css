@@ -2846,3 +2846,11 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
     -webkit-animation-name: rollOut;
     animation-name: rollOut;
 }
+
+div.limitline {
+    position:relative;
+    line-height:1.4em;
+    /* 3 times the line-height to show 3 lines */
+    height:14em;
+    overflow:hidden;
+}

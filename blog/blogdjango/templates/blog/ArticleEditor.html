@@ -3,11 +3,15 @@
 {% block jshead %}
 {{ block.super  }}
 <link href="http://cdn.bootcss.com/summernote/0.8.1/summernote.css" rel="stylesheet">
-
 <script src="http://cdn.bootcss.com/summernote/0.8.1/summernote.min.js"></script>
 
 <script>
-
+$(document).ready(function(){
+$('.summernote').summernote({
+      height: 300,
+      prettifyHtml: false
+	  });
+});
 function saveArticle() 
 	{
         var aHTML = $('.summernote').summernote('code'); //save HTML If you need(aHTML: array).
@@ -54,12 +58,30 @@ function saveArticle()
     }
 function startEditor()
 {
-	$('.summernote').summernote();
+	$('.summernote').summernote({
+      height: 300,
+      prettifyHtml: false
+	  }
+);
+$('#summernoteibox').removeClass('collapsed');
 }
 function cancel()
 {
 	$('.summernote').summernote('destroy');
+	$('#summernoteibox').addClass('collapsed');
 }
+function toggleHide()
+{
+	$('.detail-dismiss').toggleClass('hidden');
+}
+function opendetail(ArticleId)
+{
+	toggleHide();
+	var articlecontent = $("#article_list_"+ArticleId).html();
+	$("#article_detail").html(articlecontent);
+	$("#article_detail").find("div").removeClass("limitline");
+}
+
 </script>
 
 {% endblock %}
@@ -90,6 +112,13 @@ function cancel()
     </ul>
 </li>
 {% endblock %}
+{% block searchform %}
+<form role="search" class="navbar-form-custom" action="#">
+    <div class="form-group">
+        <input type="text" placeholder="根据tag搜索文章" class="form-control" name="tag-search" id="tag-search">
+    </div>
+</form>
+{% endblock %}
 {% block content %}
 <div class="row wrapper border-bottom white-bg page-heading">
     <div class="col-lg-10">
@@ -109,13 +138,71 @@ function cancel()
     </div>
 </div>
 
-<div class="wrapper wrapper-content ">
+
+<div class="wrapper wrapper-content  animated fadeInRight article hidden detail-dismiss">
+    <div class="row">
+        <div class="col-lg-10 col-lg-offset-1">
+            <div class="ibox">
+			    <div class="ibox-tools">
+					<button id="new" class="btn btn-primary  btn-xs" onclick="toggleHide()" type="button">返回文章列表</button>
+				</div>
+                <div class="ibox-content">
+					<div id="article_detail">
+					</div>
+
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-6">
+                                <h5>Tags:</h5>
+                                <button class="btn btn-primary btn-xs" type="button">Model</button>
+                                <button class="btn btn-white btn-xs" type="button">Publishing</button>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="small text-right">
+                                <h5>Stats:</h5>
+                                <div> <i class="fa fa-comments-o"> </i> 56 comments </div>
+                                <i class="fa fa-eye"> </i> 144 views
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-lg-12">
+
+                            <h2>Comments:</h2>
+                            <div class="social-feed-box">
+                                <div class="social-avatar">
+                                    <a href="" class="pull-left">
+                                        <img alt="image" src="img/a1.jpg">
+                                    </a>
+                                    <div class="media-body">
+                                        <a href="#">
+                                            Andrew Williams
+                                        </a>
+                                        <small class="text-muted">Today 4:21 pm - 12.06.2014</small>
+                                    </div>
+                                </div>
+                                <div class="social-body">
+                                    <p>
+                                        Many desktop publishing packages and web page editors now use Lorem Ipsum as their
+                                        default model text, and a search for 'lorem ipsum' will uncover many web sites still
+                                        default model text.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="wrapper wrapper-content detail-dismiss">
     <div class="row">
         <div class="col-lg-12">
-        <div class="ibox float-e-margins">
+        <div class="ibox collapsed float-e-margins" id="summernoteibox">
             <div class="ibox-title">
                 <h5>新建博文</h5>
-				
                 <div class="ibox-tools">
 				<button id="new" class="btn btn-primary  btn-xs" onclick="startEditor()" type="button">新建</button>
 				<button id="save" class="btn btn-primary  btn-xs" onclick="saveShortArticle()" type="button">保存</button>
@@ -128,16 +215,91 @@ function cancel()
                     </a>
                 </div>
             </div>
-			<div>
-			</div>
-            <div class="ibox-content no-padding">
-				<input class="col-lg-4" type="text" id="title" placeholder="主题">
+            <div class="ibox-content no-padding">	
+				<h1 class="text-center">
+				<input class="input-large" type="text" id="blog_article_title" placeholder="请在这里输入博文标题">
+				</h1>
 				<div class="summernote">
 				</div>
+				
+			<div class="form-group col-lg-12">
+				<label for="name">日志标签</label>
+				<input class="input-xlarge" type="text" id="article_tags" placeholder="每个标签以逗号分隔">
+			</div>
             </div>
 			
         </div>
     </div>
     </div>
+</div>
+
+<div class="wrapper wrapper-content  animated fadeInRight blog detail-dismiss">
+    <div class="row">
+	{% if not Articles %}
+	    <div class="col-lg-12">
+            <div class="ibox">
+			<div class="ibox-title">
+                <div class="ibox-tools">
+					<h5>全部博文</h5>
+                    <a class="collapse-link">
+                        <i class="fa fa-chevron-up"></i>
+                    </a>
+                    <a class="close-link">
+                        <i class="fa fa-times"></i>
+                    </a>
+                </div>
+            </div>
+                <div class="ibox-content">
+
+                    <p>
+                        这个人很懒，暂时没有什么可以展示的
+                    </p>			
+
+            </div>
+			</div>
+		</div>
+	{% endif %}
+	{% for Article in Articles %}
+        <div class="col-lg-12">
+            <div class="ibox">
+			<div class="ibox-title">
+                <div class="ibox-tools">
+                    <a class="collapse-link">
+                        <i class="fa fa-chevron-up"></i>
+                    </a>
+                    <a class="close-link">
+                        <i class="fa fa-times"></i>
+                    </a>
+                </div>
+            </div>
+                <div class="ibox-content">
+							<div id="article_list_{{Article.id}}">
+                            <div class="text-center article-title">
+                            <span class="text-muted"><i class="fa fa-clock-o"></i> {{Article.create_time}}</span>
+                                <h1>
+                                    {{Article.title}}
+                                </h1>
+                            </div>
+							<div class="limitline">
+							{% autoescape off %} 
+								{{Article.context}}
+							{% endautoescape %}
+							</div>
+							</div>
+                            <hr>
+							<button id="new" class="btn btn-primary  btn-xs" onclick="opendetail({{Article.id}})" type="button">查看详情</button>
+                            <div class="row">
+                                <div class="col-md-6">
+                                        <h5>Tags:</h5>
+										{% for tag in Article.tags %}
+											<button class="btn btn-white btn-xs" type="button">{{tag}}</button>
+										{% endfor %}
+                                </div>
+                            </div>
+                </div>
+            </div>
+		</div>
+	{% endfor %}
+	</div>
 </div>
 {% endblock %}
