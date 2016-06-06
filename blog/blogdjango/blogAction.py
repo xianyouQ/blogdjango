@@ -50,12 +50,12 @@ class BlogAction:
 			elif self.blog_permission_required(priority["read"],userName):
 				comments = Comment.objects.select_related(comment_user).filter(blogtext__id__exact=acticleId).filter(blogtext__blog__userDetail__user__username__exact=userName)
 			else:
-				context["error"] = {}
-		except DoesNotExist:
-			context["error"] = "Can't get anything comments the user you asked"
-			context["err_user"] = userName
+				context["denied"] = settings.NO_PERMISSON_TO_BLOG_TEMPLATE
+			context["comment"] = comments
+		except:
+			context["code"] = 500
 			return context
-		context["comment"] = comments
+		
 		return context
 
 	def askBlogPermission(self,userName):
@@ -111,7 +111,7 @@ class BlogAction:
 
 		context = {}
 		try:
-			if not self.blog_permission_required(priority["write"],userName):
+			if not self.blog_permission_required(priority["write"],username):
 				context["denied"] = True
 				return context
 			parentComment = Comment.objects.select_related(blogtext).filter(blogtext__blog__userDetail__user__username__exact=username).get(acticleId_exact=acticleId)
