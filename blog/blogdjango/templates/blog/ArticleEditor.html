@@ -12,20 +12,27 @@ $('.summernote').summernote({
       prettifyHtml: false
 	  });
 });
-function saveArticle() 
+
+function saveArticle(is_publish,articleId) 
 	{
         var aHTML = $('.summernote').summernote('code'); //save HTML If you need(aHTML: array).
+        var json;
 		if(aHTML.length == 0)
 		{
 			Message("warning","您尚未输入任何内容");
 			return void(0)
 		}
-		var json = {
-		 "content":aHTML
-		}
+
+        json  = {
+            "content":aHTML,
+            "title":$("#blog_article_title").val(),
+            "tags":$("#article_tags").val(),
+            "articleId":articleId,
+            "is_publish":is_publish
+        } ;
 		$.ajax({
 		type:"POST",
-		url:"{% url 'blogdjango:shortArticle' %}",
+		url:"{% url 'blogdjango:addNewActicle' %}",
 		data:json,
 		dataType:"json",
 		beforeSend: function(xhr, settings) {
@@ -65,6 +72,11 @@ function startEditor()
 );
 $('#summernoteibox').removeClass('collapsed');
 }
+
+function reEditor()
+{
+
+}
 function cancel()
 {
 	$('.summernote').summernote('destroy');
@@ -80,6 +92,7 @@ function opendetail(ArticleId)
 	var articlecontent = $("#article_list_"+ArticleId).html();
 	$("#article_detail").html(articlecontent);
 	$("#article_detail").find("div").removeClass("limitline");
+    $("#article_detail").find("div").addClass("detail-content");
 }
 
 </script>
@@ -87,7 +100,7 @@ function opendetail(ArticleId)
 {% endblock %}
 {% block menulist %}
 <li>
-    <a href="#"><i class="fa fa-home"></i> <span class="nav-label">首页</span> <span class="fa arrow"></span></a>
+    <a href="{% url 'blogdjango:selfIndex' %}"><i class="fa fa-home"></i> <span class="nav-label">首页</span> <span class="fa arrow"></span></a>
 </li>
 <li>
     <a href="#"><i class="fa fa-file-text-o"></i> <span class="nav-label">短篇博文</span> <span class="fa arrow"></span></a>
@@ -98,9 +111,6 @@ function opendetail(ArticleId)
 <li class="active">
     <a href="#"><i class="fa fa-file-text-o"></i> <span class="nav-label">博客文章</span> <span class="fa arrow"></span></a>
     <ul class="nav nav-second-level collapse">
-    {% for acrticletype in acrticletypes %}
-    <li><a href="#">{{acrticletype.typename}}</a></li>
-    {% endfor %}
 	<li><a href="#">新建博文</a></li>
     </ul>
 </li>
@@ -113,7 +123,7 @@ function opendetail(ArticleId)
 </li>
 {% endblock %}
 {% block searchform %}
-<form role="search" class="navbar-form-custom" action="#">
+<form role="search" class="navbar-form-custom" action="">
     <div class="form-group">
         <input type="text" placeholder="根据tag搜索文章" class="form-control" name="tag-search" id="tag-search">
     </div>
@@ -149,27 +159,9 @@ function opendetail(ArticleId)
                 <div class="ibox-content">
 					<div id="article_detail">
 					</div>
-
-                    <hr>
-                    <div class="row">
-                        <div class="col-md-6">
-                                <h5>Tags:</h5>
-                                <button class="btn btn-primary btn-xs" type="button">Model</button>
-                                <button class="btn btn-white btn-xs" type="button">Publishing</button>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="small text-right">
-                                <h5>Stats:</h5>
-                                <div> <i class="fa fa-comments-o"> </i> 56 comments </div>
-                                <i class="fa fa-eye"> </i> 144 views
-                            </div>
-                        </div>
-                    </div>
-
                     <div class="row">
                         <div class="col-lg-12">
-
-                            <h2>Comments:</h2>
+                         <h2>Comments:</h2>
                             <div class="social-feed-box">
                                 <div class="social-avatar">
                                     <a href="" class="pull-left">
@@ -205,7 +197,8 @@ function opendetail(ArticleId)
                 <h5>新建博文</h5>
                 <div class="ibox-tools">
 				<button id="new" class="btn btn-primary  btn-xs" onclick="startEditor()" type="button">新建</button>
-				<button id="save" class="btn btn-primary  btn-xs" onclick="saveShortArticle()" type="button">保存</button>
+				<button id="save" class="btn btn-primary  btn-xs" onclick="saveArticle(is_publish=true)" type="button">保存</button>
+                    <button id="save" class="btn btn-primary  btn-xs" onclick="saveArticle(is_publish=false)" type="button">暂存</button>
 				<button id="cancel" class="btn btn-primary  btn-xs" onclick="cancel()" type="button">取消</button>
                     <a class="collapse-link">
                         <i class="fa fa-chevron-up"></i>
@@ -273,11 +266,11 @@ function opendetail(ArticleId)
                 </div>
             </div>
                 <div class="ibox-content">
-							<div id="article_list_{{Article.id}}">
+						<div id="article_list_{{Article.id}}">
                             <div class="text-center article-title">
                             <span class="text-muted"><i class="fa fa-clock-o"></i> {{Article.create_time}}</span>
                                 <h1>
-                                    {{Article.title}}
+                                    {{Article.blog_text_title}}
                                 </h1>
                             </div>
 							<div class="limitline">
@@ -285,17 +278,19 @@ function opendetail(ArticleId)
 								{{Article.context}}
 							{% endautoescape %}
 							</div>
-							</div>
+							
                             <hr>
-							<button id="new" class="btn btn-primary  btn-xs" onclick="opendetail({{Article.id}})" type="button">查看详情</button>
+							
                             <div class="row">
                                 <div class="col-md-6">
                                         <h5>Tags:</h5>
-										{% for tag in Article.tags %}
-											<button class="btn btn-white btn-xs" type="button">{{tag}}</button>
-										{% endfor %}
+                                        {% for tag in Article.gettags %}
+									<button class="btn btn-white btn-xs" type="button">{{tag}}</button>
+                                        {% endfor %}
                                 </div>
                             </div>
+                        </div>
+                        <button id="new" class="btn btn-primary  btn-xs" onclick="opendetail({{Article.id}})" type="button">查看详情</button>
                 </div>
             </div>
 		</div>

@@ -30,7 +30,7 @@ def userRegister(request):
 			new_blog = Blog()
 			new_blog.userDetail = user_detail
 			new_blog.save()
-			return TemplateResponse(request,'registration/register_done.html',{"username":user.username,"title":"Register Success"})
+			return HttpResponseRedirect("/blog/index/")
 		else:
 			for messagelist in json.loads(form.errors.as_json()).itervalues():
 				for message in messagelist:

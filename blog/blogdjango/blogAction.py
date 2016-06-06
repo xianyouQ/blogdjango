@@ -19,25 +19,24 @@ class BlogAction:
 		根据用户(名)获取其主页数据
 		"""
 		context = {}
-		articles = []
 		try:
 			if userName == None: ##获取自己的博客主页数据
-				articles = BlogText.objects.select_related('blog__userDetail').filter(blog__userDetail__user=self.user)
+				article = BlogText.objects.select_related('blog__userDetail').filter(blog__userDetail__user=self.user)[0]
+				shortArticles = ShortArticle.objects.filter(blog=article.blog)[0:5]
 			elif self.blog_permission_required(priority["read"],userName):
-				articles = BlogText.objects.select_related('blog__userDetail__user').filter(blog__userDetail__user__username__exact=userName)
+				article = BlogText.objects.select_related('blog__userDetail__user').filter(blog__userDetail__user__username__exact=userName)[0]
+				shortArticles = ShortArticle.objects.filter(blog=article.blog)[0:5]
 			else:
 				context["denied"] = settings.NO_PERMISSON_TO_BLOG_TEMPLATE
+			context["lastArticle"] = article
+			context["shortArticles"] = shortArticles
+			context["blog"] = article.blog
+			context["userDetail"] = article.blog.userDetail
+			context["code"] ="200"
 		except Exception:
-			context["error"] = "Internal Server Error"
-			context["err_user"] = userName
+			context["code"] ="500"
 			return context
-		if len(articles) > 0:
-			context["articles"] = articles
-			context["blog"] = articles[0].blog
-			context["userDetail"] = articles[0].blog.userDetail
-		else:
-			context["error"] = "can't get anything"
-			context["err_user"] = userName
+
 		return context
 		
 	def queryActicleComment(self,acticleId,userName=None):
@@ -126,35 +125,63 @@ class BlogAction:
 			context["error"] = "can't commit comment request"
 		return context
 		
-	def addNewActicle(self,title,message,published=False):
-		"""
-		添加新文章
-		"""
-		context = {}
-		try:
-			blog = Blog.objects.get(userDetail__user=self.user)
-			acticle = BlogText()
-			acticle.blog = blog
-			acticle.context = message
-			acticle.is_publish = published
-			acticle.save()
-			context["acticleId"] = acticle.id
-		except:
-			context["error"] = "can't process request"
-		return context
 		
-	def updateActicle(self,title,acticleId,message=None,published=False):
+	def updateOrCreateArticle(self,requestContext):
 		"""
 		更新文章
 		"""
 		context = {}
-		context["acticleId"] = acticleId
-		try:
-			updatenum = BlogText.objects.filter(blog__userDetail__user=self.user).filter(id=acticleId).update(context=message,is_publish=published)
-			context["update"] = updatenum
-		except:
-			context["update"] = 0
+		if not requestContext.get("content","").strip():
+			context["code"] = 404
+			return context
+		if "acticleId" in requestContext:
+			try:
+				updatenum = BlogText.objects.filter(blog__userDetail__user=self.user).filter(id=requestContext.get("acticleId")). \
+				update(context=requestContext.get("content"),is_publish=requestContext.get("is_publish",False),article_tags=requestContext.get("tags",""),blog_text_title=requestContext.get("title"))
+				if updatenum == 0:
+					context["code"] = 400
+				elif updatenum > 1:
+					context["code"] = 500
+				else:
+					context["code"] = 200
+				context["acticleId"] = requestContext.get("acticleId")
+			except:
+				context["code"] = 500
+		else:
+			try:
+				blog = Blog.objects.get(userDetail__user=self.user)
+				article = BlogText()
+				article.blog = blog
+				article.context = requestContext.get("content")
+				article.is_publish = requestContext.get("is_publish",False)
+				article.article_tags = requestContext.get("tags","")
+				article.blog_text_title = requestContext.get("title","")
+				article.save()
+				context["acticleId"] = article.id
+				context["code"] = 200
+			except:
+				context["code"] = 500
 		return context
+
+
+	def queryArticle(self,username=None,tag=""):
+		"""
+		查询文章
+		"""
+		context = {}
+		try:
+			if username == None:
+				Articles = BlogText.objects.filter(blog__userDetail__user=self.user).filter(article_tags__icontains=tag)
+			else:
+				Articles = BlogText.objects.filter(blog__userDetail__user__username__exact=username).filter(is_publish__exact=True).filter(article_tags__icontains=tag)
+			context["code"] = 200
+			context["Articles"] = Articles
+		except:
+			context["code"] = 500
+			traceback.print_exc()
+
+		return context
+
 
 	def blog_permission_required(self,permission,username):
 		"""
@@ -162,7 +189,6 @@ class BlogAction:
 		"""
 		try:
 			dbpermission = BlogPermisson.objects.filter(asked_user__user=user).filter(from_user__user__username__exact=username).values("blog_priority")
-			print len(dbpermission)
 			if len(dbpermission) > 0 and dbpermission[0] >= permission:
 				return True
 			else:
@@ -176,7 +202,7 @@ class BlogAction:
 		"""
 		context = {}
 		try:
-			if not requestContext["content"].strip():
+			if not requestContext.get("content","").strip():
 				context["code"] = 404
 				return context
 			blog = Blog.objects.get(userDetail__user=self.user)
@@ -203,9 +229,7 @@ class BlogAction:
 				shortArticles = ShortArticle.objects.filter(blog__userDetail__user__username__exact=username)
 			context["code"] = 200
 			context["shortArticles"] = shortArticles
-			print shortArticles[0].context
 		except:
 			context["code"] = 500
 			traceback.print_exc()
-
 		return context

@@ -12,10 +12,7 @@
 <li>
     <a href="#"><i class="fa fa-file-text-o"></i> <span class="nav-label">博客文章</span> <span class="fa arrow"></span></a>
     <ul class="nav nav-second-level collapse">
-    {% for acrticletype in acrticletypes %}
-    <li><a href="#">{{acrticletype.typename}}</a></li>
-    {% endfor %}
-	<li><a href="#">新建博文</a></li>
+	<li><a href="{% url 'blogdjango:addNewActicle' %}">全部博文</a></li>
     </ul>
 </li>
 <li>
@@ -30,9 +27,9 @@
 {% load static %}
 <div class="row wrapper border-bottom white-bg page-heading">
     <div class="col-sm-4">
-	{% if title%}
-        <h2>{{title}}</h2>
-		<small>诗万卷，酒千觞</small>
+	{% if blog%}
+        <h2>{{blog.blog_title}}</h2>
+		<small>{{userDetail.signature}}</small>
 	{% endif %}
     </div>
 </div>
@@ -50,27 +47,23 @@
                     </a>
                 </div>
             </div>
+            {%  if lastimgs %}
             <div class="ibox-content">
                 <div class="carousel slide" id="carousel3">
                     <div class="carousel-inner">
+                     {% for img in lastimgs %}
+                      {% if forloop.counter0|divisibleby:"4" %}
                         <div class="item gallery active left">
                             <div class="row">
-								{% for img in firstimgs %}
+                        {% endif %}
                                 <div class="col-sm-6">
                                     <img alt="image" class="img-responsive" src="{{img}}">
                                 </div>
-								{% endfor %}
-                                
+                         {% if forloop.counter|divisibleby:"4" %}
                             </div>
                         </div>
-                        <div class="item gallery next left">
-								{% for img in secondimgs %}
-                                <div class="col-sm-6">
-                                    <img alt="image" class="img-responsive" src="{{img}}">
-                                </div>
-								{% endfor %}
-                        </div>
-                    </div>
+                        {% endif %}
+                    {% endfor %}
                     <a data-slide="prev" href="#carousel3" class="left carousel-control">
                         <span class="icon-prev"></span>
                     </a>
@@ -79,6 +72,13 @@
                     </a>
                 </div>
             </div>
+            {% else %}
+            <div class="ibox-content">
+                <p>
+                        这个人很懒，暂时没有什么可以展示的
+                </p>
+            </div>
+            {% endif %}
         </div>
     </div>
 </div>
@@ -125,7 +125,7 @@
                         <span class="text-muted"><i class="fa fa-clock-o"></i> {{shortArticle.create_time}}</span>
                     </div>
                     <p>
-                        {{shortArticle.content}}
+                        {{shortArticle.context}}
                     </p>
                 </div>
             </div>
@@ -158,18 +158,24 @@
 				</div>
 				{% else %}
                 <div class="ibox-content">
-                    <div class="pull-right">
-                        <button class="btn btn-white btn-xs" type="button">{{ lastArticle.type }}</button>
-                    </div>
                     <div class="text-center article-title">
                     <span class="text-muted"><i class="fa fa-clock-o"></i> {{ lastArticle.create_time }}</span>
                         <h1>
-                            {{ lastArticle.title }}
+                              {{lastArticle.blog_text_title}}
                         </h1>
-						    {{ lastArticle.content }}
-                    </div>
-  
+                        </div>
+                        {% autoescape off %} 
+						    {{ lastArticle.context }}
+                        {% endautoescape %}
                     <hr>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Tags:</h5>
+                                {% for tag in lastArticle.gettags %}
+                                    <button class="btn btn-white btn-xs" type="button">{{tag}}</button>
+                                {% endfor %}
+                              </div>
+                     </div>               
                 </div>
 			{% endif %}
             </div>

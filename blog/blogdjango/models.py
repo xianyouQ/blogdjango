@@ -56,7 +56,7 @@ class BlogPermisson(models.Model):
 class BlogText(models.Model):
 	id = models.AutoField(primary_key=True)
 	blog = models.ForeignKey(Blog) ##考虑是否删除
-	article_type = models.CharField(max_length=400,default="",verbose_name=u"blogText tag")
+	article_tags = models.CharField(max_length=400,default="",verbose_name=u"blogText tag")
 	create_time = models.DateTimeField(auto_now_add=True,verbose_name=u"文档创建日期")
 	context = models.TextField(verbose_name=u"blogText内容")
 	blog_text_title = models.CharField(max_length=400,default="",verbose_name=u"blogText名称")
@@ -67,7 +67,10 @@ class BlogText(models.Model):
 	class Meta:
 		db_table = "blog_text"
 		verbose_name = "博客文档"
-		ordering = ["create_time"]
+		ordering = ["-create_time"]
+
+	def gettags(self):
+		return self.article_tags.split(",")
 		
 class ShortArticle(models.Model):
 	id = models.AutoField(primary_key=True)
@@ -80,7 +83,7 @@ class ShortArticle(models.Model):
 	class Meta:
 		db_table = "short_article"
 		verbose_name = "短博文"
-		ordering = ["create_time"]
+		ordering = ["-create_time"]
 		
 class Comment(models.Model):
 	blogtext = models.ForeignKey(BlogText)
@@ -116,6 +119,6 @@ class Message(models.Model):
 	class Meta:
 		db_table = "blog_message"
 		verbose_name = "聊天记录"
-		ordering = ["contact_time"]
+		ordering = ["-contact_time"]
 	
 		
