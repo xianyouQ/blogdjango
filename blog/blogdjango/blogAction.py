@@ -46,11 +46,18 @@ class BlogAction:
 		context = {}
 		try:
 			if userName == None: ##获取自己的评论
-				comments = Comment.objects.select_related(comment_user).filter(blogtext__id__exact=acticleId).filter(blogtext__blog__userDetail__user=self.user)
+				querycomments = Comment.objects.select_related(comment_user).filter(blogtext__id__exact=acticleId).filter(blogtext__blog__userDetail__user=self.user)
 			elif self.blog_permission_required(priority["read"],userName):
-				comments = Comment.objects.select_related(comment_user).filter(blogtext__id__exact=acticleId).filter(blogtext__blog__userDetail__user__username__exact=userName)
+				querycomments = Comment.objects.select_related(comment_user).filter(blogtext__id__exact=acticleId).filter(blogtext__blog__userDetail__user__username__exact=userName)
 			else:
 				context["denied"] = settings.NO_PERMISSON_TO_BLOG_TEMPLATE
+			comments = {}
+			for comment in querycomments:
+				if comment.parent_comment == None:
+					comments[comment.id] = []
+					comments[comment.id].append(comment)
+				else:
+					comments[comment.parent_comment.id].append(comment)  #是否会导致多次查询数据库
 			context["comment"] = comments
 		except:
 			context["code"] = 500
@@ -63,7 +70,7 @@ class BlogAction:
 		请求查看某个blog的权限
 		"""
 		context = {}
-		try:
+		try: 
 			userDetail = UserDetail.objects.get(user__username__exact=userName)
 			askPermisson = BlogPermisson()   ##可能需要检查是否曾经申请过
 			askPermisson.ask_from_user = self.user
@@ -81,7 +88,7 @@ class BlogAction:
 		context = {}
 		try:
 			askPermissons = BlogPermisson.objects.select_related(ask_from_user).filter(asked_user=self.user).filter(need_confirm=True)
-		except DoesNotExist:
+		except:
 			return context
 		permissions = []
 		for permission in askPermissons:
@@ -96,6 +103,7 @@ class BlogAction:
 		"""
 		context = {}
 		for priority,usernameList in requestContext.items():
+			usernameList = usernameStr.split(",")
 			try:
 				changenum = BlogPermisson.objects.filter(asked_user=self.user).filter(ask_from_user__user__username__in=usernameList).update(blog_priority=priority,need_confirm=False)
 				context[priority]=changenum
@@ -104,29 +112,47 @@ class BlogAction:
 		return context
 			
 			
-	def addNewComment(self,username=None,acticleId,message,parent_id ,requestContext):
+			
+	
+	def addNewComment(self,username=None,requestContext):
 		"""
 		添加新评论
 		"""
 
 		context = {}
 		try:
-			if userName == None: 
-				parentComment = Comment.objects.select_related(blogtext).filter(blogtext__blog__userDetail__user__exact=self.user).filter(acticleId__exact=requestContext.get(acticleId)).filter(id__exact=parent_id)[0]
-			elif self.blog_permission_required(priority["write"],username):
-				parentComment = Comment.objects.select_related(blogtext).filter(blogtext__blog__userDetail__user__username__exact=username).get(acticleId__exact=acticleId).filter(id__exact=parent_id)[0]
 			newComment = Comment()
-			newComment.blogtext = parentComment.blogtext
-			newComment.parent_comment = parentComment
-			newComment.context = message
+			if "parentId" in requestContext:
+				if userName == None: 
+					parentComment = Comment.objects.select_related(blogtext).filter(blogtext__blog__userDetail__user__exact=self.user). \
+					filter(blogtext__id__exact=requestContext.get("acticleId")).filter(id__exact=requestContext.get("parentId"))[0]
+				elif self.blog_permission_required(priority["write"],username):
+					parentComment = Comment.objects.select_related(blogtext).filter(blogtext__blog__userDetail__user__username__exact=username). \
+					get(blogtext__id__exact=requestContext.get("acticleId")).filter(id__exact=requestContext.get("parentId"))[0]
+				else:
+					context["denied"] = settings.NO_PERMISSON_TO_BLOG_TEMPLATE
+					return context
+				newComment.blogtext = parentComment.blogtext
+				newComment.parent_comment = parentComment
+				toUser =  UserDetail.objects.get(user__username__exact=requestContext.get("toUser")) #能否根据主键直接设置外键
+				newComment.comment_to_user = toUser
+			else: 
+				if userName == None:
+					blogText = BlogText.objects.filter(blog__userDetail__user__exact=self.user).filter(blogtext__id__exact=requestContext.get("acticleId"))[0]
+				else:
+					blogText = BlogText.objects.filter(blog__userDetail__user__username__exact=username).filter(blogtext__id__exact=requestContext.get("acticleId"))[0]
+				newComment.blogtext = blogText
+			newComment.context = requestContext.get("message")
 			newComment.comment_user = self.user
 			newComment.save()
-			newCommentId = newComment.id
+			context["newId"] = newComment.id
 			else:
-				context["denied"] = True
+				context["denied"] = settings.NO_PERMISSON_TO_BLOG_TEMPLATE
 				return context
+		except KeyError:
+			context["code"] = 400
 		except:
-			context["error"] = "can't commit comment request"
+			context["code"] = 500
 		return context
 		
 		

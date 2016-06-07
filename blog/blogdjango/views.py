@@ -80,6 +80,7 @@ def shortArticle(request):
 	else:
 		context = mblogAction.queryShortArticle()
 		return TemplateResponse(request,"blog/shortArticleEditor.html",context,status = context["code"])
+		
 def test(request):
 	return TemplateResponse(request,"blog/test.html")
 
