@@ -104,23 +104,27 @@ class BlogAction:
 		return context
 			
 			
-	def addNewComment(self,username,acticleId,message,parent_id):
+	def addNewComment(self,username=None,acticleId,message,parent_id ,requestContext):
 		"""
 		添加新评论
 		"""
 
 		context = {}
 		try:
-			if not self.blog_permission_required(priority["write"],username):
-				context["denied"] = True
-				return context
-			parentComment = Comment.objects.select_related(blogtext).filter(blogtext__blog__userDetail__user__username__exact=username).get(acticleId_exact=acticleId)
+			if userName == None: 
+				parentComment = Comment.objects.select_related(blogtext).filter(blogtext__blog__userDetail__user__exact=self.user).filter(acticleId__exact=requestContext.get(acticleId)).filter(id__exact=parent_id)[0]
+			elif self.blog_permission_required(priority["write"],username):
+				parentComment = Comment.objects.select_related(blogtext).filter(blogtext__blog__userDetail__user__username__exact=username).get(acticleId__exact=acticleId).filter(id__exact=parent_id)[0]
 			newComment = Comment()
 			newComment.blogtext = parentComment.blogtext
 			newComment.parent_comment = parentComment
 			newComment.context = message
 			newComment.comment_user = self.user
 			newComment.save()
+			newCommentId = newComment.id
+			else:
+				context["denied"] = True
+				return context
 		except:
 			context["error"] = "can't commit comment request"
 		return context
@@ -145,6 +149,9 @@ class BlogAction:
 				else:
 					context["code"] = 200
 				context["acticleId"] = requestContext.get("acticleId")
+			except KeyError:
+				context["code"] = 400
+				return context
 			except:
 				context["code"] = 500
 		else:
@@ -159,21 +166,26 @@ class BlogAction:
 				article.save()
 				context["acticleId"] = article.id
 				context["code"] = 200
+			except KeyError:
+				context["code"] = 400
+				return context
 			except:
 				context["code"] = 500
 		return context
 
 
-	def queryArticle(self,username=None,tag=""):
+	def queryArticle(self,username=None,tag="",echpage=5,pagenum=0):
 		"""
 		查询文章
 		"""
 		context = {}
+		NumStart = pagenum * echpage
+		NumEnd = ( pagenum + 1 ) * echpage
 		try:
 			if username == None:
-				Articles = BlogText.objects.filter(blog__userDetail__user=self.user).filter(article_tags__icontains=tag)
+				Articles = BlogText.objects.filter(blog__userDetail__user=self.user).filter(article_tags__icontains=tag)[NumStart:NumEnd]
 			else:
-				Articles = BlogText.objects.filter(blog__userDetail__user__username__exact=username).filter(is_publish__exact=True).filter(article_tags__icontains=tag)
+				Articles = BlogText.objects.filter(blog__userDetail__user__username__exact=username).filter(is_publish__exact=True).filter(article_tags__icontains=tag)[NumStart:NumEnd]
 			context["code"] = 200
 			context["Articles"] = Articles
 		except:
@@ -187,6 +199,7 @@ class BlogAction:
 		"""
 		检查对某个账户blog的访问权限，如果没有会根据redirect_template返回对应页面,或者抛出PermissionDenied
 		"""
+
 		try:
 			dbpermission = BlogPermisson.objects.filter(asked_user__user=user).filter(from_user__user__username__exact=username).values("blog_priority")
 			if len(dbpermission) > 0 and dbpermission[0] >= permission:
@@ -217,16 +230,18 @@ class BlogAction:
 		context["code"] = 200
 		return  context
 		
-	def queryShortArticle(self,username=None):
+	def queryShortArticle(self,username=None,echpage=5,pagenum=0):
 		"""
 		查询所有的短博文，后续加上分页功能
 		"""
 		context = {}
+		NumStart = pagenum * echpage
+		NumEnd = ( pagenum + 1 ) * echpage
 		try:
 			if username == None:
-				shortArticles = ShortArticle.objects.filter(blog__userDetail__user=self.user)
+				shortArticles = ShortArticle.objects.filter(blog__userDetail__user=self.user)[NumStart:NumEnd]
 			else:
-				shortArticles = ShortArticle.objects.filter(blog__userDetail__user__username__exact=username)
+				shortArticles = ShortArticle.objects.filter(blog__userDetail__user__username__exact=username)[NumStart:NumEnd]
 			context["code"] = 200
 			context["shortArticles"] = shortArticles
 		except:

@@ -86,10 +86,12 @@ class ShortArticle(models.Model):
 		ordering = ["-create_time"]
 		
 class Comment(models.Model):
+	id = models.AutoField(primary_key=True)
 	blogtext = models.ForeignKey(BlogText)
 	parent_comment = models.ForeignKey("self",blank=True,null=True,related_name="children_comments")
 	context = models.TextField()
-	comment_user = models.ForeignKey(UserDetail,blank=True,null=True,on_delete=models.SET_NULL)
+	comment_user = models.ForeignKey(UserDetail,blank=True,null=True,on_delete=models.SET_NULL,related_name="comment_from")
+	comment_to_user = models.ForeignKey(UserDetail,blank=True,null=True,on_delete=models.SET_NULL.related_name="comment_to")
 	comment_time = models.DateTimeField(auto_now_add=True,verbose_name=u"评论时间")
 
 	class Meta:
