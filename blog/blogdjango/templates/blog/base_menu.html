@@ -23,7 +23,7 @@
 		{% block searchform %}
 		{% endblock %}
             <ul class="nav navbar-top-links navbar-right">
-				{% if username != username %}
+				{% if username %}
 				<li>
 					<a href="{% url 'blogdjango:selfIndex' %}">
 					<span class="m-r-sm text-muted">返回自己的主页</span>

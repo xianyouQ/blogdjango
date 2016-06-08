@@ -6,63 +6,7 @@
 
 <script src="http://cdn.bootcss.com/summernote/0.8.1/summernote.min.js"></script>
 
-<script>
 
-function saveShortArticle() 
-	{
-        var aHTML = $('.summernote').summernote('code'); //save HTML If you need(aHTML: array).
-		if(aHTML.length == 0)
-		{
-			Message("warning","您尚未输入任何内容");
-			return void(0)
-		}
-		var json = {
-		 "content":aHTML
-		}
-		$.ajax({
-		type:"POST",
-		url:"{% url 'blogdjango:shortArticle' %}",
-		data:json,
-		dataType:"json",
-		beforeSend: function(xhr, settings) {
-			var csrftoken = $.cookie('csrftoken');
-			if (!csrfSafeMethod(settings.type) && !this.crossDomain)
-				{
-				xhr.setRequestHeader("X-CSRFToken", csrftoken);
-				}
-				$(this).attr({disabled:"disabled"});
-			},
-		success: function(data, textStatus) {
-			if(data)
-			{
-				Message("success","成功提交");
-				$('.summernote').summernote('destroy');
-				$('.summernote').empty();
-			}	
-		
-		},
-		error : function(XMLHttpRequest, textStatus, errorThrown) {
-			if (XMLHttpRequest.status == 404) {
-				Message("warning","您尚未输入任何内容");
-			} else if (XMLHttpRequest.status == 500) {
-				Message("error","哎呀，服务器出错了");
-			} else if (XMLHttpRequest.status == 400) {
-				Message("error","提交的数据有错");
-			}
-		}	
-	});
-    }
-function startEditor()
-{
-	$('.summernote').summernote({ height: 300,});
-	$('#summernoteibox').removeClass('collapsed');
-}
-function cancel()
-{
-	$('.summernote').summernote('destroy');
-	$('#summernoteibox').addClass('collapsed');
-}
-</script>
 
 {% endblock %}
 {% block menulist %}

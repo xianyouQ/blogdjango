@@ -5,86 +5,6 @@
 <link href="http://cdn.bootcss.com/summernote/0.8.1/summernote.css" rel="stylesheet">
 <script src="http://cdn.bootcss.com/summernote/0.8.1/summernote.min.js"></script>
 
-<script>
-function saveArticle(is_publish,articleId) 
-	{
-        var aHTML = $('.summernote').summernote('code'); //save HTML If you need(aHTML: array).
-        var json;
-		if(aHTML.length == 0)
-		{
-			Message("warning","您尚未输入任何内容");
-			return void(0)
-		}
-
-        json  = {
-            "content":aHTML,
-            "title":$("#blog_article_title").val(),
-            "tags":$("#article_tags").val(),
-            "articleId":articleId,
-            "is_publish":is_publish
-        } ;
-		$.ajax({
-		type:"POST",
-		url:"{% url 'blogdjango:addNewActicle' %}",
-		data:json,
-		dataType:"json",
-		beforeSend: function(xhr, settings) {
-			var csrftoken = $.cookie('csrftoken');
-			if (!csrfSafeMethod(settings.type) && !this.crossDomain)
-				{
-				xhr.setRequestHeader("X-CSRFToken", csrftoken);
-				}
-				$(this).attr({disabled:"disabled"});
-			},
-		success: function(data, textStatus) {
-			if(data)
-			{
-				Message("success","成功提交");
-				$('.summernote').summernote('destroy');
-				$('.summernote').empty();
-			}	
-		
-		},
-		error : function(XMLHttpRequest, textStatus, errorThrown) {
-			if (XMLHttpRequest.status == 404) {
-				Message("warning","您尚未输入任何内容");
-			} else if (XMLHttpRequest.status == 500) {
-				Message("error","哎呀，服务器出错了");
-			} else if (XMLHttpRequest.status == 400) {
-				Message("error","提交的数据有错");
-			}
-		}	
-	});
-    }
-function startEditor()
-{
-	$('.summernote').summernote({ height: 300,});
-    $('#summernoteibox').removeClass('collapsed');
-}
-
-function reEditor()
-{
-
-}
-function cancel()
-{
-	$('.summernote').summernote('destroy');
-	$('#summernoteibox').addClass('collapsed');
-}
-function toggleHide()
-{
-	$('.detail-dismiss').toggleClass('hidden');
-}
-function opendetail(ArticleId)
-{
-	toggleHide();
-	var articlecontent = $("#article_list_"+ArticleId).html();
-	$("#article_detail").html(articlecontent);
-	$("#article_detail").find("div").removeClass("limitline");
-    $("#article_detail").find("div").addClass("detail-content");
-}
-
-</script>
 
 {% endblock %}
 {% block menulist %}
@@ -152,33 +72,35 @@ function opendetail(ArticleId)
                        <div class="col-lg-12">
                          <h2>评论:</h2>		
 						<div class="social-feed-box hidden">
-							<div class="pull-left hidden" id="comment_template">
+							<div class="hidden comment-Template">
                                     <div class="social-avatar">
                                       <a href="" class="pull-left">
-                                         <img alt="image" src="img/a1.jpg">
+                                         <img class="user-img" alt="image" src="img/a1.jpg">
                                      </a>
                                      <div class="media-body">
-                                        <a href="#">
+                                        <a class="comment-User" href="#">
                                               Andrew Williams
                                         </a>
                                         <small class="text-muted">Today 4:21 pm - 12.06.2014</small>
+                                        <small class="commentParentId hidden"></small>
                                     </div>
                                 </div>
                                 <div class="social-body">
-                                    <p>
+                                    <p class="comment-content"> 
                                         Many desktop publishing packages and web page editors now use Lorem Ipsum as their
                                         default model text, and a search for 'lorem ipsum' will uncover many web sites still
                                         default model text.
                                     </p>
-									<button class="btn btn-primary  btn-xs"  type="button">回复</button>
+									<button class="btn btn-primary  btn-xs"  type="button" onclick="answerComment()">回复</button>
                                 </div>
 							</div>
 						</div>
 							<div class="form-group col-lg-8">
-								<textarea class="form-control" rows="1"></textarea>
+                                    <input type="hidden" name="parentId" id="commentParentId" value="undefined">
+							     <textarea class="form-control" rows="1" id="commentText" placeholder="在这里写评论"></textarea>
 							</div>
 							<div class="form-group col-lg-4">
-							<button class="btn btn-primary  btn-xs"  type="button">回复</button>
+							<button class="btn btn-primary  btn-xs" id="commitCommentBtn"  type="button">评论</button>
 							</div>
                         </div>
                     </div>
@@ -289,7 +211,11 @@ function opendetail(ArticleId)
                                 </div>
                             </div>
                         </div>
+                        {% if username %}
+                        <button id="new" class="btn btn-primary  btn-xs" onclick="opendetail({{Article.id}},{{username}})" type="button">查看详情</button>
+                        {% else %}
                         <button id="new" class="btn btn-primary  btn-xs" onclick="opendetail({{Article.id}})" type="button">查看详情</button>
+                        {% endif %}
                 </div>
             </div>
 		</div>

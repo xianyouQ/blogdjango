@@ -1,6 +1,7 @@
 # encoding=utf8
 from django.db import models
 from django.contrib.auth.models import User
+import json
 
 class UserDetail(models.Model):
 	user = models.OneToOneField(User)
@@ -19,6 +20,7 @@ class UserDetail(models.Model):
 		db_table = "user_detail"
 		verbose_name = "用户详细数据"
 		ordering = ["create_time"]
+
 
 class Blog(models.Model):
 	userDetail = models.OneToOneField(UserDetail)
@@ -91,7 +93,7 @@ class Comment(models.Model):
 	parent_comment = models.ForeignKey("self",blank=True,null=True,related_name="children_comments")
 	context = models.TextField()
 	comment_user = models.ForeignKey(UserDetail,blank=True,null=True,on_delete=models.SET_NULL,related_name="comment_from")
-	comment_to_user = models.ForeignKey(UserDetail,blank=True,null=True,on_delete=models.SET_NULL.related_name="comment_to")
+	comment_to_user = models.ForeignKey(UserDetail,blank=True,null=True,on_delete=models.SET_NULL,related_name="comment_to")
 	comment_time = models.DateTimeField(auto_now_add=True,verbose_name=u"评论时间")
 
 	class Meta:

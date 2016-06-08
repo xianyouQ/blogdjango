@@ -2,7 +2,7 @@
 from blogdjango.models import *
 from blog import settings
 import traceback
-
+from django.core.serializers import serialize
 priority = {"denied":0,"read":1,"write":2}
 
 
@@ -26,8 +26,10 @@ class BlogAction:
 			elif self.blog_permission_required(priority["read"],userName):
 				article = BlogText.objects.select_related('blog__userDetail__user').filter(blog__userDetail__user__username__exact=userName)[0]
 				shortArticles = ShortArticle.objects.filter(blog=article.blog)[0:5]
+				context["username"] = userName
 			else:
 				context["denied"] = settings.NO_PERMISSON_TO_BLOG_TEMPLATE
+				context["username"] = userName
 			context["lastArticle"] = article
 			context["shortArticles"] = shortArticles
 			context["blog"] = article.blog
@@ -39,27 +41,38 @@ class BlogAction:
 
 		return context
 		
-	def queryActicleComment(self,acticleId,userName=None):
+	def queryActicleComment(self,requestContext):
 		"""
 		根据用户(名)以及他的文章id获取评论
 		"""
 		context = {}
+		userName = requestContext.get("username",None)
 		try:
 			if userName == None: ##获取自己的评论
-				querycomments = Comment.objects.select_related(comment_user).filter(blogtext__id__exact=acticleId).filter(blogtext__blog__userDetail__user=self.user)
+				querycomments = Comment.objects.select_related("comment_user").filter(blogtext__id__exact=requestContext.get("acticleId")).filter(blogtext__blog__userDetail__user=self.user)
 			elif self.blog_permission_required(priority["read"],userName):
-				querycomments = Comment.objects.select_related(comment_user).filter(blogtext__id__exact=acticleId).filter(blogtext__blog__userDetail__user__username__exact=userName)
+				querycomments = Comment.objects.select_related("comment_user").filter(blogtext__id__exact=requestContext.get("acticleId")).filter(blogtext__blog__userDetail__user__username__exact=userName)
+				context["username"] = userName
 			else:
 				context["denied"] = settings.NO_PERMISSON_TO_BLOG_TEMPLATE
+				context["username"] = userName
 			comments = {}
 			for comment in querycomments:
 				if comment.parent_comment == None:
 					comments[comment.id] = []
-					comments[comment.id].append(comment)
+					newComment = {}
+					newComment["comment"] = serialize('json',[comment])[1:-1]
+					newComment["user"] = serialize('json',[comment.comment_user])[1:-1]
+					comments[comment.id].append(newComment)
 				else:
+					newComment = {}
+					newComment["comment"] = serialize('json',[comment])[1:-1]
+					newComment["user"] = serialize('json',[comment.comment_user])[1:-1]
 					comments[comment.parent_comment.id].append(comment)  #是否会导致多次查询数据库
 			context["comment"] = comments
+			context["code"] = 200
 		except:
+			traceback.print_exc()
 			context["code"] = 500
 			return context
 		
@@ -114,23 +127,29 @@ class BlogAction:
 			
 			
 	
-	def addNewComment(self,username=None,requestContext):
+	def addNewComment(self,requestContext):
 		"""
 		添加新评论
 		"""
 
 		context = {}
+		userName = requestContext.get("username",None)
+		if not requestContext.get("message","").strip():
+			context["code"] = 404
+			return context
 		try:
 			newComment = Comment()
 			if "parentId" in requestContext:
 				if userName == None: 
-					parentComment = Comment.objects.select_related(blogtext).filter(blogtext__blog__userDetail__user__exact=self.user). \
+					parentComment = Comment.objects.select_related("blogtext").filter(blogtext__blog__userDetail__user__exact=self.user). \
 					filter(blogtext__id__exact=requestContext.get("acticleId")).filter(id__exact=requestContext.get("parentId"))[0]
 				elif self.blog_permission_required(priority["write"],username):
-					parentComment = Comment.objects.select_related(blogtext).filter(blogtext__blog__userDetail__user__username__exact=username). \
+					parentComment = Comment.objects.select_related("blogtext").filter(blogtext__blog__userDetail__user__username__exact=username). \
 					get(blogtext__id__exact=requestContext.get("acticleId")).filter(id__exact=requestContext.get("parentId"))[0]
+					context["username"] = userName
 				else:
 					context["denied"] = settings.NO_PERMISSON_TO_BLOG_TEMPLATE
+					context["username"] = userName
 					return context
 				newComment.blogtext = parentComment.blogtext
 				newComment.parent_comment = parentComment
@@ -138,20 +157,25 @@ class BlogAction:
 				newComment.comment_to_user = toUser
 			else: 
 				if userName == None:
-					blogText = BlogText.objects.filter(blog__userDetail__user__exact=self.user).filter(blogtext__id__exact=requestContext.get("acticleId"))[0]
+					blogText = BlogText.objects.filter(blog__userDetail__user__exact=self.user).filter(id__exact=requestContext.get("acticleId"))[0]
+				elif self.blog_permission_required(priority["write"],username):
+					blogText = BlogText.objects.filter(blog__userDetail__user__username__exact=username).filter(id__exact=requestContext.get("acticleId"))[0]
+					context["username"] = username
 				else:
-					blogText = BlogText.objects.filter(blog__userDetail__user__username__exact=username).filter(blogtext__id__exact=requestContext.get("acticleId"))[0]
+					context["denied"] = settings.NO_PERMISSON_TO_BLOG_TEMPLATE
+					context["username"] = username
+					return context
 				newComment.blogtext = blogText
 			newComment.context = requestContext.get("message")
-			newComment.comment_user = self.user
+			mUserDetail = UserDetail.objects.get(user__exact=self.user)
+			newComment.comment_user = mUserDetail
 			newComment.save()
 			context["newId"] = newComment.id
-			else:
-				context["denied"] = settings.NO_PERMISSON_TO_BLOG_TEMPLATE
-				return context
+			context["code"] = 200
 		except KeyError:
 			context["code"] = 400
 		except:
+			traceback.print_exc()
 			context["code"] = 500
 		return context
 		
@@ -210,8 +234,12 @@ class BlogAction:
 		try:
 			if username == None:
 				Articles = BlogText.objects.filter(blog__userDetail__user=self.user).filter(article_tags__icontains=tag)[NumStart:NumEnd]
-			else:
+			elif self.blog_permission_required(priority["read"],userName):
 				Articles = BlogText.objects.filter(blog__userDetail__user__username__exact=username).filter(is_publish__exact=True).filter(article_tags__icontains=tag)[NumStart:NumEnd]
+				context["username"] = username
+			else:
+				context["denied"] = settings.NO_PERMISSON_TO_BLOG_TEMPLATE
+				context["username"] = username				
 			context["code"] = 200
 			context["Articles"] = Articles
 		except:
@@ -266,8 +294,12 @@ class BlogAction:
 		try:
 			if username == None:
 				shortArticles = ShortArticle.objects.filter(blog__userDetail__user=self.user)[NumStart:NumEnd]
-			else:
+			elif self.blog_permission_required(priority["read"],userName):
 				shortArticles = ShortArticle.objects.filter(blog__userDetail__user__username__exact=username)[NumStart:NumEnd]
+				context["username"] = username
+			else:
+				context["denied"] = settings.NO_PERMISSON_TO_BLOG_TEMPLATE
+				context["username"] = username	
 			context["code"] = 200
 			context["shortArticles"] = shortArticles
 		except:

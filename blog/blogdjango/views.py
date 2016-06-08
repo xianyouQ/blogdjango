@@ -9,6 +9,7 @@ from django.views.decorators.csrf import csrf_protect
 from django.template.response import TemplateResponse
 from django.core.exceptions import PermissionDenied
 import json
+
 # Create your views here.
 
 
@@ -27,12 +28,17 @@ def userIndex(request,username):
 		return TemplateResponse(request,context["denied"],context)
 	return TemplateResponse(request,"blog/index.html",context)
 
-
+@csrf_protect
 @account_active_required()
-def userComment(request,username,articalid):
+def Comment(request):
 	mblogAction = BlogAction(request.user)
-	context = mblogAction.queryActicleComment(articalid,username)
-	return HttpResponse(json.dumps(context),content_type="application/json")
+	if request.method == 'GET':
+		context = mblogAction.queryActicleComment(request.GET)
+	else:
+		context = mblogAction.addNewComment(request.POST)
+	if context.has_key("denied"):
+		return TemplateResponse(request,context["denied"],context)
+	return HttpResponse(json.dumps(context),content_type="application/json",status = context["code"])
 
 @account_active_required()	
 def askPermission(request,username):
@@ -51,13 +57,6 @@ def getAskedPermission(request):
 def processPermission(request):
 	mblogAction = BlogAction(request.user)
 	context = mblogAction.processAskedPermission(request.POST) ##POST中的部分数据，后续要改
-	return HttpResponse(json.dumps(context),content_type="application/json")
-
-@csrf_protect
-@account_active_required()
-def addNewComment(request,username,acticleId):
-	mblogAction = BlogAction(request.user)
-	context = mblogAction.processAskedPermission(username,acticleId,request.POST) ##参数要修正
 	return HttpResponse(json.dumps(context),content_type="application/json")
 
 @csrf_protect
