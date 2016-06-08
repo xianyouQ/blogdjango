@@ -49,9 +49,9 @@ class BlogAction:
 		userName = requestContext.get("username",None)
 		try:
 			if userName == None: ##获取自己的评论
-				querycomments = Comment.objects.select_related("comment_user").filter(blogtext__id__exact=requestContext.get("acticleId")).filter(blogtext__blog__userDetail__user=self.user)
+				querycomments = Comment.objects.select_related("comment_user__user").filter(blogtext__id__exact=requestContext.get("acticleId")).filter(blogtext__blog__userDetail__user=self.user)
 			elif self.blog_permission_required(priority["read"],userName):
-				querycomments = Comment.objects.select_related("comment_user").filter(blogtext__id__exact=requestContext.get("acticleId")).filter(blogtext__blog__userDetail__user__username__exact=userName)
+				querycomments = Comment.objects.select_related("comment_user__user").filter(blogtext__id__exact=requestContext.get("acticleId")).filter(blogtext__blog__userDetail__user__username__exact=userName)
 				context["username"] = userName
 			else:
 				context["denied"] = settings.NO_PERMISSON_TO_BLOG_TEMPLATE
@@ -62,13 +62,13 @@ class BlogAction:
 					comments[comment.id] = []
 					newComment = {}
 					newComment["comment"] = serialize('json',[comment])[1:-1]
-					newComment["user"] = serialize('json',[comment.comment_user])[1:-1]
+					newComment["user"] = serialize('json',[comment.comment_user.user])[1:-1]
 					comments[comment.id].append(newComment)
 				else:
 					newComment = {}
 					newComment["comment"] = serialize('json',[comment])[1:-1]
-					newComment["user"] = serialize('json',[comment.comment_user])[1:-1]
-					comments[comment.parent_comment.id].append(comment)  #是否会导致多次查询数据库
+					newComment["user"] = serialize('json',[comment.comment_user.user])[1:-1]
+					comments[comment.parent_comment.id].append(newComment)  #是否会导致多次查询数据库
 			context["comment"] = comments
 			context["code"] = 200
 		except:

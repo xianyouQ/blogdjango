@@ -139,6 +139,13 @@ function cancel()
 	$('.summernote').summernote('destroy');
 	$('#summernoteibox').addClass('collapsed');
 }
+
+function returnToArticleList()
+{
+	toggleHide();
+	$(".social-feed-box div").remove(".commentBox");
+	$(".social-feed-box").addClass("hidden");
+}
 function toggleHide()
 {
 	$('.detail-dismiss').toggleClass('hidden');
@@ -147,18 +154,29 @@ function toggleHide()
 function queryCommentSuccessHandle(data,textStatus)
 {
 	
-	var commentTemplate = $(".comment-Template").clone();
-	for (var commentParentId in data["comment"])
+	var commentTemplate = $(".comment-Template").clone(true);	
+	for (var commentParentId in data.comment)
 	{
-	 for (var commentId in data["comment"]["commentParentId"])
-	 {
-	 		 //commentTemplate.children("img.user-img").attr(data["comment"]["commentParentId"]["commentId"]["user"]["fields"]["user_img"]);
-	 		commentTemplate.children("a.comment-User").val(data["comment"]["commentParentId"]["commentId"]["user"]["fields"]["nickname"]);
-	 		commentTemplate.children("small.text-muted").val(data["comment"]["commentParentId"]["commentId"]["comment"]["fields"]["comment_time"]);
-	 		commentTemplate.children("small.commentParentId").val(commentParentId);
-	 		commentTemplate.children("p.comment-content").val(data["comment"]["commentParentId"]["commentId"]["comment"]["fields"]["context"]);
+		 $.each(data.comment[commentParentId],function(n,json){
+			var userjson = $.parseJSON(json.user);
+			var commentjson = $.parseJSON(json.comment);
+			commentTemplate.find("a.comment-User").html(userjson.fields["username"]);
+	 		commentTemplate.find("small.text-muted").html(commentjson.fields["comment_time"]);
+	 		commentTemplate.find("small.commentParentId").html(commentParentId);
+	 		commentTemplate.find("p.comment-content").html(commentjson.fields["context"]);
+			commentTemplate.find("button.answer-btn").focus(function(){
+					var username = $(this).closest(".commentBox").find(".comment-User").html();
+					var parentId = $(this).closest(".commentBox").find(".commentParentId").html();
+					$("#commentText").attr("placeholder","@" + username)
+					$("#commentText").attr("rows",3);
+					$("#commentParentId").attr("value",parentId);
+					$("#commentText").focus();
+			});
+
 	 		commentTemplate.removeClass("hidden");
-	 	if (data["comment"]["commentParentId"]["commentId"]["comment"]["pk"] == commentParentId)
+			commentTemplate.removeClass("comment-Template");
+			commentTemplate.addClass("commentBox")
+	 	if (commentjson["pk"] == commentParentId)
 	 	{
 	 		commentTemplate.addClass("pull-left");
 	 	}
@@ -166,21 +184,30 @@ function queryCommentSuccessHandle(data,textStatus)
 	 	{
 	 		commentTemplate.addClass("pull-right");
 		}
-	 	$(".social-feed-box").append(commentTemplate);
-	 }
+			$(".social-feed-box").append(commentTemplate);
+			//commentTemplate.appendTo($(".social-feed-box")); //为啥只会剩最后一个
+		 });
+		 	console.log($(".social-feed-box").html())
 	}
+	$(".social-feed-box").removeClass("hidden");
 }
 
-function answerComment()
+function commentTextfocus()
 {
-	var username = $(this).closest(".comment-Template").children(".comment-User").val();
-	var parentId = $(this).closest(".comment-Template").children(".commentParentId").val();
-	console.log(username)
-	$("#commentText").attr("placeholder","@" + username)
 	$("#commentText").attr("rows",3);
-	$("#commentParentId").attr("value",parentId)
 }
 
+function commentTextblur()
+{
+	if ($("#commentText").val().length > 0 )
+	{
+		
+		return void(0);
+	}
+	$("#commentText").attr("placeholder","在这里写评论")
+	$("#commentText").attr("rows",1);
+	$("#commentParentId").attr("value",undefined)
+}
 function commitComment(articleId,username)
 {
 	var username;

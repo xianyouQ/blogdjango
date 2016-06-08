@@ -63,7 +63,7 @@
         <div class="col-lg-10 col-lg-offset-1">
             <div class="ibox">
 			    <div class="ibox-tools">
-					<button id="new" class="btn btn-primary  btn-xs" onclick="toggleHide()" type="button">返回文章列表</button>
+					<button id="new" class="btn btn-primary  btn-xs" onclick="returnToArticleList()" type="button">返回文章列表</button>
 				</div>
                 <div class="ibox-content">
 					<div id="article_detail">
@@ -91,13 +91,13 @@
                                         default model text, and a search for 'lorem ipsum' will uncover many web sites still
                                         default model text.
                                     </p>
-									<button class="btn btn-primary  btn-xs"  type="button" onclick="answerComment()">回复</button>
+									<button class="btn btn-primary  btn-xs answer-btn"  type="button">回复</button>
                                 </div>
 							</div>
 						</div>
 							<div class="form-group col-lg-8">
                                     <input type="hidden" name="parentId" id="commentParentId" value="undefined">
-							     <textarea class="form-control" rows="1" id="commentText" placeholder="在这里写评论"></textarea>
+							     <textarea class="form-control" rows="1" id="commentText" placeholder="在这里写评论" onfocus="commentTextfocus()" onblur="commentTextblur()"></textarea>
 							</div>
 							<div class="form-group col-lg-4">
 							<button class="btn btn-primary  btn-xs" id="commitCommentBtn"  type="button">评论</button>
