@@ -21,7 +21,8 @@
     <script type="text/javascript">
     $(document).ready(function () {
       {% if user.is_authenticated %}
-      Message("error","你已经以 {{ user.username }}登陆，请勿重复登陆",4000);
+      Message("error","你已经以 {{ user.username }}登陆，系统会自动跳转到blog主页",3000);
+	  setTimeout('location.href = "/blog/index/"', 3000);
       {% endif %}
 
       {% for error in form.non_field_errors %}
@@ -66,10 +67,6 @@
                             <input type="password" class="form-control" placeholder="Password" required="" id="password" name="password" >
                         </div>
                         <button type="submit" class="btn btn-primary block full-width m-b">登录</button>
-
-                        <a href="{% url 'blogauth:password_change' %}">
-                            <small>修改密码?</small>
-                        </a>
 
                         <p class="text-muted text-center">
                             <small>没有账号?</small>

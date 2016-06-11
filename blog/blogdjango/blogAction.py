@@ -83,13 +83,16 @@ class BlogAction:
 		请求查看某个blog的权限
 		"""
 		context = {}
-		try: 
+		try:
+			if self.user.username == userName:
+				return context
 			userDetail = UserDetail.objects.get(user__username__exact=userName)
+			mUserDetail = UserDetail.objects.get(user__exact=self.user)
 			askPermisson = BlogPermisson()   ##可能需要检查是否曾经申请过
-			askPermisson.ask_from_user = self.user
+			askPermisson.ask_from_user = mUserDetail
 			askPermisson.asked_user = userDetail
 			askPermisson.save()
-		except DoesNotExist:
+		except UserDetail.DoesNotExist:
 			context["error"] = "No such User:" + userName
 			return context
 		return context

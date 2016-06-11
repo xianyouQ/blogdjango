@@ -110,8 +110,6 @@ $(document).ready(function () {
 
     });
 
-
-
     // Move modal to body
     // Fix Bootstrap backdrop issu with animation.css
     $('.modal').appendTo("body");
@@ -170,9 +168,17 @@ $(document).ready(function () {
         }
     });
 
-
-
-
+/*
+$("button.answer-btn").click(function(){
+	console.log("haha");
+	var username = $(this).closest("div.commentBox").find("a.comment-User").html();
+	var parentId = $(this).closest("div.commentBox").find("small.commentParentId").html();
+	$("#commentText").attr("placeholder","@" + username);
+	$("#commentText").attr("rows",3);
+	$("#commentParentId").attr("value",parentId);
+	$("#commentText").focus();
+}); 
+*/
     // Add slimscroll to element
     $('.full-height-scroll').slimscroll({
         height: '100%'
@@ -220,23 +226,8 @@ $(document).ready(function () {
 	}	
 });
 	});
-});
-
-
-// Minimalize menu when screen is less than 768px
-$(window).bind("resize", function () {
-    if ($(this).width() < 769) {
-        $('body').addClass('body-small')
-    } else {
-        $('body').removeClass('body-small')
-    }
-});
-
-// Local Storage functions
-// Set proper body class and plugins based on user configuration
-$(document).ready(function () {
-    if (localStorageSupport) {
-
+	
+if (localStorageSupport) {
         var collapse = localStorage.getItem("collapse_menu");
         var fixedsidebar = localStorage.getItem("fixedsidebar");
         var fixednavbar = localStorage.getItem("fixednavbar");
@@ -280,4 +271,18 @@ $(document).ready(function () {
         }
     }
 });
+
+
+// Minimalize menu when screen is less than 768px
+$(window).bind("resize", function () {
+    if ($(this).width() < 769) {
+        $('body').addClass('body-small')
+    } else {
+        $('body').removeClass('body-small')
+    }
+});
+
+// Local Storage functions
+// Set proper body class and plugins based on user configuration
+
 

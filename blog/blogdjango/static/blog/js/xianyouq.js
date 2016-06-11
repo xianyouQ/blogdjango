@@ -72,6 +72,40 @@ function csrfSafeMethod(method) {
 	return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
 	}
 
+	
+function sendFile(file, editor, $editable){
+	var filename = false;
+	try{
+		filename = file['name'];
+	} catch(e){filename = false;}
+	if(!filename){}
+	var ext = filename.substr(filename.lastIndexOf("."));
+	ext = ext.toUpperCase();
+	var timestamp = new Date().getTime();
+	var name = timestamp+"_"+$("#summernote").attr('aid')+ext;
+	data = new FormData();
+	data.append("file", file);
+	data.append("key",name);
+	data.append("token",$("#summernote").attr('token'));
+	$.ajax({
+		data: data,
+		type: "POST",
+		url: "http://upload.qiniu.com",
+		cache: false,
+		contentType: false,
+		processData: false,
+		success: function(data) {
+		editor.insertImage($editable, $("#summernote").attr('url-head')+data['key']);
+	
+			$(".note-alarm").html("上传成功,请等待加载");
+		setTimeout(function(){$(".note-alarm").remove();},3000);
+			},
+		error:function(){
+			$(".note-alarm").html("上传失败");
+			setTimeout(function(){$(".note-alarm").remove();},3000);
+			}
+		});
+	}
 function getNowtime()
     {
         var myDate = new Date();
@@ -151,10 +185,11 @@ function toggleHide()
 	$('.detail-dismiss').toggleClass('hidden');
 }
 
+/*
 function queryCommentSuccessHandle(data,textStatus)
 {
 	
-	var commentTemplate = $(".comment-Template").clone(true);	
+	var commentTemplate = $(".comment-template").clone(true);	
 	for (var commentParentId in data.comment)
 	{
 		 $.each(data.comment[commentParentId],function(n,json){
@@ -174,23 +209,74 @@ function queryCommentSuccessHandle(data,textStatus)
 			});
 
 	 		commentTemplate.removeClass("hidden");
-			commentTemplate.removeClass("comment-Template");
+			commentTemplate.removeClass("comment-template");
 			commentTemplate.addClass("commentBox")
 	 	if (commentjson["pk"] == commentParentId)
 	 	{
+			commentTemplate.removeClass("pull-right");
 	 		commentTemplate.addClass("pull-left");
 	 	}
 	 	else
 	 	{
+			commentTemplate.removeClass("pull-left");
 	 		commentTemplate.addClass("pull-right");
 		}
 			$(".social-feed-box").append(commentTemplate);
+			console.log($(".social-feed-box").html());
 			//commentTemplate.appendTo($(".social-feed-box")); //为啥只会剩最后一个
 		 });
-		 	console.log($(".social-feed-box").html())
+		 	
 	}
 	$(".social-feed-box").removeClass("hidden");
 }
+*/
+
+function queryCommentSuccessHandle(data,textStatus)
+{
+	
+	var commentTemplate = $(".social-feed-box").clone(true);
+	var commentStr="";
+	for (var commentParentId in data.comment)
+	{
+		
+		 $.each(data.comment[commentParentId],function(n,json){
+			var userjson = $.parseJSON(json.user);
+			var commentjson = $.parseJSON(json.comment);
+			commentTemplate.find("a.comment-User").html(userjson.fields["username"]);
+	 		commentTemplate.find("small.text-muted").html(commentjson.fields["comment_time"]);
+	 		commentTemplate.find("small.commentParentId").html(commentParentId);
+	 		commentTemplate.find("p.comment-content").html(commentjson.fields["context"]);
+
+	 		commentTemplate.children().removeClass("hidden");
+			commentTemplate.children().addClass("commentBox")
+	 	if (commentjson["pk"] == commentParentId)
+	 	{
+			commentTemplate.children().removeClass("pull-right");
+	 		commentTemplate.children().addClass("pull-left");
+	 	}
+	 	else
+	 	{
+			commentTemplate.children().removeClass("pull-left");
+	 		commentTemplate.children().addClass("pull-right");
+		}	
+			commentStr = commentStr + commentTemplate.html();
+		 });
+	}
+	$(".social-feed-box").append(commentStr);
+	$(".social-feed-box").removeClass("hidden");
+		
+	$(".social-feed-box").find("button.answer-btn").click(function(){
+		
+			var username = $(this).closest("div.commentBox").find("a.comment-User").html();
+			var parentId = $(this).closest("div.commentBox").find("small.commentParentId").html();
+			$("#commentText").attr("placeholder","@" + username);
+			$("#commentText").attr("rows",3);
+			$("#commentParentId").attr("value",parentId);
+			$("#commentText").focus();
+	}); 
+			
+}
+
 
 function commentTextfocus()
 {
@@ -282,7 +368,7 @@ function saveArticle(is_publish,articleId)
             "articleId":articleId,
             "is_publish":is_publish
         } ;
-        commitJson(ArticleSuccessHandle,ArticleErrorHandle,json,"/blog/addNewActicle/","POST");
+        commitJson(ArticleSuccessHandle,ArticleErrorHandle,json,"/blog/article/","POST");
  }
  function saveShortArticle() 
 	{
