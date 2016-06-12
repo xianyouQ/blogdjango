@@ -85,16 +85,28 @@ class BlogAction:
 		context = {}
 		try:
 			if self.user.username == userName:
+				context["code"] = 400
 				return context
 			userDetail = UserDetail.objects.get(user__username__exact=userName)
 			mUserDetail = UserDetail.objects.get(user__exact=self.user)
-			askPermisson = BlogPermisson()   ##可能需要检查是否曾经申请过
-			askPermisson.ask_from_user = mUserDetail
-			askPermisson.asked_user = userDetail
-			askPermisson.save()
+			askPermisson,created = BlogPermisson.objects.get_or_create(ask_from_user__exact=mUserDetail,asked_user__exact=userDetail)
+			'''
+			try:
+				askPermisson = BlogPermisson.objects.get(ask_from_user__exact=mUserDetail,asked_user__exact=userDetail)
+			except BlogPermisson.DoesNotExist:
+				askPermisson = BlogPermisson(ask_from_user__exact=mUserDetail,asked_user__exact=userDetail）
+				askPermisson.save()
+			'''
+			if created == False and askPermisson.need_confirm == False and askPermisson.blog_priority == priority["denied"]:
+				context["code"] = 403
 		except UserDetail.DoesNotExist:
-			context["error"] = "No such User:" + userName
+			context["code"] = 404
 			return context
+		except:
+			context["code"] = 500
+			traceback.print_exc()
+			return context
+		context["code"] = 200
 		return context
 		
 	def queryAskedPermission(self):
@@ -103,13 +115,14 @@ class BlogAction:
 		"""
 		context = {}
 		try:
-			askPermissons = BlogPermisson.objects.select_related(ask_from_user).filter(asked_user=self.user).filter(need_confirm=True)
+			mUserDetail = UserDetail.objects.get(user__exact=self.user)
+			askPermissons = BlogPermisson.objects.select_related("ask_from_user__user").filter(asked_user=mUserDetail).filter(need_confirm=True)
 		except:
+			traceback.print_exc()
+			context["code"] = 500
 			return context
-		permissions = []
-		for permission in askPermissons:
-			permissions.append(permission.ask_from_user)
-		context["permisson"] = permissions
+		context["permissons"] = askPermissons
+		context["code"] = 200
 		return context
 		
 		

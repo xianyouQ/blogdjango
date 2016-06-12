@@ -9,5 +9,5 @@ urlpatterns = [
 	url(r'^user/(?P<username>[a-zA-Z0-9]+)/permission/',views.askPermission),
 	url(r'^article/$',views.addNewActicle,name="addNewActicle"),
 	url(r'^shortArticle/$',views.shortArticle,name="shortArticle"),
-	url(r'^permission/$',views.getAskedPermission,name="getAskedPermission")
+	url(r'^permission/$',views.processPermission,name="processPermission")
 ]

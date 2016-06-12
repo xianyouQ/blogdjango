@@ -10,11 +10,43 @@
     {% load static %}
     <link href="http://libs.baidu.com/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
     <link href="http://libs.baidu.com/fontawesome/4.0.3/css/font-awesome.min.css" rel="stylesheet">
+    <link href="http://libs.cdnjs.net/files/toastr/2.1.2/toastr.min.css" rel="stylesheet">
 
     <link href="{% static 'admin/css/animate.css' %}" rel="stylesheet">
     <link href="{% static 'admin/css/style.css' %}" rel="stylesheet">
     <script src="http://libs.cdnjs.net/files/jquery/2.2.4/jquery.min.js"></script>
     <script src="http://libs.baidu.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
+    <script src="http://libs.baidu.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
+    <script src="http://libs.cdnjs.net/files/jquery.cookie/1.4.1/jquery.cookie.min.js"></script>
+    <script src="http://libs.cdnjs.net/files/toastr/2.1.2/toastr.min.js"></script>
+    <script src="{% static 'blog/js/xianyouq.js' %}"></script>
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $("#permissionCommit").click(function(){
+                function commitSuccess(data,textStatus)
+                {
+                    if(data)
+                     {
+                    Message("success","成功提交申请");
+                    }   
+                }
+                function commitError(XMLHttpRequest, textStatus, errorThrown)
+                {
+                if (XMLHttpRequest.status == 404) {
+                    Message("warning","您申请查看的用户不存在");
+                } else if (XMLHttpRequest.status == 500) {
+                   Message("error","哎呀，服务器出错了");
+                } else if (XMLHttpRequest.status == 400) {
+                 Message("error","提交的数据有错");
+                }else if (XMLHttpRequest.status == 403) {
+                 Message("error","您之前已经申请过但是被对方拒绝，不能继续申请");
+                   }
+                }
+                var json = {};
+                commitJson(commitSuccess,commitError,json,"/blog/user/{{username}}/permission/","GET");
+            });
+        });
+    </script>
 </head>
 
 <body class="gray-bg">
@@ -26,7 +58,7 @@
 
         <div class="error-desc">
             对不起，您的帐号没有足够的权限查看{{username}}的blog<br/>
-            你可以通过这个按钮向对方申请权限 <br/><a href="/blog/user/{{username}}/permission/" class="btn btn-primary m-t">权限申请</a>
+            你可以通过这个按钮向对方申请权限 <br/><a href="#" id="permissionCommit" class="btn btn-primary m-t">权限申请</a>
         </div>
     </div>
 

@@ -317,7 +317,6 @@ function commitComment(articleId,username)
 	{
 		var parentId = $("#commentParentId").attr("value");
 		toUser = placeholder.split("@")[1];
-		console.log(toUser);
 		json = {
 			"username":username,
 			"acticleId":articleId,

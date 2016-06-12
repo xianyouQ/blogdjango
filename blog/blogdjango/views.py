@@ -44,20 +44,18 @@ def Comment(request):
 def askPermission(request,username):
 	mblogAction = BlogAction(request.user)
 	context = mblogAction.askBlogPermission(username)
-	return HttpResponse(json.dumps(context),content_type="application/json")
-
-@account_active_required()
-def getAskedPermission(request):
-	mblogAction = BlogAction(request.user)
-	context = mblogAction.queryAskedPermission()
-	return HttpResponse(request,"",context)
+	return HttpResponse(json.dumps(context),content_type="application/json",status = context["code"])
 
 @csrf_protect
 @account_active_required()
 def processPermission(request):
 	mblogAction = BlogAction(request.user)
-	context = mblogAction.processAskedPermission(request.POST) ##POST中的部分数据，后续要改
-	return HttpResponse(json.dumps(context),content_type="application/json")
+	if request.method == 'GET':
+		context = mblogAction.queryAskedPermission()
+	else:
+		context = mblogAction.processAskedPermission(request.POST)
+		return HttpResponse(json.dumps(context),content_type="application/json",status = context["code"])
+	return TemplateResponse(request,"blog/Permission.html",context,status = context["code"])
 
 @csrf_protect
 @account_active_required()
