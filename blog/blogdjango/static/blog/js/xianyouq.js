@@ -120,12 +120,15 @@ function commitJson(successHandle,errorHandle,json,url,method)
 		data:json,
 		dataType:"json",
 		beforeSend: function(xhr, settings) {
+			if(method == "POST")
+			{
 			var csrftoken = $.cookie('csrftoken');
 			if (!csrfSafeMethod(settings.type) && !this.crossDomain)
 				{
 				xhr.setRequestHeader("X-CSRFToken", csrftoken);
 				}
-				$(this).attr({disabled:"disabled"});
+			}
+				//$(this).attr({disabled:"disabled"});
 			},
 		success: function(data, textStatus) {
 			successHandle(data,textStatus);

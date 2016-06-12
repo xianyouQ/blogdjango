@@ -24,7 +24,7 @@ class BlogAction:
 				article = BlogText.objects.select_related('blog__userDetail').filter(blog__userDetail__user=self.user)[0]
 				shortArticles = ShortArticle.objects.filter(blog=article.blog)[0:5]
 			elif self.blog_permission_required(priority["read"],userName):
-				article = BlogText.objects.select_related('blog__userDetail__user').filter(blog__userDetail__user__username__exact=userName)[0]
+				article = BlogText.objects.select_related('blog__userDetail__user').filter(blog__userDetail__user__username__exact=userName,is_publish=True)[0]
 				shortArticles = ShortArticle.objects.filter(blog=article.blog)[0:5]
 				context["username"] = userName
 			else:
@@ -88,17 +88,16 @@ class BlogAction:
 				context["code"] = 400
 				return context
 			userDetail = UserDetail.objects.get(user__username__exact=userName)
-			mUserDetail = UserDetail.objects.get(user__exact=self.user)
-			askPermisson,created = BlogPermisson.objects.get_or_create(ask_from_user__exact=mUserDetail,asked_user__exact=userDetail)
-			'''
+			#askPermisson,created = BlogPermisson.objects.get_or_create(ask_from_user__exact=mUserDetail,asked_user__exact=userDetail)
 			try:
-				askPermisson = BlogPermisson.objects.get(ask_from_user__exact=mUserDetail,asked_user__exact=userDetail)
+				askPermisson = BlogPermisson.objects.get(ask_from_user__user__exact=self.user,asked_user__exact=userDetail)
+				if askPermisson.need_confirm == False and askPermisson.blog_priority == priority["denied"]:
+					context["code"] = 403
+					return context
 			except BlogPermisson.DoesNotExist:
-				askPermisson = BlogPermisson(ask_from_user__exact=mUserDetail,asked_user__exact=userDetail）
+				mUserDetail = UserDetail.objects.get(user__exact=self.user)
+				askPermisson = BlogPermisson(ask_from_user=mUserDetail,asked_user=userDetail)
 				askPermisson.save()
-			'''
-			if created == False and askPermisson.need_confirm == False and askPermisson.blog_priority == priority["denied"]:
-				context["code"] = 403
 		except UserDetail.DoesNotExist:
 			context["code"] = 404
 			return context
@@ -115,8 +114,7 @@ class BlogAction:
 		"""
 		context = {}
 		try:
-			mUserDetail = UserDetail.objects.get(user__exact=self.user)
-			askPermissons = BlogPermisson.objects.select_related("ask_from_user__user").filter(asked_user=mUserDetail).filter(need_confirm=True)
+			askPermissons = BlogPermisson.objects.select_related("ask_from_user__user").filter(asked_user__user=self.user).filter(need_confirm=True)
 		except:
 			traceback.print_exc()
 			context["code"] = 500
@@ -131,13 +129,17 @@ class BlogAction:
 		处理权限请求
 		"""
 		context = {}
-		for priority,usernameList in requestContext.items():
+		for priority,usernameStr in requestContext.items():
 			usernameList = usernameStr.split(",")
+			print usernameList
 			try:
-				changenum = BlogPermisson.objects.filter(asked_user=self.user).filter(ask_from_user__user__username__in=usernameList).update(blog_priority=priority,need_confirm=False)
+				changenum = BlogPermisson.objects.filter(asked_user__user=self.user).filter(ask_from_user__user__username__in=usernameList).update(blog_priority=priority,need_confirm=False)
 				context[priority]=changenum
 			except Exception:
+				traceback.print_exc()
+				context["code"] = 500
 				context[priority] = 0
+		context["code"]=200
 		return context
 			
 			
@@ -201,6 +203,7 @@ class BlogAction:
 		更新文章
 		"""
 		context = {}
+		
 		if not requestContext.get("content","").strip():
 			context["code"] = 404
 			return context
@@ -226,7 +229,7 @@ class BlogAction:
 				article = BlogText()
 				article.blog = blog
 				article.context = requestContext.get("content")
-				article.is_publish = requestContext.get("is_publish",False)
+				article.is_publish = requestContext.get("is_publish",False)      ######暂存不知道为啥会有问题。。。。。。。。。。。
 				article.article_tags = requestContext.get("tags","")
 				article.blog_text_title = requestContext.get("title","")
 				article.save()
@@ -271,8 +274,8 @@ class BlogAction:
 		"""
 
 		try:
-			dbpermission = BlogPermisson.objects.filter(asked_user__user=user).filter(from_user__user__username__exact=username).values("blog_priority")
-			if len(dbpermission) > 0 and dbpermission[0] >= permission:
+			dbpermission = BlogPermisson.objects.filter(ask_from_user__user=self.user).filter(asked_user__user__username__exact=username).values("blog_priority")
+			if len(dbpermission) > 0 and dbpermission[0].blog_priority >= permission:
 				return True
 			else:
 				return False
