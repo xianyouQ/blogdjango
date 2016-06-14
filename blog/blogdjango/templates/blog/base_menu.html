@@ -3,7 +3,32 @@
     <nav class="navbar-default navbar-static-side" role="navigation">
         <div class="sidebar-collapse">
             <ul class="nav metismenu" id="side-menu">
-                <li class="nav-header">
+                 <li class="nav-header">
+                    <div class="profile-element"> <span>
+                            {%  if username %}
+                                {% if userimg %}
+                            <img alt="image" height="60" width="60" class="img-circle" src="{{userimg}}" />
+                                {% else %}
+                                <img alt="image" height="60" width="60" class="img-circle" src="/static/blog/default.jpg" />
+                                {% endif %}
+                            {% else %}
+                                {% if user.userimg %}
+                                <img alt="image" height="60" width="60" class="img-circle" src="{{user.userimg}}" />
+                                {% else %}
+                                <img alt="image" height="60" width="60" class="img-circle" src="/static/blog/default.jpg" />
+                                {% endif %}
+                             </span>
+                               {% endif %}
+                            <a href="#">
+                            <span class="clear"> <span class="block m-t-xs"> 
+                            {%  if username %}
+                            <strong class="font-bold">{{username}}</strong>
+                            {% else %}
+                            <strong class="font-bold">{{user.username}}</strong>
+                            {% endif %}
+                             </span></span> 
+                            </a>
+                    </div>
                       <div class="logo-element">
                          BLOG
                        </div>

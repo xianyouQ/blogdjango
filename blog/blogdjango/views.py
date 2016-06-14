@@ -81,3 +81,6 @@ def shortArticle(request):
 def test(request):
 	return TemplateResponse(request,"blog/test.html")
 
+@account_active_required()
+def userProfile(request):
+	return TemplateResponse(request,"blog/userProfile.html",{})
