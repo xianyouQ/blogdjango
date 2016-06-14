@@ -84,25 +84,26 @@
 {% endblock %}
 {% block menulist %}
 <li>
-    <a href="#"><i class="fa fa-home"></i> <span class="nav-label">首页</span> <span class="fa arrow"></span></a>
+	{% if username %}
+    <a href="/blog/user/{{username}}/"><i class="fa fa-home"></i> <span class="nav-label">首页</span> <span class="fa arrow"></span></a>
+	{% else %}
+	<a href="{% url 'blogdjango:selfIndex' %}"><i class="fa fa-home"></i> <span class="nav-label">首页</span> <span class="fa arrow"></span></a>
+	{% endif %}
 </li>
 <li>
-    <a href="#"><i class="fa fa-file-text-o"></i> <span class="nav-label">短篇博文</span> <span class="fa arrow"></span></a>
-    <ul class="nav nav-second-level collapse">
-        <li><a href="{% url 'blogdjango:shortArticle' %}">全部博文</a></li>
-    </ul>
+    <a href="{% url 'blogdjango:shortArticle' %}"><i class="fa fa-file-text-o"></i> <span class="nav-label">短篇博文</span> <span class="fa arrow"></span></a>
 </li>
 <li>
-    <a href="#"><i class="fa fa-file-text-o"></i> <span class="nav-label">博客文章</span> <span class="fa arrow"></span></a>
-    <ul class="nav nav-second-level collapse">
-    <li><a href="{% url 'blogdjango:addNewActicle' %}">全部博文</a></li>
-    </ul>
+    <a href="{% url 'blogdjango:addNewActicle' %}"><i class="fa fa-file-text-o"></i> <span class="nav-label">博客文章</span> <span class="fa arrow"></span></a>
 </li>
-<li  class="active">
-    <a href="#"><i class="fa fa-cog"></i> <span class="nav-label">博客设置</span><span class="fa arrow"></span></a>
+<li>
+    <a href="{% url 'blogdjango:photoView' %}"><i class="fa fa-file-text-o"></i> <span class="nav-label">照片</span> <span class="fa arrow"></span></a>
+</li>
+<li class="active">
+    <a href="{% url 'blogdjango:processPermission' %}"><i class="fa fa-cog"></i> <span class="nav-label">博客设置</span><span class="fa arrow"></span></a>
     <ul class="nav nav-second-level collapse">
         <li><a href="{% url 'blogdjango:processPermission' %}">权限管理</a></li>
-        <li><a href="#">用户配置</a></li>
+        <li><a href="{% url 'blogdjango:userProfile' %}">用户配置</a></li>
     </ul>
 </li>
 {% endblock %}
@@ -125,7 +126,7 @@
     </div>
 </div>
         <div class="row">
-            <div class="col-lg-8">
+            <div class="col-lg-12">
                 <div class="ibox float-e-margins">
                     <div class="ibox-title  back-change">
                         <h5>修改头像</h5>
@@ -173,7 +174,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-4">
+            <div class="col-lg-12">
                 <div class="ibox float-e-margins">
                     <div class="ibox-title  back-change">
                         <h5>修改用户资料</h5>

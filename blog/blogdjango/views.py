@@ -84,3 +84,7 @@ def test(request):
 @account_active_required()
 def userProfile(request):
 	return TemplateResponse(request,"blog/userProfile.html",{})
+	
+@account_active_required()	
+def photoView(request):
+	return TemplateResponse(request,"blog/photo.html",{})

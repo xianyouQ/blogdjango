@@ -1,0 +1,153 @@
+﻿{% extends 'blog/base_menu.html' %}
+{% load static %}
+{% block jshead %}
+{{ block.super  }}
+<link href="http://libs.cdnjs.net/files/blueimp-gallery/2.15.0/css/blueimp-gallery.min.css" rel="stylesheet">
+<link href="http://libs.cdnjs.net/files/dropzone/4.3.0/dropzone.min.css" rel="stylesheet">
+<link href="http://cdn.cdnjs.net/files/dropzone/4.3.0/basic.min.css" rel="stylesheet">
+
+<script src="http://libs.cdnjs.net/files/blueimp-gallery/2.15.0/js/jquery.blueimp-gallery.min.js"></script>
+<script src="http://libs.cdnjs.net/files/dropzone/4.3.0/dropzone.min.js"></script>
+
+
+<script>
+    $(document).ready(function(){
+
+        Dropzone.options.myAwesomeDropzone = {
+
+            autoProcessQueue: false,
+            uploadMultiple: true,
+            parallelUploads: 100,
+            maxFiles: 100,
+
+            // Dropzone settings
+            init: function() {
+                var myDropzone = this;
+
+                this.element.querySelector("button[type=submit]").addEventListener("click", function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    myDropzone.processQueue();
+                });
+                this.on("sendingmultiple", function() {
+                });
+                this.on("successmultiple", function(files, response) {
+                });
+                this.on("errormultiple", function(files, response) {
+                });
+            }
+
+        }
+
+   });
+</script>
+
+{% endblock %}
+{% block menulist %}
+<li>
+	{% if username %}
+    <a href="/blog/user/{{username}}/"><i class="fa fa-home"></i> <span class="nav-label">首页</span> <span class="fa arrow"></span></a>
+	{% else %}
+	<a href="{% url 'blogdjango:selfIndex' %}"><i class="fa fa-home"></i> <span class="nav-label">首页</span> <span class="fa arrow"></span></a>
+	{% endif %}
+</li>
+<li>
+    <a href="{% url 'blogdjango:shortArticle' %}"><i class="fa fa-file-text-o"></i> <span class="nav-label">短篇博文</span> <span class="fa arrow"></span></a>
+</li>
+<li>
+    <a href="{% url 'blogdjango:addNewActicle' %}"><i class="fa fa-file-text-o"></i> <span class="nav-label">博客文章</span> <span class="fa arrow"></span></a>
+</li>
+<li class="active">
+    <a href="{% url 'blogdjango:photoView' %}"><i class="fa fa-file-text-o"></i> <span class="nav-label">照片</span> <span class="fa arrow"></span></a>
+</li>
+<li>
+    <a href="{% url 'blogdjango:processPermission' %}"><i class="fa fa-cog"></i> <span class="nav-label">博客设置</span><span class="fa arrow"></span></a>
+    <ul class="nav nav-second-level collapse">
+        <li><a href="{% url 'blogdjango:processPermission' %}">权限管理</a></li>
+        <li><a href="{% url 'blogdjango:userProfile' %}">用户配置</a></li>
+    </ul>
+</li>
+{% endblock %}
+{% block content %}
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-lg-10">
+        <h2>Blog</h2>
+        <ol class="breadcrumb">
+            <li>
+                <a href="#">Blog</a>
+            </li>
+
+            <li class="active">
+                <strong>Photo</strong>
+            </li>
+        </ol>
+    </div>
+</div>
+<div class="wrapper wrapper-content animated fadeIn">
+    <div class="row">
+        <div class="col-lg-12">
+        <div class="ibox collapsed float-e-margins">
+            <div class="ibox-title">
+                <h5>图片上传</h5>
+                <div class="ibox-tools">
+                    <a class="collapse-link">
+                        <i class="fa fa-chevron-up"></i>
+                    </a>
+                    <a class="close-link">
+                        <i class="fa fa-times"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="ibox-content">
+                <form id="my-awesome-dropzone" class="dropzone" action="#">
+                    <div class="dropzone-previews"></div>
+                    <button type="submit" class="btn btn-primary pull-right">Submit this form!</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    </div>
+ </div>
+<div class="wrapper wrapper-content">
+    <div class="row">
+        <div class="col-lg-12">
+        <div class="ibox float-e-margins">
+
+            <div class="ibox-content">
+
+                <h2>照片展示</h2>
+                <div class="lightBoxGallery">
+					{% for photo in photos %}
+                    <a href="{{photo.url}}" title="Image from Unsplash" data-gallery=""><img height="200" width="200" src="{{photo.url}}"></a>
+					{% endfor %}
+					<a href="/static/blog/test.jpg" title="Image from Unsplash" data-gallery=""><img height="200" width="200" src="/static/blog/test.jpg"></a>
+					<a href="/static/blog/test.jpg" title="Image from Unsplash" data-gallery=""><img height="200" width="200" src="/static/blog/test.jpg"></a>
+					<a href="/static/blog/test.jpg" title="Image from Unsplash" data-gallery=""><img height="200" width="200" src="/static/blog/test.jpg"></a>
+					<a href="/static/blog/test.jpg" title="Image from Unsplash" data-gallery=""><img height="200" width="200" src="/static/blog/test.jpg"></a>
+					<a href="/static/blog/test.jpg" title="Image from Unsplash" data-gallery=""><img height="200" width="200" src="/static/blog/test.jpg"></a>
+					<a href="/static/blog/test.jpg" title="Image from Unsplash" data-gallery=""><img height="200" width="200" src="/static/blog/test.jpg"></a>
+					<a href="/static/blog/test.jpg" title="Image from Unsplash" data-gallery=""><img height="200" width="200" src="/static/blog/test.jpg"></a>
+					<a href="/static/blog/test.jpg" title="Image from Unsplash" data-gallery=""><img height="200" width="200" src="/static/blog/test.jpg"></a>				
+                    <!-- The Gallery as lightbox dialog, should be a child element of the document body -->
+                    <div id="blueimp-gallery" class="blueimp-gallery">
+                        <div class="slides"></div>
+                        <h3 class="title"></h3>
+                        <a class="prev">‹</a>
+                        <a class="next">›</a>
+                        <a class="close">×</a>
+                        <a class="play-pause"></a>
+                        <ol class="indicator"></ol>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    </div>
+</div>
+
+
+       
+{% endblock %}
