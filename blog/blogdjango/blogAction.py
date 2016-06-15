@@ -3,8 +3,11 @@ from blogdjango.models import *
 from blog import settings
 import traceback
 from django.core.serializers import serialize
-priority = {"denied":0,"read":1,"write":2}
+import base64
+from django.core.files.base import ContentFile
 
+
+priority = {"denied":0,"read":1,"write":2}
 
 class BlogAction:
 	"""
@@ -331,14 +334,59 @@ class BlogAction:
 		上传头像
 		"""
 		context = {}
+		
 		try:
+			picName = requestContext.get("picName")
+			photoData = base64.decodestring(requestContext.get('photo_base64').split(',')[1])
 			mUserDetail = UserDetail.objects.get(user__exact=self.user)
-			mUserDetail.head_photo = requestContext.FILES["headphoto"]
+			mUserDetail.head_photo = ContentFile(photoData,picName)
 			mUserDetail.save()
+			context["code"] = 200
+			context["photoUrl"] = mUserDetail.head_photo.url
+		except KeyError:
+			context["code"] = 400
+		except:
+			context["code"] = 500
+		return context
+	
+	def uploadPhoto(self,requestContext):
+		"""
+		上传图片
+		"""
+		context = {}
+		try:
+			mBlog = Blog.objects.get(userDetail__user__exact=self.user)
+			context["photoUrls"] = []
+			for upload in requestContext.FILES.values():
+				mBlogPhoto = BlogPhoto.objects.create(blog=mBlog,photo=upload)
+				context["photoUrls"].append(mBlogPhoto.photo.url)
 			context["code"] = 200
 		except KeyError:
 			context["code"] = 400
 		except:
 			context["code"] = 500
 		return context
-
+		
+	def requeryPhoto(self,username = None,echpage=5,pagenum=0):
+		"""
+		查询图片
+		"""
+		context = {}
+		NumStart = pagenum * echpage
+		NumEnd = ( pagenum + 1 ) * echpage
+		try:
+			if username == None:
+				photos = BlogPhoto.objects.filter(blog__userDetail__user=self.user)[NumStart:NumEnd]
+			elif self.blog_permission_required(priority["read"],userName):
+				photos = BlogPhoto.objects.filter(blog__userDetail__user__username__exact=username)[NumStart:NumEnd]
+				context["username"] = username
+			else:
+				context["denied"] = settings.NO_PERMISSON_TO_BLOG_TEMPLATE
+				context["username"] = username	
+			context["code"] = 200
+			context["photos"] = photos
+		except:
+			context["code"] = 500
+			traceback.print_exc()
+		return context
+		

@@ -162,51 +162,7 @@ function toggleHide()
 	$('.detail-dismiss').toggleClass('hidden');
 }
 
-/*
-function queryCommentSuccessHandle(data,textStatus)
-{
-	
-	var commentTemplate = $(".comment-template").clone(true);	
-	for (var commentParentId in data.comment)
-	{
-		 $.each(data.comment[commentParentId],function(n,json){
-			var userjson = $.parseJSON(json.user);
-			var commentjson = $.parseJSON(json.comment);
-			commentTemplate.find("a.comment-User").html(userjson.fields["username"]);
-	 		commentTemplate.find("small.text-muted").html(commentjson.fields["comment_time"]);
-	 		commentTemplate.find("small.commentParentId").html(commentParentId);
-	 		commentTemplate.find("p.comment-content").html(commentjson.fields["context"]);
-			commentTemplate.find("button.answer-btn").focus(function(){
-					var username = $(this).closest(".commentBox").find(".comment-User").html();
-					var parentId = $(this).closest(".commentBox").find(".commentParentId").html();
-					$("#commentText").attr("placeholder","@" + username)
-					$("#commentText").attr("rows",3);
-					$("#commentParentId").attr("value",parentId);
-					$("#commentText").focus();
-			});
 
-	 		commentTemplate.removeClass("hidden");
-			commentTemplate.removeClass("comment-template");
-			commentTemplate.addClass("commentBox")
-	 	if (commentjson["pk"] == commentParentId)
-	 	{
-			commentTemplate.removeClass("pull-right");
-	 		commentTemplate.addClass("pull-left");
-	 	}
-	 	else
-	 	{
-			commentTemplate.removeClass("pull-left");
-	 		commentTemplate.addClass("pull-right");
-		}
-			$(".social-feed-box").append(commentTemplate);
-			console.log($(".social-feed-box").html());
-			//commentTemplate.appendTo($(".social-feed-box")); //为啥只会剩最后一个
-		 });
-		 	
-	}
-	$(".social-feed-box").removeClass("hidden");
-}
-*/
 
 function queryCommentSuccessHandle(data,textStatus)
 {
@@ -359,17 +315,24 @@ function saveArticle(is_publish,articleId)
 		}
     commitJson(ArticleSuccessHandle,ArticleErrorHandle,json,"/blog/shortArticle/","POST");
 }
-function FileUpload(file,successHandle,errorHandle)
+function FileUpload(file,url,successHandle,errorHandle)
 {
-	var data = new FormData();
-    data.append("file", file);
+	var data = new FormData(file);
     $.ajax({
         data: data,
         type: "POST",
-        url: "/ajax/saveimage",
+        url: url,
         cache: false,
         contentType: false,
         processData: false,
+		beforeSend: function(xhr, settings) {
+
+			var csrftoken = $.cookie('csrftoken');
+			if (!csrfSafeMethod(settings.type) && !this.crossDomain)
+				{
+				xhr.setRequestHeader("X-CSRFToken", csrftoken);
+				}
+			},
         success: function(url) {
                successHandle(url)
         },

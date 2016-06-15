@@ -12,4 +12,5 @@ urlpatterns = [
 	url(r'^permission/$',views.processPermission,name="processPermission"),
 	url(r'^userProfile/$',views.userProfile,name="userProfile"),
 	url(r'^photo/$',views.photoView,name="photoView"),
+	url(r'^uploadHeadPhoto/$',views.uploadHeadPhoto,name="uploadHeadPhoto"),
 ]

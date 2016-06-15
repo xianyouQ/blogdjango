@@ -79,6 +79,30 @@
                 }, 200 );
             }
         });
+		$("#headSubmit").click(function()
+		{
+			$(this).attr("disabled","true");
+			var picName=Date.parse(new Date())+".jpg";
+			var result= $(".image-crop > img").cropper("getCroppedCanvas");
+			var data=result.toDataURL();
+			var success = function(data, textStatus){
+				$(this).removeAttr("disabled");
+				if (data)
+				{
+				//$("div.profile-element > img").attr("src",url);
+				}
+			};
+			var error = function(XMLHttpRequest, textStatus, errorThrown)
+			{
+				Message("error","头像上传失败");
+				$(this).removeAttr("disabled");
+			};
+			json = {
+				"picName":picName,
+				"photo_base64":data
+			};
+			 commitJson(success,error,json,"/blog/uploadHeadPhoto/","POST");
+		});
         });
 </script>
 {% endblock %}
@@ -143,8 +167,8 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="image-crop">
-                                {% if user.userimg %}
-                                    <img src="img/p3.jpg">
+                                {% if user.head_photo %}
+                                    <img src="{{user.head_photo.url}}">
                                     {% else %}
                                     <img src="/static/blog/default.jpg">
                                     {% endif %}

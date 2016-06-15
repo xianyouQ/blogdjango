@@ -90,11 +90,18 @@ def userProfile(request):
 def uploadHeadPhoto(request):
 	if request.method == 'POST':
 		mblogAction = BlogAction(request.user)
-		context = mblogAction.uploadHeadPhoto(request)
+		context = mblogAction.uploadHeadPhoto(request.POST)
 	else:
 		context["code"] = 405
 	return HttpResponse(json.dumps(context),content_type="application/json",status = context["code"])
-	
+
+@csrf_protect
 @account_active_required()	
 def photoView(request):
-	return TemplateResponse(request,"blog/photo.html",{})
+	mblogAction = BlogAction(request.user)
+	if request.method == 'POST':
+		context = mblogAction.uploadPhoto(request)
+		return HttpResponse(json.dumps(context),content_type="application/json",status = context["code"])
+	else:
+		context = mblogAction.requeryPhoto()
+	return TemplateResponse(request,"blog/photo.html",context,status = context["code"])

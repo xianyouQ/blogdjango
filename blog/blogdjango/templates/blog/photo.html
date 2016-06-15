@@ -17,7 +17,7 @@
 
             autoProcessQueue: false,
             uploadMultiple: true,
-            parallelUploads: 100,
+            parallelUploads: 10,
             maxFiles: 100,
 
             // Dropzone settings
@@ -99,9 +99,10 @@
                 </div>
             </div>
             <div class="ibox-content">
-                <form id="my-awesome-dropzone" class="dropzone" action="#">
-                    <div class="dropzone-previews"></div>
-                    <button type="submit" class="btn btn-primary pull-right">Submit this form!</button>
+                <form id="my-awesome-dropzone" class="dropzone" action="{% url 'blogdjango:photoView' %}" enctype="multipart/form-data">{% csrf_token %}
+                    <div class="dropzone-previews">
+					</div>
+                    <button type="submit" class="btn btn-primary pull-right">开始上传！</button>
                 </form>
             </div>
         </div>
@@ -118,7 +119,7 @@
                 <h2>照片展示</h2>
                 <div class="lightBoxGallery">
 					{% for photo in photos %}
-                    <a href="{{photo.url}}" title="Image from Unsplash" data-gallery=""><img height="200" width="200" src="{{photo.url}}"></a>
+                    <a href="{{photo.photo.url}}" title="Image from Unsplash" data-gallery=""><img height="200" width="200" src="{{photo.photo.url}}"></a>
 					{% endfor %}
 					<a href="/static/blog/test.jpg" title="Image from Unsplash" data-gallery=""><img height="200" width="200" src="/static/blog/test.jpg"></a>
 					<a href="/static/blog/test.jpg" title="Image from Unsplash" data-gallery=""><img height="200" width="200" src="/static/blog/test.jpg"></a>
