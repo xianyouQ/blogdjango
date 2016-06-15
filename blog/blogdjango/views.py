@@ -84,6 +84,16 @@ def test(request):
 @account_active_required()
 def userProfile(request):
 	return TemplateResponse(request,"blog/userProfile.html",{})
+
+@csrf_protect
+@account_active_required()
+def uploadHeadPhoto(request):
+	if request.method == 'POST':
+		mblogAction = BlogAction(request.user)
+		context = mblogAction.uploadHeadPhoto(request)
+	else:
+		context["code"] = 405
+	return HttpResponse(json.dumps(context),content_type="application/json",status = context["code"])
 	
 @account_active_required()	
 def photoView(request):

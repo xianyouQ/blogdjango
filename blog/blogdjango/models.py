@@ -13,6 +13,7 @@ class UserDetail(models.Model):
 	askuser = models.ManyToManyField("self",through="BlogPermisson",symmetrical=False,related_name="Permission")
 	contact_user = models.ManyToManyField("self",through="Message",symmetrical=False,related_name="Contact")  ###对称关系的话，through表会怎么表示
 	signature = models.CharField(max_length=400,default="",verbose_name=u"个性签名")
+	head_photo = models.ImageField(upload_to="face/%Y/%m/%d",null=True)
 	
 	def __unicode__(self):
 		return self.user.username  
@@ -125,5 +126,15 @@ class Message(models.Model):
 		db_table = "blog_message"
 		verbose_name = "聊天记录"
 		ordering = ["-contact_time"]
-	
+
+class BlogPhoto(models.Model):
+	blog = models.ForeignKey(Blog)
+	upload_time = models.DateTimeField(auto_now_add=True,verbose_name=u"照片上传时间")
+	photo = models.ImageField(upload_to="userphoto/%Y/%m/%d")
+
+	class Meta:
+		db_table = "blog_photo"
+		verbose_name = "照片"
+		ordering = ["-upload_time"]
+
 		

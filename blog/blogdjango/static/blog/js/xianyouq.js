@@ -72,40 +72,6 @@ function csrfSafeMethod(method) {
 	return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
 	}
 
-	
-function sendFile(file, editor, $editable){
-	var filename = false;
-	try{
-		filename = file['name'];
-	} catch(e){filename = false;}
-	if(!filename){}
-	var ext = filename.substr(filename.lastIndexOf("."));
-	ext = ext.toUpperCase();
-	var timestamp = new Date().getTime();
-	var name = timestamp+"_"+$("#summernote").attr('aid')+ext;
-	data = new FormData();
-	data.append("file", file);
-	data.append("key",name);
-	data.append("token",$("#summernote").attr('token'));
-	$.ajax({
-		data: data,
-		type: "POST",
-		url: "http://upload.qiniu.com",
-		cache: false,
-		contentType: false,
-		processData: false,
-		success: function(data) {
-		editor.insertImage($editable, $("#summernote").attr('url-head')+data['key']);
-	
-			$(".note-alarm").html("上传成功,请等待加载");
-		setTimeout(function(){$(".note-alarm").remove();},3000);
-			},
-		error:function(){
-			$(".note-alarm").html("上传失败");
-			setTimeout(function(){$(".note-alarm").remove();},3000);
-			}
-		});
-	}
 function getNowtime()
     {
         var myDate = new Date();
@@ -163,7 +129,15 @@ function ArticleErrorHandle(XMLHttpRequest, textStatus, errorThrown)
 
 function startEditor()
 {
-	$('.summernote').summernote({ height: 300,});
+	$('.summernote').summernote({ height: 300,
+		 callbacks: {
+	onImageUpload: function(files, editor, welEditable) {
+            $.each(files, function(idx, file) {
+			console.log(file,idx);
+        });
+    		}
+    	}
+	});
     $('#summernoteibox').removeClass('collapsed');
 }
 
@@ -373,7 +347,7 @@ function saveArticle(is_publish,articleId)
         commitJson(ArticleSuccessHandle,ArticleErrorHandle,json,"/blog/article/","POST");
  }
  function saveShortArticle() 
-	{
+{
         var aHTML = $('.summernote').summernote('code'); //save HTML If you need(aHTML: array).
 		if(aHTML.length == 0)
 		{
@@ -384,4 +358,63 @@ function saveArticle(is_publish,articleId)
 		 "content":aHTML
 		}
     commitJson(ArticleSuccessHandle,ArticleErrorHandle,json,"/blog/shortArticle/","POST");
-    }
+}
+function FileUpload(file,successHandle,errorHandle)
+{
+	var data = new FormData();
+    data.append("file", file);
+    $.ajax({
+        data: data,
+        type: "POST",
+        url: "/ajax/saveimage",
+        cache: false,
+        contentType: false,
+        processData: false,
+        success: function(url) {
+               successHandle(url)
+        },
+		error : function(XMLHttpRequest, textStatus, errorThrown) {
+			errorHandle(XMLHttpRequest,textStatus,errorThrown)
+		}	
+    });
+}
+function summernoteFileUpload(files,editor,welEditable)
+{
+	
+}
+
+
+	
+function sendFile(file, editor, $editable){
+	var filename = false;
+	try{
+		filename = file['name'];
+	} catch(e){filename = false;}
+	if(!filename){}
+	var ext = filename.substr(filename.lastIndexOf("."));
+	ext = ext.toUpperCase();
+	var timestamp = new Date().getTime();
+	var name = timestamp+"_"+$("#summernote").attr('aid')+ext;
+	data = new FormData();
+	data.append("file", file);
+	data.append("key",name);
+	data.append("token",$("#summernote").attr('token'));
+	$.ajax({
+		data: data,
+		type: "POST",
+		url: "http://upload.qiniu.com",
+		cache: false,
+		contentType: false,
+		processData: false,
+		success: function(data) {
+		editor.insertImage($editable, $("#summernote").attr('url-head')+data['key']);
+	
+			$(".note-alarm").html("上传成功,请等待加载");
+		setTimeout(function(){$(".note-alarm").remove();},3000);
+			},
+		error:function(){
+			$(".note-alarm").html("上传失败");
+			setTimeout(function(){$(".note-alarm").remove();},3000);
+			}
+		});
+	}

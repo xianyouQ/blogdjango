@@ -325,3 +325,20 @@ class BlogAction:
 			context["code"] = 500
 			traceback.print_exc()
 		return context
+
+	def uploadHeadPhoto(self,requestContext):
+		"""
+		上传头像
+		"""
+		context = {}
+		try:
+			mUserDetail = UserDetail.objects.get(user__exact=self.user)
+			mUserDetail.head_photo = requestContext.FILES["headphoto"]
+			mUserDetail.save()
+			context["code"] = 200
+		except KeyError:
+			context["code"] = 400
+		except:
+			context["code"] = 500
+		return context
+
