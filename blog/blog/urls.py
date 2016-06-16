@@ -19,6 +19,6 @@ from django.conf.urls import url,include
 
 urlpatterns = [
 	url(r'^accounts/',include("blogdjango.auth.urls",namespace="blogauth")),
-	url(r'^blog/',include("blogdjango.urls",namespace="blogdjango")),
+	url(r'^blog/',include("blogdjango.blog.urls",namespace="blogdjango")),
 	url(r'^admin/',include("blogdjango.admin.urls",namespace="blogadmin")),
 ]

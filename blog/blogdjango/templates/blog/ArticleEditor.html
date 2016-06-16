@@ -66,7 +66,8 @@
         <div class="col-lg-10 col-lg-offset-1">
             <div class="ibox">
 			    <div class="ibox-tools">
-					<button id="new" class="btn btn-primary  btn-xs" onclick="returnToArticleList()" type="button">返回文章列表</button>
+                        <button  class="btn btn-primary  btn-xs" onclick="reEditor()" type="button">修改</button>
+					<button  class="btn btn-primary  btn-xs" onclick="returnToArticleList()" type="button">返回文章列表</button>
 				</div>
                 <div class="ibox-content">
 					<div id="article_detail">
@@ -116,10 +117,10 @@
             <div class="ibox-title">
                 <h5>新建博文</h5>
                 <div class="ibox-tools">
-				<button id="new" class="btn btn-primary  btn-xs" onclick="startEditor()" type="button">新建</button>
-				<button id="save" class="btn btn-primary  btn-xs" onclick="saveArticle(is_publish=true)" type="button">保存</button>
-                    <button id="save" class="btn btn-primary  btn-xs" onclick="saveArticle(is_publish=false)" type="button">暂存</button>
-				<button id="cancel" class="btn btn-primary  btn-xs" onclick="cancel()" type="button">取消</button>
+				<button class="btn btn-primary  btn-xs" onclick="startEditor()" type="button">新建</button>
+				<button class="btn btn-primary  btn-xs" onclick="saveArticle(is_publish=true)" type="button">保存</button>
+                    <button class="btn btn-primary  btn-xs" onclick="saveArticle(is_publish=false)" type="button">暂存</button>
+				<button class="btn btn-primary  btn-xs" onclick="cancel()" type="button">取消</button>
                     <a class="collapse-link">
                         <i class="fa fa-chevron-up"></i>
                     </a>
@@ -137,6 +138,7 @@
 				
 			<div class="form-group col-lg-12">
 				<label for="name">日志标签</label>
+                    <input type="hidden" name="artcleId" id="artcleId" value="undefined">
 				<input class="input-xlarge" type="text" id="article_tags" placeholder="每个标签以逗号分隔">
 			</div>
             </div>
@@ -145,6 +147,47 @@
     </div>
     </div>
 </div>
+
+<!-- moban -->
+<div class="hidden articleTemplate">
+        <div class="col-lg-12">
+            <div class="ibox">
+            <div class="ibox-title">
+                <div class="ibox-tools">
+                    <a class="collapse-link">
+                        <i class="fa fa-chevron-up"></i>
+                    </a>
+                    <a class="close-link">
+                        <i class="fa fa-times"></i>
+                    </a>
+                </div>
+            </div>
+                <div class="ibox-content">
+                        <div id="article_list_template">
+                            <div class="text-center article-title">
+                            <span class="text-muted"><i class="fa fa-clock-o"></i> create_time</span>
+                                <h1>
+                                  blog_text_title
+                                </h1>
+                            </div>
+                            <div class="limitline">
+                                Article.context
+                            </div>
+                            
+                            <hr>
+                            
+                            <div class="row">
+                                <div class="col-md-6 tags">
+                                        <h5>Tags:</h5>      
+                                </div>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary  btn-xs" onclick="" type="button">查看详情</button>
+                </div>
+            </div>
+        </div>
+</div>
+<!-- -->
 
 <div class="wrapper wrapper-content  animated fadeInRight blog detail-dismiss">
     <div class="row">
@@ -172,6 +215,7 @@
 			</div>
 		</div>
 	{% endif %}
+
 	{% for Article in Articles %}
         <div class="col-lg-12">
             <div class="ibox">
@@ -211,9 +255,9 @@
                             </div>
                         </div>
                         {% if username %}
-                        <button id="new" class="btn btn-primary  btn-xs" onclick="opendetail({{Article.id}},{{username}})" type="button">查看详情</button>
+                        <button class="btn btn-primary  btn-xs" onclick="opendetail({{Article.id}},{{username}})" type="button">查看详情</button>
                         {% else %}
-                        <button id="new" class="btn btn-primary  btn-xs" onclick="opendetail({{Article.id}})" type="button">查看详情</button>
+                        <button class="btn btn-primary  btn-xs" onclick="opendetail({{Article.id}})" type="button">查看详情</button>
                         {% endif %}
                 </div>
             </div>

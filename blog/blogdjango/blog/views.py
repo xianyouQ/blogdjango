@@ -4,7 +4,7 @@ from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from blogdjango.auth.decorators import account_active_required
 from blogdjango.models import UserDetail
-from blogdjango.blogAction import BlogAction
+from blogdjango.blog.blogAction import BlogAction
 from django.views.decorators.csrf import csrf_protect
 from django.template.response import TemplateResponse
 from django.core.exceptions import PermissionDenied

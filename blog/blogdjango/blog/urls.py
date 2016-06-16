@@ -1,5 +1,5 @@
 from django.conf.urls import url,include
-from blogdjango import views
+from blogdjango.blog import views
 from django.contrib.auth.views import login
 urlpatterns = [
 	url(r'^index/$',views.selfIndex,name="selfIndex"),

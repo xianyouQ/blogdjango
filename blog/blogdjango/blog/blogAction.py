@@ -55,9 +55,9 @@ class BlogAction:
 		userName = requestContext.get("username",None)
 		try:
 			if userName == None: ##获取自己的评论
-				querycomments = Comment.objects.select_related("comment_user__user").filter(blogtext__id__exact=requestContext.get("acticleId")).filter(blogtext__blog__userDetail__user=self.user)
+				querycomments = Comment.objects.select_related("comment_user__user").filter(blogtext__id__exact=requestContext.get("articleId")).filter(blogtext__blog__userDetail__user=self.user)
 			elif self.blog_permission_required(priority["read"],userName):
-				querycomments = Comment.objects.select_related("comment_user__user").filter(blogtext__id__exact=requestContext.get("acticleId")).filter(blogtext__blog__userDetail__user__username__exact=userName)
+				querycomments = Comment.objects.select_related("comment_user__user").filter(blogtext__id__exact=requestContext.get("articleId")).filter(blogtext__blog__userDetail__user__username__exact=userName)
 				context["username"] = userName
 			else:
 				context["denied"] = settings.NO_PERMISSON_TO_BLOG_TEMPLATE
@@ -166,10 +166,10 @@ class BlogAction:
 			if "parentId" in requestContext:
 				if userName == None: 
 					parentComment = Comment.objects.select_related("blogtext").filter(blogtext__blog__userDetail__user__exact=self.user). \
-					filter(blogtext__id__exact=requestContext.get("acticleId")).filter(id__exact=requestContext.get("parentId"))[0]
+					filter(blogtext__id__exact=requestContext.get("articleId")).filter(id__exact=requestContext.get("parentId"))[0]
 				elif self.blog_permission_required(priority["write"],username):
 					parentComment = Comment.objects.select_related("blogtext").filter(blogtext__blog__userDetail__user__username__exact=username). \
-					get(blogtext__id__exact=requestContext.get("acticleId")).filter(id__exact=requestContext.get("parentId"))[0]
+					get(blogtext__id__exact=requestContext.get("articleId")).filter(id__exact=requestContext.get("parentId"))[0]
 					context["username"] = userName
 				else:
 					context["denied"] = settings.NO_PERMISSON_TO_BLOG_TEMPLATE
@@ -181,9 +181,9 @@ class BlogAction:
 				newComment.comment_to_user = toUser
 			else: 
 				if userName == None:
-					blogText = BlogText.objects.filter(blog__userDetail__user__exact=self.user).filter(id__exact=requestContext.get("acticleId"))[0]
+					blogText = BlogText.objects.filter(blog__userDetail__user__exact=self.user).filter(id__exact=requestContext.get("articleId"))[0]
 				elif self.blog_permission_required(priority["write"],username):
-					blogText = BlogText.objects.filter(blog__userDetail__user__username__exact=username).filter(id__exact=requestContext.get("acticleId"))[0]
+					blogText = BlogText.objects.filter(blog__userDetail__user__username__exact=username).filter(id__exact=requestContext.get("articleId"))[0]
 					context["username"] = username
 				else:
 					context["denied"] = settings.NO_PERMISSON_TO_BLOG_TEMPLATE
@@ -213,9 +213,9 @@ class BlogAction:
 		if not requestContext.get("content","").strip():
 			context["code"] = 404
 			return context
-		if "acticleId" in requestContext:
+		if "articleId" in requestContext:
 			try:
-				updatenum = BlogText.objects.filter(blog__userDetail__user=self.user).filter(id=requestContext.get("acticleId")). \
+				updatenum = BlogText.objects.filter(blog__userDetail__user=self.user).filter(id=requestContext.get("articleId")). \
 				update(context=requestContext.get("content"),is_publish=requestContext.get("is_publish",False),article_tags=requestContext.get("tags",""),blog_text_title=requestContext.get("title"))
 				if updatenum == 0:
 					context["code"] = 400
@@ -223,7 +223,7 @@ class BlogAction:
 					context["code"] = 500
 				else:
 					context["code"] = 200
-				context["acticleId"] = requestContext.get("acticleId")
+				context["articleId"] = requestContext.get("articleId")
 			except KeyError:
 				context["code"] = 400
 				return context
@@ -239,12 +239,14 @@ class BlogAction:
 				article.article_tags = requestContext.get("tags","")
 				article.blog_text_title = requestContext.get("title","")
 				article.save()
-				context["acticleId"] = article.id
+				context["articleId"] = article.id
+				context["create_time"] = str(article.create_time)
 				context["code"] = 200
 			except KeyError:
 				context["code"] = 400
 				return context
 			except:
+				traceback.print_exc()
 				context["code"] = 500
 		return context
 
@@ -302,6 +304,7 @@ class BlogAction:
 			mShortArticle.blog = blog
 			mShortArticle.context = requestContext["content"]
 			mShortArticle.save()
+			context["create_time"] = str(mShortArticle.create_time)
 		except KeyError:
 			context["code"] = 400
 		except:

@@ -97,7 +97,7 @@ function commitJson(successHandle,errorHandle,json,url,method)
 				//$(this).attr({disabled:"disabled"});
 			},
 		success: function(data, textStatus) {
-			successHandle(data,textStatus);
+			successHandle(data,textStatus,json);
 		},
 		error : function(XMLHttpRequest, textStatus, errorThrown) {
 			errorHandle(XMLHttpRequest,textStatus,errorThrown)
@@ -113,7 +113,8 @@ function commitJson(successHandle,errorHandle,json,url,method)
                 $('.summernote').summernote('destroy');
                 $('.summernote').empty();
                 $('#summernoteibox').addClass('collapsed');
-            }   
+
+            }
         }
 function ArticleErrorHandle(XMLHttpRequest, textStatus, errorThrown)
         {
@@ -150,7 +151,15 @@ function startEditor()
 
 function reEditor()
 {
-
+	toggleHide();
+	var title = $(".article_detail").find("h1").html();
+	var content = $(".article_detail .detail-content").html();
+	var articleId = $(".article_detail").attr("id").split("-")[2];
+	console.log(content);
+	$("#artcleId").attr("value",articleId);
+	$("#blog_article_title").val(title);
+	$("#summernote").html(content);
+	startEditor();
 }
 function cancel()
 {
@@ -249,7 +258,7 @@ function commitComment(articleId,username)
 	{
 		json = {
 			"username":username,
-			"acticleId":articleId,
+			"articleId":articleId,
 			"message":content
 		}
 	}
@@ -259,7 +268,7 @@ function commitComment(articleId,username)
 		toUser = placeholder.split("@")[1];
 		json = {
 			"username":username,
-			"acticleId":articleId,
+			"articleId":articleId,
 			"parentId":parentId,
 			"toUser":toUser,
 			"message":content
@@ -270,10 +279,10 @@ function commitComment(articleId,username)
 }
 
 
-function queryComments(acticleId,username)
+function queryComments(articleId,username)
 {
 	var json = {
-		"acticleId":acticleId,
+		"articleId":articleId,
 		"username":username
 	};
 	commitJson(queryCommentSuccessHandle,ArticleErrorHandle,json,"/blog/comment/","GET")
@@ -283,9 +292,9 @@ function opendetail(ArticleId,username)
 {
 	toggleHide();
 	var articlecontent = $("#article_list_"+ArticleId).html();
-	$("#article_detail").html(articlecontent);
-	$("#article_detail").find("div").removeClass("limitline");
-    $("#article_detail").find("div").addClass("detail-content");
+	$(".article_detail").html(articlecontent);
+	$(".article_detail").find("div.limitline").removeClass("limitline").addClass("detail-content");
+	$(".article_detail").attr("id","article_detail_"+ArticleId);
     $("#commitCommentBtn").attr("onclick","commitComment(" + ArticleId + ", " +username +")");
 	queryComments(ArticleId,username)
 }
@@ -307,7 +316,25 @@ function saveArticle(is_publish,articleId)
             "articleId":articleId,
             "is_publish":is_publish
         } ;
-        commitJson(ArticleSuccessHandle,ArticleErrorHandle,json,"/blog/article/","POST");
+
+        function success(data,textStatus,json)
+        {
+			ArticleSuccessHandle(data,textStatus);
+               var articleTemplate = $(".articleTemplate").clone();
+			articleTemplate.find("span.text-muted").html('<i class="fa fa-clock-o"></i>'+ data.create_time);
+			articleTemplate.find("h1").html(json.title);
+			articleTemplate.find("div.limitline").html(json.content);
+			articleTemplate.find("#article_list_template").attr("id","article_list_" + data.articleId);
+			articleTemplate.find("button").attr("onclick","opendetail(" + data.articleId + ")");
+			var tags = json.tags.split(',');
+			for (var tag in tags)
+			{
+				articleTemplate.find("div.tags").append('<button class="btn btn-white btn-xs" type="button">'+tags[tag]+ '</button>')
+			}
+			
+			$("div.blog > div.row").prepend(articleTemplate.html());
+        };
+        commitJson(success,ArticleErrorHandle,json,"/blog/article/","POST");
  }
  function saveShortArticle() 
 {
@@ -320,7 +347,28 @@ function saveArticle(is_publish,articleId)
 		var json = {
 		 "content":aHTML
 		}
-    commitJson(ArticleSuccessHandle,ArticleErrorHandle,json,"/blog/shortArticle/","POST");
+		function success(data,textStatus,json)
+		{
+			ArticleSuccessHandle(data,textStatus);
+			var listsize = $(".shortArticleList .row:first-child").children(".col-lg-12").length;
+			if (listsize > 0)
+			{
+				$(".shortArticleList").addClass("hidden");
+			}
+			var size = $(".newShortArticleList .row:first-child").children(".ibox").length;
+			if (size >= 3)
+			{
+				$(".newShortArticleList").prepend('<div class="row"></div>');
+			}
+			var shortArticleTemplate = $(".shortArticleTemplate").clone();
+			shortArticleTemplate.find("span.text-muted").html('<i class="fa fa-clock-o"></i>'+ data.create_time);
+			shortArticleTemplate.find(".article-content").html(json.content);
+			console.log(shortArticleTemplate.html());
+			$(".newShortArticleList .row:first-child").prepend(shortArticleTemplate.html());
+			$(".newShortArticleList").removeClass("hidden");
+			console.log($(".newShortArticleList").html());
+		}
+    commitJson(success,ArticleErrorHandle,json,"/blog/shortArticle/","POST");
 }
 function FileUpload(file,url,successHandle,errorHandle)
 {
