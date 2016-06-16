@@ -83,7 +83,13 @@ def test(request):
 
 @account_active_required()
 def userProfile(request):
-	return TemplateResponse(request,"blog/userProfile.html",{})
+	mblogAction = BlogAction(request.user)
+	if request.method == 'POST':
+		context = mblogAction.uploadUserDetail(request.POST)
+		return HttpResponse(json.dumps(context),content_type="application/json",status = context["code"])
+	else:
+		context = mblogAction.queryUserDetail()
+		return TemplateResponse(request,"blog/userProfile.html",context,status = context["code"])
 
 @csrf_protect
 @account_active_required()

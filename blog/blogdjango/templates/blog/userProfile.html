@@ -97,11 +97,29 @@
 				Message("error","头像上传失败");
 				$(this).removeAttr("disabled");
 			};
-			json = {
+			var json = {
 				"picName":picName,
 				"photo_base64":data
 			};
 			 commitJson(success,error,json,"/blog/uploadHeadPhoto/","POST");
+		});
+		$("#userProfile_submit").click(function(){
+			$(this).attr("disabled","true");
+			var json={
+			"nickname": $("#nickname_text").val(),
+			"signature": $("#signature_text").val(),
+			}
+			var success = function(data,textStatus)
+			{
+				Message("success","上传成功");
+				$(this).removeAttr("disabled");
+			};
+			var error = function(XMLHttpRequest, textStatus, errorThrown)
+			{
+				Message("error","上传失败");
+				$(this).removeAttr("disabled");
+			};
+			commitJson(success,error,json,"/blog/userProfile/","POST");
 		});
         });
 </script>
@@ -214,18 +232,17 @@
                     <div class="ibox-content">
                       <form method="get" class="form-horizontal">
                                 <div class="form-group"><label class="col-sm-2 control-label">昵称</label>
-
-                                    <div class="col-sm-10"><input type="text" class="form-control"></div>
+                                    <div class="col-sm-10"><input type="text" class="form-control" id="nickname_text" value="{{userDetail.nickname}}"></div>
                                 </div>
                             <div class="hr-line-dashed"></div>
                                 <div class="form-group"><label class="col-sm-2 control-label">签名</label>
-                                    <div class="col-sm-10"><input type="text" class="form-control"></div>
+                                    <div class="col-sm-10"><input type="text" class="form-control" id="signature_text" value="{{userDetail.signature}}"></div>
                                 </div>
                             <div class="hr-line-dashed"></div>
                                 <div class="form-group">
                                     <div class="col-sm-3 col-sm-offset-2">
                                         <section class="progress-demo">
-                                        <button class="ladda-button btn btn-primary" data-style="slide-down">保存</button>
+                                        <button class="ladda-button btn btn-primary" id="userProfile_submit" data-style="slide-down">保存</button>
                                         </section>
                                     </div>
                                 </div>

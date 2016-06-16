@@ -146,6 +146,7 @@ function startEditor()
     		}
     	}
 	});
+	$("#articleId").attr("value","undefined");
     $('#summernoteibox').removeClass('collapsed');
 }
 
@@ -154,12 +155,17 @@ function reEditor()
 	toggleHide();
 	var title = $(".article_detail").find("h1").html();
 	var content = $(".article_detail .detail-content").html();
-	var articleId = $(".article_detail").attr("id").split("-")[2];
-	console.log(content);
-	$("#artcleId").attr("value",articleId);
+	var articleId = $(".article_detail").attr("id").split("_")[2];
+	var tags = "";
+	$(".article_detail .tags button").each(function(idx,tag)
+	{	
+		tags = tags + $(tag).html() + ",";
+	});
+	$("#article_tags").val(tags);
 	$("#blog_article_title").val(title);
-	$("#summernote").html(content);
+	$(".summernote").html(content);
 	startEditor();
+	$("#articleId").attr("value",articleId);
 }
 function cancel()
 {
@@ -292,35 +298,54 @@ function opendetail(ArticleId,username)
 {
 	toggleHide();
 	var articlecontent = $("#article_list_"+ArticleId).html();
+	
 	$(".article_detail").html(articlecontent);
-	$(".article_detail").find("div.limitline").removeClass("limitline").addClass("detail-content");
+	$(".article_detail").find("div.limitline").addClass("detail-content");
+	$(".article_detail").find("div.limitline").removeClass("limitline");
 	$(".article_detail").attr("id","article_detail_"+ArticleId);
     $("#commitCommentBtn").attr("onclick","commitComment(" + ArticleId + ", " +username +")");
 	queryComments(ArticleId,username)
 }
 
-function saveArticle(is_publish,articleId) 
+function saveArticle(is_publish) 
 {
         var aHTML = $('.summernote').summernote('code'); //save HTML If you need(aHTML: array).
         var json;
+		var articleId = $("#articleId").attr("value");
 		if(aHTML.length == 0)
 		{
 			Message("warning","您尚未输入任何内容");
 			return void(0)
 		}
+		console.log(articleId);
+		if(articleId == "undefined")
+		{
+			articleId = undefined;
+		}
 
-        json  = {
-            "content":aHTML,
-            "title":$("#blog_article_title").val(),
-            "tags":$("#article_tags").val(),
-            "articleId":articleId,
-            "is_publish":is_publish
-        } ;
+		json  = {
+			"content":aHTML,
+			"title":$("#blog_article_title").val(),
+			"tags":$("#article_tags").val(),
+			"articleId":articleId,
+			"is_publish":is_publish
+		} ;
 
         function success(data,textStatus,json)
         {
 			ArticleSuccessHandle(data,textStatus);
-               var articleTemplate = $(".articleTemplate").clone();
+			if (json.articleId){
+				$("#article_list_"+ json.articleId + " h1").html(json.title);
+				$("#article_list_"+ json.articleId + " .limitline").html(json.content);
+				$("#article_list_"+ json.articleId + " div.tags").html("<h5>Tags:</h5>");
+				var tags = json.tags.split(',');
+				for (var tag in tags)
+				{
+					$("#article_list_"+ json.articleId + " div.tags").append('<button class="btn btn-white btn-xs" type="button">'+tags[tag]+ '</button>');
+				}
+			}
+			else{
+            var articleTemplate = $(".articleTemplate").clone();
 			articleTemplate.find("span.text-muted").html('<i class="fa fa-clock-o"></i>'+ data.create_time);
 			articleTemplate.find("h1").html(json.title);
 			articleTemplate.find("div.limitline").html(json.content);
@@ -333,6 +358,7 @@ function saveArticle(is_publish,articleId)
 			}
 			
 			$("div.blog > div.row").prepend(articleTemplate.html());
+			}
         };
         commitJson(success,ArticleErrorHandle,json,"/blog/article/","POST");
  }
@@ -363,10 +389,8 @@ function saveArticle(is_publish,articleId)
 			var shortArticleTemplate = $(".shortArticleTemplate").clone();
 			shortArticleTemplate.find("span.text-muted").html('<i class="fa fa-clock-o"></i>'+ data.create_time);
 			shortArticleTemplate.find(".article-content").html(json.content);
-			console.log(shortArticleTemplate.html());
 			$(".newShortArticleList .row:first-child").prepend(shortArticleTemplate.html());
 			$(".newShortArticleList").removeClass("hidden");
-			console.log($(".newShortArticleList").html());
 		}
     commitJson(success,ArticleErrorHandle,json,"/blog/shortArticle/","POST");
 }

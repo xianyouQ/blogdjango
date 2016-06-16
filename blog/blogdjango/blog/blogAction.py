@@ -228,6 +228,7 @@ class BlogAction:
 				context["code"] = 400
 				return context
 			except:
+				traceback.print_exc()
 				context["code"] = 500
 		else:
 			try:
@@ -403,7 +404,7 @@ class BlogAction:
 		context = {}
 		article_photo_dir = settings.ARTICLE_PHOTO_DIR
 		try:
-			file = requestContext.FILES['file']
+			file = requestContext.FILES['file'] ##获取文件名拿到对应的格式
 			filename = int(time.time())
 			strstr = "%Y" + os.path.sep + "%m" + os.path.sep + "%d"
 			path=time.strftime(strstr, time.localtime() )
@@ -421,4 +422,33 @@ class BlogAction:
 		except:
 			context["code"] = 500
 		return context
-
+	def uploadUserDetail(self,requestContext):
+		"""
+		上传用户资料
+		"""
+		context = {}
+		try:
+			updatenum = UserDetail.objects.filter(user__exact=self.user).update(nickname=requestContext.get("nickname"),signature=requestContext.get("signature"))
+			if updatenum == 1:
+				context["code"] = 200
+			else:
+				context["code"] = 500
+			
+		except KeyError:
+			context["code"] = 400
+		except:
+			traceback.print_exc()
+			context["code"] = 500
+		return context
+	def queryUserDetail(self):
+		"""
+		查询用户资料
+		"""
+		context = {}
+		try:
+			mUserDetail = UserDetail.objects.get(user__exact=self.user)
+			context["userDetail"] = mUserDetail
+			context["code"] = 200
+		except:
+			context["code"] = 500
+		return context
