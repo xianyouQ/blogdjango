@@ -1,7 +1,7 @@
 from django.shortcuts import render
-from blogauth.decorators import account_admin_required
+from blogdjango.auth.decorators import account_admin_required
 from django.template.response import TemplateResponse
-from blogadmin.adminAction import adminAction
+from blogdjango.admin.adminAction import adminAction
 from django.http import HttpResponse
 import json
 # Create your views here.

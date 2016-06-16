@@ -133,7 +133,14 @@ function startEditor()
 		 callbacks: {
 	onImageUpload: function(files, editor, welEditable) {
             $.each(files, function(idx, file) {
-			console.log(file,idx);
+			FileUpload(file,"/blog/uploadArticlePhoto/",function(data){
+				if(data)
+				{
+					 $(".summernote").summernote("insertImage", data.url);
+				}
+			},function(XMLHttpRequest, textStatus, errorThrown){
+				Message("error","图片加载失败");
+			});
         });
     		}
     	}
@@ -317,7 +324,8 @@ function saveArticle(is_publish,articleId)
 }
 function FileUpload(file,url,successHandle,errorHandle)
 {
-	var data = new FormData(file);
+	var data = new FormData();
+	data.append("file",file);
     $.ajax({
         data: data,
         type: "POST",
@@ -333,51 +341,13 @@ function FileUpload(file,url,successHandle,errorHandle)
 				xhr.setRequestHeader("X-CSRFToken", csrftoken);
 				}
 			},
-        success: function(url) {
-               successHandle(url)
+        success: function(data) {
+               successHandle(data)
         },
 		error : function(XMLHttpRequest, textStatus, errorThrown) {
 			errorHandle(XMLHttpRequest,textStatus,errorThrown)
 		}	
     });
 }
-function summernoteFileUpload(files,editor,welEditable)
-{
-	
-}
 
 
-	
-function sendFile(file, editor, $editable){
-	var filename = false;
-	try{
-		filename = file['name'];
-	} catch(e){filename = false;}
-	if(!filename){}
-	var ext = filename.substr(filename.lastIndexOf("."));
-	ext = ext.toUpperCase();
-	var timestamp = new Date().getTime();
-	var name = timestamp+"_"+$("#summernote").attr('aid')+ext;
-	data = new FormData();
-	data.append("file", file);
-	data.append("key",name);
-	data.append("token",$("#summernote").attr('token'));
-	$.ajax({
-		data: data,
-		type: "POST",
-		url: "http://upload.qiniu.com",
-		cache: false,
-		contentType: false,
-		processData: false,
-		success: function(data) {
-		editor.insertImage($editable, $("#summernote").attr('url-head')+data['key']);
-	
-			$(".note-alarm").html("上传成功,请等待加载");
-		setTimeout(function(){$(".note-alarm").remove();},3000);
-			},
-		error:function(){
-			$(".note-alarm").html("上传失败");
-			setTimeout(function(){$(".note-alarm").remove();},3000);
-			}
-		});
-	}

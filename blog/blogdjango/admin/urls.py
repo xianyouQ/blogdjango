@@ -1,5 +1,5 @@
 from django.conf.urls import url,include
-from blogadmin.views import adminIndex,NewAccounts
+from blogdjango.admin.views import adminIndex,NewAccounts
 
 
 urlpatterns = [

@@ -13,4 +13,5 @@ urlpatterns = [
 	url(r'^userProfile/$',views.userProfile,name="userProfile"),
 	url(r'^photo/$',views.photoView,name="photoView"),
 	url(r'^uploadHeadPhoto/$',views.uploadHeadPhoto,name="uploadHeadPhoto"),
+	url(r'^uploadArticlePhoto/$',views.uploadArticlePhoto,name="uploadArticlePhoto"),
 ]

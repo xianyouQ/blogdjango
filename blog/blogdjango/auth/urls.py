@@ -1,7 +1,7 @@
 # encoding=utf8
 from django.conf.urls import url,include
 from django.contrib.auth.views import login,logout,password_change_done
-from blogauth.views import userRegister,password_change
+from blogdjango.auth.views import userRegister,password_change
 
 urlpatterns = [
     url(r'^login/$', login,{'template_name': 'registration/login.html'},name='login'),

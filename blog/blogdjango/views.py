@@ -2,7 +2,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
-from blogauth.decorators import account_active_required
+from blogdjango.auth.decorators import account_active_required
 from blogdjango.models import UserDetail
 from blogdjango.blogAction import BlogAction
 from django.views.decorators.csrf import csrf_protect
@@ -105,3 +105,14 @@ def photoView(request):
 	else:
 		context = mblogAction.requeryPhoto()
 	return TemplateResponse(request,"blog/photo.html",context,status = context["code"])
+
+
+@csrf_protect
+@account_active_required()
+def uploadArticlePhoto(request):
+	if request.method == 'POST':
+		mblogAction = BlogAction(request.user)
+		context = mblogAction.uploadArticlePhoto(request)
+	else:
+		context["code"] = 405
+	return HttpResponse(json.dumps(context),content_type="application/json",status = context["code"]) 

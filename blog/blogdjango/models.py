@@ -17,6 +17,8 @@ class UserDetail(models.Model):
 	
 	def __unicode__(self):
 		return self.user.username  
+	def getheadphotourl(self):
+		return "/" + self.head_photo.url
 
 	class Meta:
 		db_table = "user_detail"
@@ -132,9 +134,12 @@ class BlogPhoto(models.Model):
 	upload_time = models.DateTimeField(auto_now_add=True,verbose_name=u"照片上传时间")
 	photo = models.ImageField(upload_to="userphoto/%Y/%m/%d")
 
+	def getphotourl(self):
+		return "/" + self.photo.url
 	class Meta:
 		db_table = "blog_photo"
 		verbose_name = "照片"
 		ordering = ["-upload_time"]
+
 
 		

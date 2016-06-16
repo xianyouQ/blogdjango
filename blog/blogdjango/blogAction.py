@@ -5,7 +5,7 @@ import traceback
 from django.core.serializers import serialize
 import base64
 from django.core.files.base import ContentFile
-
+import time,os
 
 priority = {"denied":0,"read":1,"write":2}
 
@@ -26,9 +26,11 @@ class BlogAction:
 			if userName == None: ##获取自己的博客主页数据
 				article = BlogText.objects.select_related('blog__userDetail').filter(blog__userDetail__user=self.user)[0]
 				shortArticles = ShortArticle.objects.filter(blog=article.blog)[0:5]
+				photos = BlogPhoto.objects.filter(blog=article.blog)[0:8]
 			elif self.blog_permission_required(priority["read"],userName):
 				article = BlogText.objects.select_related('blog__userDetail__user').filter(blog__userDetail__user__username__exact=userName,is_publish=True)[0]
 				shortArticles = ShortArticle.objects.filter(blog=article.blog)[0:5]
+				photos = BlogPhoto.objects.filter(blog=article.blog)[0:8]
 				context["username"] = userName
 			else:
 				context["denied"] = settings.NO_PERMISSON_TO_BLOG_TEMPLATE
@@ -37,6 +39,7 @@ class BlogAction:
 			context["shortArticles"] = shortArticles
 			context["blog"] = article.blog
 			context["userDetail"] = article.blog.userDetail
+			context["lastimgs"] = photos
 			context["code"] ="200"
 		except Exception:
 			context["code"] ="500"
@@ -390,3 +393,29 @@ class BlogAction:
 			traceback.print_exc()
 		return context
 		
+	def uploadArticlePhoto(self,requestContext):
+		"""
+		上传博客中使用到的图片
+		"""
+		context = {}
+		article_photo_dir = settings.ARTICLE_PHOTO_DIR
+		try:
+			file = requestContext.FILES['file']
+			filename = int(time.time())
+			strstr = "%Y" + os.path.sep + "%m" + os.path.sep + "%d"
+			path=time.strftime(strstr, time.localtime() )
+			truepath = os.path.join(article_photo_dir, path)
+			if not os.path.isdir(truepath):
+				os.makedirs(truepath)
+			fp = open(os.path.join(truepath,str(filename) +".jpg"), 'wb')
+			for chunk in file.chunks():
+				fp.write(chunk)
+			fp.close()
+			context["code"] = 200
+			context["url"] = path + os.path.sep + str(filename) + ".jpg"
+		except KeyError:
+			context["code"] = 400
+		except:
+			context["code"] = 500
+		return context
+
