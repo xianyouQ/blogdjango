@@ -25,11 +25,11 @@ class BlogAction:
 		try:
 			if userName == None: ##获取自己的博客主页数据
 				article = BlogText.objects.select_related('blog__userDetail').filter(blog__userDetail__user=self.user)[0]
-				shortArticles = ShortArticle.objects.filter(blog=article.blog)[0:5]
+				shortArticles = ShortArticle.objects.filter(blog=article.blog)[0:3]
 				photos = BlogPhoto.objects.filter(blog=article.blog)[0:8]
 			elif self.blog_permission_required(priority["read"],userName):
 				article = BlogText.objects.select_related('blog__userDetail__user').filter(blog__userDetail__user__username__exact=userName,is_publish=True)[0]
-				shortArticles = ShortArticle.objects.filter(blog=article.blog)[0:5]
+				shortArticles = ShortArticle.objects.filter(blog=article.blog)[0:3]
 				photos = BlogPhoto.objects.filter(blog=article.blog)[0:8]
 				context["username"] = userName
 			else:

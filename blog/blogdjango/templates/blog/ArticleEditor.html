@@ -131,16 +131,15 @@
             </div>
             <div class="ibox-content no-padding">	
 				<h1 class="text-center">
-				<input class="input-large" type="text" id="blog_article_title" placeholder="请在这里输入博文标题">
+					<input class="input-large" type="text" id="blog_article_title" placeholder="请在这里输入博文标题">
 				</h1>
 				<div class="summernote">
 				</div>
-				
-			<div class="form-group col-lg-12">
-				<label for="name">日志标签</label>
-                    <input type="hidden" name="articleId" id="articleId" value="undefined">
-				<input class="input-xlarge" type="text" id="article_tags" placeholder="每个标签以逗号分隔">
-			</div>
+				<div class="form-group form-horizontal">
+					<label class="col-sm-2 control-label" for="name">日志标签</label>
+						<input type="hidden" name="articleId" id="articleId" value="undefined">
+					<div class="col-sm-10"><input type="text" class="form-control" id="article_tags" placeholder="每个标签以逗号分隔"></div>
+				</div>
             </div>
 			
         </div>

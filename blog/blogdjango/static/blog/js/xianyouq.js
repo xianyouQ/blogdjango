@@ -9,25 +9,9 @@ function Message(type,message,timeout) {
         toastr[type](message);
 
     }
-
     // check if browser support HTML5 local storage
 function localStorageSupport() {
     return (('localStorage' in window) && window['localStorage'] !== null)
-}
-
-// For demo purpose - animation css script
-function animationHover(element, animation) {
-    element = $(element);
-    element.hover(
-        function () {
-            element.addClass('animated ' + animation);
-        },
-        function () {
-            //wait for animation to finish before removing classes
-            window.setTimeout(function () {
-                element.removeClass('animated ' + animation);
-            }, 2000);
-        });
 }
 
 function SmoothlyMenu() {
@@ -422,4 +406,35 @@ function FileUpload(file,url,successHandle,errorHandle)
     });
 }
 
+function userActive(){
+		$("#useractivesubmit").attr({disabled:"true"});
+		var obj=document.getElementsByName('useractivecheckbox');
+		var able = "";
+		var disable = ""
+		for(var i=0; i<obj.length; i++){    
+		if(obj[i].checked) able+=obj[i].value+',';
+		else {
+			disable+=obj[i].value+',';
+		}
+	} 
+	 var json = {
+		 "1":able,
+		 "0":disable,
+	 };
+	 function success(data, textStatus) {
+		if(data)
+		{
+			Message("success","成功提交");
+		}	
+	};
+	function error(XMLHttpRequest, textStatus, errorThrown) {
+		if (XMLHttpRequest.status == 500) {
+			Message("error","哎呀，服务器出错了");
+		}
+		else{
+			Message("error","提交失败");
+		}
+	};
+	  commitJson(success,error,json,"/admin/users/","POST");
+}
 

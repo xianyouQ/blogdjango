@@ -6,6 +6,8 @@
  */
 
 
+
+
 $(document).ready(function () {
 
 
@@ -17,21 +19,46 @@ $(document).ready(function () {
     }
 
     // MetsiMenu
-    $('#side-menu').metisMenu();
+    $('#side-menu').metisMenu({
+   toggle: false,
+ });
 
+    // Collapse ibox function
+    $('.collapse-link').click(function () {
+        var ibox = $(this).closest('div.ibox');
+        var button = $(this).find('i');
+        var content = ibox.find('div.ibox-content');
+        content.slideToggle(200);
+        button.toggleClass('fa-chevron-up').toggleClass('fa-chevron-down');
+        ibox.toggleClass('').toggleClass('border-bottom');
+        setTimeout(function () {
+            ibox.resize();
+            ibox.find('[id^=map-]').resize();
+        }, 50);
+    });
 
-
-    // Close menu in canvas mode
+    // Close ibox function
+    $('.close-link').click(function () {
+        var content = $(this).closest('div.ibox');
+        content.remove();
+    });
 
     // Run menu of canvas
-	
     $('body.canvas-menu .sidebar-collapse').slimScroll({
         height: '100%',
         railOpacity: 0.9
     });
 
-	  $('.right-sidebar-toggle').click(function () {
+    // Open close right sidebar
+    $('.right-sidebar-toggle').click(function () {
         $('#right-sidebar').toggleClass('sidebar-open');
+    });
+
+    // Initialize slimscroll for right sidebar
+    $('.sidebar-container').slimScroll({
+        height: '100%',
+        railOpacity: 0.4,
+        wheelStep: 10
     });
 
     // Open close small chat
@@ -43,13 +70,13 @@ $(document).ready(function () {
     });
 
     // Initialize slimscroll for small chat
-	
     $('.small-chat-box .content').slimScroll({
         height: '234px',
         railOpacity: 0.4
     });
-   
-    // Small todo handler
+
+    // Append config box / Only for demo purpose
+    // Uncomment on server mode to enable XHR calls
 
     // Minimalize menu
     $('.navbar-minimalize').click(function () {
@@ -58,47 +85,11 @@ $(document).ready(function () {
 
     });
 
-        $('.check-link').click(function () {
-        var button = $(this).find('i');
-        var label = $(this).next('span');
-        button.toggleClass('fa-check-square').toggleClass('fa-square-o');
-        label.toggleClass('todo-completed');
-        return false;
-    });
-
-    // Tooltips demo
-
     // Move modal to body
     // Fix Bootstrap backdrop issu with animation.css
-
-    // Full height of sidebar
-       $('.modal').appendTo("body");
-    function fix_height() {
-        var heightWithoutNavbar = $("body > #wrapper").height() - 61;
-        $(".sidebard-panel").css("min-height", heightWithoutNavbar + "px");
-
-        var navbarHeigh = $('nav.navbar-default').height();
-        var wrapperHeigh = $('#page-wrapper').height();
-
-        if (navbarHeigh > wrapperHeigh) {
-            $('#page-wrapper').css("min-height", navbarHeigh + "px");
-        }
-
-        if (navbarHeigh < wrapperHeigh) {
-            $('#page-wrapper').css("min-height", $(window).height() + "px");
-        }
-
-        if ($('body').hasClass('fixed-nav')) {
-            if (navbarHeigh > wrapperHeigh) {
-                $('#page-wrapper').css("min-height", navbarHeigh - 60 + "px");
-            } else {
-                $('#page-wrapper').css("min-height", $(window).height() - 60 + "px");
-            }
-        }
-
-    }
-
-    fix_height();
+    $('.modal').appendTo("body");
+ 
+  
 
     // Fixed Sidebar
     $(window).bind("load", function () {
@@ -112,114 +103,24 @@ $(document).ready(function () {
 
     // Move right sidebar top after scroll
     $(window).scroll(function () {
-        if ($(window).scrollTop() > 0 && !$('body').hasClass('fixed-nav')) {
+        if ($(window).scrollTop() > 0) {
             $('#right-sidebar').addClass('sidebar-top');
-        } else {
+        } 
+		else {
             $('#right-sidebar').removeClass('sidebar-top');
         }
     });
-
-    $(window).bind("load resize scroll", function () {
-        if (!$("body").hasClass('body-small')) {
-            fix_height();
-        }
-    });
-
 
 
     // Add slimscroll to element
     $('.full-height-scroll').slimscroll({
         height: '100%'
     });
-
-    $(window).bind("resize", function () {
-    if ($(this).width() < 769) {
-        $('body').addClass('body-small')
-    } else {
-        $('body').removeClass('body-small')
-    }
-    });
+	if(!localStorageSupport)
+	{
+		Message("warning","此站点需要支持html5的浏览器,否则显示会有异常");
+	}
 });
 
 
-// Minimalize menu when screen is less than 768px
 
-
-// Local Storage functions
-// Set proper body class and plugins based on user configuration
-
-
-// For demo purpose - animation css script
-function animationHover(element, animation) {
-    element = $(element);
-    element.hover(
-        function () {
-            element.addClass('animated ' + animation);
-        },
-        function () {
-            //wait for animation to finish before removing classes
-            window.setTimeout(function () {
-                element.removeClass('animated ' + animation);
-            }, 2000);
-        });
-}
-
-function SmoothlyMenu() {
-    if (!$('body').hasClass('mini-navbar') || $('body').hasClass('body-small')) {
-        // Hide menu in order to smoothly turn on when maximize menu
-        $('#side-menu').hide();
-        // For smoothly turn on menu
-        setTimeout(
-            function () {
-                $('#side-menu').fadeIn(400);
-            }, 200);
-    } else if ($('body').hasClass('fixed-sidebar')) {
-        $('#side-menu').hide();
-        setTimeout(
-            function () {
-                $('#side-menu').fadeIn(400);
-            }, 100);
-    } else {
-        // Remove all inline style from jquery fadeIn function to reset menu state
-        $('#side-menu').removeAttr('style');
-    }
-}
-
-
-// Dragable panels
-function WinMove() {
-    var element = "[class*=col]";
-    var handle = ".ibox-title";
-    var connect = "[class*=col]";
-    $(element).sortable(
-        {
-            handle: handle,
-            connectWith: connect,
-            tolerance: 'pointer',
-            forcePlaceholderSize: true,
-            opacity: 0.8
-        })
-        .disableSelection();
-}
-
-
-
-
-
-
-function Message(type,message) {
-    toastr.options = {
-        closeButton: true,
-        progressBar: true,
-        //showMethod: 'slideDown',
-        timeOut: 1000,
-        positionClass:'toast-top-center'
-        };
-        toastr[type](message);
-
-    }
-function getNowtime()
-    {
-        var myDate = new Date();
-         return myDate.getDate()+"."+(myDate.getMonth()+1)+"."+myDate.getFullYear();  
-    }
