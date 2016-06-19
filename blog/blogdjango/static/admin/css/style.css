@@ -239,12 +239,15 @@ h5 {
 .nav-second-level li:last-child {
   margin-bottom: 10px;
 }
+
+
 body:not(.fixed-sidebar):not(.canvas-menu).mini-navbar .nav li:hover > .nav-second-level,
 .mini-navbar .nav li:focus > .nav-second-level {
   display: block;
   border-radius: 0 2px 2px 0;
   min-width: 140px;
   height: auto;
+  z-index: 2001;
 }
 body.mini-navbar .navbar-default .nav > li > .nav-second-level li a {
   font-size: 12px;
@@ -264,6 +267,13 @@ body.mini-navbar .navbar-default .nav > li > .nav-second-level li a {
   padding: 10px 10px 10px 10px;
   font-size: 12px;
 }
+.mini-navbar.mini-fixed-sidebar .nav-second-level {
+  position: fixed;
+  background-color: #2f4050;
+  padding: 10px 10px 10px 10px;
+  font-size: 12px;
+}
+
 .canvas-menu.mini-navbar .nav-second-level {
   background: #293846;
 }
@@ -323,8 +333,13 @@ body.mini-navbar .navbar-default .nav > li > .nav-second-level li a {
   background: #f3f3f4;
 }
 .fixed-nav #wrapper {
-  margin-top: 0;
+  margin-top: 0px;
 }
+
+.fixed-nav .page-heading {
+  margin-top: 60px;
+}
+
 body.fixed-nav #wrapper .navbar-static-side,
 body.fixed-nav #wrapper #page-wrapper {
   margin-top: 60px;
@@ -339,7 +354,7 @@ body.fixed-nav.fixed-nav-basic.mini-navbar .navbar-fixed-top {
   left: 70px;
 }
 body.fixed-nav.fixed-nav-basic.fixed-sidebar.mini-navbar .navbar-fixed-top {
-  left: 0;
+  left: 0px;
 }
 body.fixed-nav.fixed-nav-basic #wrapper .navbar-static-side {
   margin-top: 0;
@@ -404,11 +419,16 @@ body.canvas-menu .navbar-static-side {
   z-index: 2001;
   height: 100%;
 }
+body.mini-fixed-sidebar .navbar-static-side{
+	position: fixed;
+	z-index: 2001;
+}
+
 body.fixed-sidebar.mini-navbar .navbar-static-side {
-  width: 0;
+  width: 0px;
 }
 body.fixed-sidebar.mini-navbar #page-wrapper {
-  margin: 0 0 0 0;
+  margin: 0 0 0 0px;
 }
 body.body-small.fixed-sidebar.mini-navbar #page-wrapper {
   margin: 0 0 0 220px;
@@ -3207,6 +3227,7 @@ body.tour-open .animated {
 #right-sidebar.sidebar-open {
   right: 0;
 }
+
 #right-sidebar.sidebar-open.sidebar-top {
   top: 0;
   border-top: none;

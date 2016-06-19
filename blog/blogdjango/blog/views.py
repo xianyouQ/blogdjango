@@ -65,6 +65,9 @@ def addNewActicle(request):
 		context = mblogAction.updateOrCreateArticle(request.POST)
 		return HttpResponse(json.dumps(context),content_type="application/json",status = context["code"])
 	else:
+		if "lastArticleId" in request.GET:
+			context = mblogAction.queryArticle(tag=request.GET.get("tag-search",""),startNum=request.GET.get("lastArticleId"))
+			return HttpResponse(json.dumps(context),content_type="application/json",status = context["code"])
 		context = mblogAction.queryArticle(tag=request.GET.get("tag-search",""))
 		return TemplateResponse(request,"blog/ArticleEditor.html",context,status = context["code"])
 		
@@ -75,6 +78,9 @@ def shortArticle(request):
 		context = mblogAction.addNewShortArticle(request.POST)
 		return HttpResponse(json.dumps(context),content_type="application/json",status = context["code"])
 	else:
+		if "lastShortArticleId" in request.GET:
+			context = mblogAction.queryShortArticle(startNum=request.GET.get("lastShortArticleId"))
+			return HttpResponse(json.dumps(context),content_type="application/json",status = context["code"])
 		context = mblogAction.queryShortArticle()
 		return TemplateResponse(request,"blog/shortArticleEditor.html",context,status = context["code"])
 		
@@ -109,6 +115,9 @@ def photoView(request):
 		context = mblogAction.uploadPhoto(request)
 		return HttpResponse(json.dumps(context),content_type="application/json",status = context["code"])
 	else:
+		if "lastPhotoId" in request.GET:
+			context = mblogAction.requeryPhoto(startNum=request.GET.get("lastPhotoId"))
+			return HttpResponse(json.dumps(context),content_type="application/json",status = context["code"])
 		context = mblogAction.requeryPhoto()
 	return TemplateResponse(request,"blog/photo.html",context,status = context["code"])
 

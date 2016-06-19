@@ -1,55 +1,65 @@
-﻿
-<!DOCTYPE html>
-<html>
-<!-- 测试使用 -->
-<head>
-
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-
-    <title>ADMIN | Dashboard</title>
-	{% load static %}
-	<link href="http://libs.baidu.com/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
-    <link href="http://libs.baidu.com/fontawesome/4.0.3/css/font-awesome.min.css" rel="stylesheet">
-	<link href="http://libs.cdnjs.net/files/toastr/2.1.2/toastr.min.css" rel="stylesheet">
-	<link href="http://libs.cdnjs.net/files/jquery.gritter/1.7.4/css/jquery.gritter.css" rel="stylesheet">
-    <link href="{% static 'admin/css/animate.css' %}" rel="stylesheet">
-    <link href="{% static 'admin/css/style.css' %}" rel="stylesheet">
-	
-   
-	<script src="http://libs.cdnjs.net/files/jquery/2.2.4/jquery.min.js"></script>
-	<script src="http://libs.baidu.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
-    <script src="http://libs.cdnjs.net/files/jquery.metismenu/2.5.2/metisMenu.min.js"></script>
-	<script src="http://cdn.bootcss.com/jQuery-slimScroll/1.3.7/jquery.slimscroll.min.js"></script>
-    
-	
-
-    <script src="http://libs.cdnjs.net/files/pace/1.0.2/pace.min.js"></script>
-	<!--<script src="http://libs.cdnjs.net/files/jquery.ui/1.11.4/jquery-ui.min.js"></script> -->
-    <script src="http://libs.cdnjs.net/files/jquery.gritter/1.7.4/js/jquery.gritter.min.js"></script>
-	<script src="http://libs.cdnjs.net/files/jquery.cookie/1.4.1/jquery.cookie.min.js"></script>
-
-    <script src="http://libs.cdnjs.net/files/toastr/2.1.2/toastr.min.js"></script>
-    <script src="{% static 'blog/js/xianyouq.js' %}"></script>
-    <script src="{% static 'admin/js/inspinia2.js' %}"></script>
-	
-	<link href="http://cdn.bootcss.com/summernote/0.8.1/summernote.css" rel="stylesheet">
-
-<script src="http://cdn.bootcss.com/summernote/0.8.1/summernote.min.js"></script>
+﻿{% extends 'blog/base.html' %}
+{% block jshead %}
+{{ block.super }}
 <script>
-function startEditor()
-{
-	$('.summernote').summernote();
-}
-</script>
-</head>
-<body>
-<div>
-<button id="new" onclick="startEditor()" type="button">新建</button>
-<div class="summernote">
+$(document).ready(function(){
+$("li[id].menu-li").hover(function(){
+  var id = $(this).attr("id").split("-")[1];
+  var top = Number(id) * 40;
+ $(this).find("ul.nav-second-level").css("top",top + "px");
+	Message("success",top);
+});
+});
 
-</div>
-</div>
+</script>
+{% endblock %}
+{% block leftmenu %}
+    <nav class="navbar-default navbar-static-side" role="navigation">
+        <div class="sidebar-collapse">
+            <ul class="nav metismenu" id="side-menu">
+                 {% block menulist %}
+					<li id="li-1" class="menu-li">
+						{% if username %}
+						<a href="/blog/user/{{username}}/"><i class="fa fa-home"></i> <span class="nav-label">首页</span> <span class="fa arrow"></span></a>
+						{% else %}
+						<a href="{% url 'blogdjango:selfIndex' %}"><i class="fa fa-home"></i> <span class="nav-label">首页</span> <span class="fa arrow"></span></a>
+						{% endif %}
+					</li>
+					<li id="li-2" class="menu-li">
+						<a href="{% url 'blogdjango:shortArticle' %}"><i class="fa fa-file-text-o"></i> <span class="nav-label">短篇博文</span> <span class="fa arrow"></span></a>
+												<ul class="nav nav-second-level collapse">
+							<li><a href="{% url 'blogdjango:processPermission' %}">权限管理</a></li>
+							<li><a href="{% url 'blogdjango:userProfile' %}">用户配置</a></li>
+						</ul>
+					</li>
+					<li id="li-3" class="menu-li">
+						<a href="{% url 'blogdjango:addNewActicle' %}"><i class="fa fa-file-text-o"></i> <span class="nav-label">博客文章</span> <span class="fa arrow"></span></a>
+												<ul class="nav nav-second-level collapse">
+							<li><a href="{% url 'blogdjango:processPermission' %}">权限管理</a></li>
+							<li><a href="{% url 'blogdjango:userProfile' %}">用户配置</a></li>
+						</ul>
+					</li>
+					<li id="li-4" class="menu-li">
+						<a href="{% url 'blogdjango:photoView' %}"><i class="fa fa-file-text-o"></i> <span class="nav-label">照片</span> <span class="fa arrow"></span></a>
+												<ul class="nav nav-second-level collapse">
+							<li><a href="{% url 'blogdjango:processPermission' %}">权限管理</a></li>
+							<li><a href="{% url 'blogdjango:userProfile' %}">用户配置</a></li>
+						</ul>
+					</li>
+					<li id="li-5" class="active menu-li">
+						<a href="{% url 'blogdjango:processPermission' %}"><i class="fa fa-cog"></i> <span class="nav-label">博客设置</span><span class="fa arrow"></span></a>
+						<ul class="nav nav-second-level collapse">
+							<li><a href="{% url 'blogdjango:processPermission' %}">权限管理</a></li>
+							<li><a href="{% url 'blogdjango:userProfile' %}">用户配置</a></li>
+						</ul>
+					</li>
+                 {% endblock %}
+              </ul>
+            </div>
+        </nav>
+
+      
+{% endblock %}
 
 </body>
+</html>

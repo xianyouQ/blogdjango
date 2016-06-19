@@ -14,6 +14,14 @@ function localStorageSupport() {
     return (('localStorage' in window) && window['localStorage'] !== null)
 }
 
+ (function ($) {
+     $.getUrlParam = function (name) {
+         var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+         var r = window.location.search.substr(1).match(reg);
+         if (r != null) return unescape(r[2]); return null;
+     }
+ })(jQuery);
+
 function SmoothlyMenu() {
     if (!$('body').hasClass('mini-navbar') || $('body').hasClass('body-small')) {
         // Hide menu in order to smoothly turn on when maximize menu
@@ -175,20 +183,19 @@ function queryCommentSuccessHandle(data,textStatus)
 	
 	var commentTemplate = $(".social-feed-box").clone(true);
 	var commentStr="";
+	console.log(data.comment);
 	for (var commentParentId in data.comment)
 	{
 		
 		 $.each(data.comment[commentParentId],function(n,json){
-			var userjson = $.parseJSON(json.user);
-			var commentjson = $.parseJSON(json.comment);
-			commentTemplate.find("a.comment-User").html(userjson.fields["username"]);
-	 		commentTemplate.find("small.text-muted").html(commentjson.fields["comment_time"]);
+			commentTemplate.find("a.comment-User").html(json.user);
+	 		commentTemplate.find("small.text-muted").html(json.comment.comment_time);
 	 		commentTemplate.find("small.commentParentId").html(commentParentId);
-	 		commentTemplate.find("p.comment-content").html(commentjson.fields["context"]);
+	 		commentTemplate.find("p.comment-content").html(json.comment.context);
 
 	 		commentTemplate.children().removeClass("hidden");
 			commentTemplate.children().addClass("commentBox")
-	 	if (commentjson["pk"] == commentParentId)
+	 	if (json.comment.id == commentParentId)
 	 	{
 			commentTemplate.children().removeClass("pull-right");
 	 		commentTemplate.children().addClass("pull-left");
@@ -280,6 +287,12 @@ function queryComments(articleId,username)
 
 function opendetail(ArticleId,username)
 {
+	console.log(ArticleId);
+	if(typeof(ArticleId)=="undefined")
+	{
+		Message("error","数据异常,请尝试重新刷新");
+		return void(0);
+	}
 	toggleHide();
 	var articlecontent = $("#article_list_"+ArticleId).html();
 	
@@ -301,7 +314,6 @@ function saveArticle(is_publish)
 			Message("warning","您尚未输入任何内容");
 			return void(0)
 		}
-		console.log(articleId);
 		if(articleId == "undefined")
 		{
 			articleId = undefined;
@@ -360,21 +372,16 @@ function saveArticle(is_publish)
 		function success(data,textStatus,json)
 		{
 			ArticleSuccessHandle(data,textStatus);
-			var listsize = $(".shortArticleList .row:first-child").children(".col-lg-12").length;
+			var listsize = $(".shortArticleList").children(".col-lg-12").length;
 			if (listsize > 0)
 			{
-				$(".shortArticleList").addClass("hidden");
-			}
-			var size = $(".newShortArticleList .row:first-child").children(".ibox").length;
-			if (size >= 3)
-			{
-				$(".newShortArticleList").prepend('<div class="row"></div>');
+				$(".shortArticleList").children(".col-lg-12").remove();
 			}
 			var shortArticleTemplate = $(".shortArticleTemplate").clone();
+			shortArticleTemplate.find("div.col-lg-4").attr("id","short_Article_" + json.id)
 			shortArticleTemplate.find("span.text-muted").html('<i class="fa fa-clock-o"></i>'+ data.create_time);
 			shortArticleTemplate.find(".article-content").html(json.content);
-			$(".newShortArticleList .row:first-child").prepend(shortArticleTemplate.html());
-			$(".newShortArticleList").removeClass("hidden");
+			$(".shortArticleList").prepend(shortArticleTemplate.html());;
 		}
     commitJson(success,ArticleErrorHandle,json,"/blog/shortArticle/","POST");
 }
@@ -438,3 +445,192 @@ function userActive(){
 	  commitJson(success,error,json,"/admin/users/","POST");
 }
 
+function blogChange(id)
+{
+	var key = id.split("_")[1];
+	var checked = $("#" + id).prop("checked");
+	localStorage.setItem(key,checked);
+	readLocalStorageChange(key)
+	
+}
+
+function readLocalStorageChange(updatekey){
+
+	 if (localStorage.getItem("fixedsidebar") == "true") {
+		 if(updatekey == "fixedsidebar")
+		{
+        $('body').removeClass("fixed-sidebar");
+		localStorage.setItem("hiddensidebar",false);
+		}
+		$('body').addClass('mini-fixed-sidebar');
+    }
+	else{
+		$('body').removeClass('mini-fixed-sidebar');
+	}
+	if(localStorage.getItem("hiddensidebar") == "true")
+	{
+		 if(updatekey == "hiddensidebar")
+		{
+        $('body').removeClass("mini-fixed-sidebar");
+		localStorage.setItem("fixedsidebar",false);
+		}
+		$('body').addClass('fixed-sidebar');
+	}
+	else{
+		$('body').removeClass('fixed-sidebar');
+	}
+    if (localStorage.getItem("collapse_menu") == "true") {
+            if (!$('body').hasClass('body-small')) {
+                $('body').addClass('mini-navbar');
+            }
+    }
+	else {
+		 $('body').removeClass('mini-navbar');
+	}
+	if (localStorage.getItem("fixednavbar") == "true") {
+        $(".navbar-static-top").removeClass('navbar-static-top').addClass('navbar-fixed-top');
+        $('body').addClass('fixed-nav').addClass("fixed-nav-basic");
+    }
+	else{
+		$(".navbar-fixed-top").addClass("navbar-static-top").removeClass("navbar-fixed-top");
+		$('body').removeClass('fixed-nav').removeClass("fixed-nav-basic");
+	}
+	function checkvalue(str)
+	{
+		if(str == "true")
+		{
+			return true;
+		}
+		else{
+			return false;
+		}
+	}
+	$("input[id$='fixedsidebar']").attr("checked",checkvalue(localStorage.getItem("fixedsidebar")));
+	$("input[id$='fixednavbar']").attr("checked",checkvalue(localStorage.getItem("fixednavbar")));
+	$("input[id$='hiddensidebar']").attr("checked",checkvalue(localStorage.getItem("hiddensidebar")));
+}
+
+function refreshArticle()
+{
+	var size = $("div[id^='article_list']").length
+	
+	if (size < 6)
+	{
+		return void(0);
+	}
+	var lastArticleDiv = $("div[id^='article_list']")[size - 1];
+	var lastId = lastArticleDiv.id.split("_")[2];
+	if (lastId <= 1)
+	{
+		return void(0);
+	}
+	var tag = $.getUrlParam("tag-search");
+	if(tag != null )
+	{
+		var url = "/blog/article/?tag-search=" + tag + "&lastArticleId=" + lastId;
+	}
+	else
+	{
+		var url = "/blog/article/?lastArticleId=" + lastId;
+	}
+	function success(data,textStatus)
+	{
+		$.each(data.Articles,function(idx,json){
+			var articleTemplate = $(".articleTemplate").clone();
+			articleTemplate.find("span.text-muted").html('<i class="fa fa-clock-o"></i>'+ json.create_time);
+			articleTemplate.find("h1").html(json.blog_text_title);
+			articleTemplate.find("div.limitline").html(json.context);
+			articleTemplate.find("#article_list_template").attr("id","article_list_" + json.id);
+			articleTemplate.find("button").attr("onclick","opendetail(" + json.id + ")");
+			console.log(json.article_tags);
+			var tags = json.article_tags.split(',');
+			for (var tag in tags)
+			{
+				articleTemplate.find("div.tags").append('<button class="btn btn-white btn-xs" type="button">'+tags[tag]+ '</button>')
+			}
+			$("div.blog > div.row").append(articleTemplate.html());
+		});
+	}
+	function error(XMLHttpRequest, textStatus, errorThrown)
+	{
+		if (XMLHttpRequest.status == 500) {
+			Message("error","哎呀，服务器出错了");
+		}
+		else{
+			Message("error","获取数据失败");
+		}
+	}
+	commitJson(success,error,{},url,"GET");
+}
+
+function refreshPhoto()
+{
+	var size = $("a[id^='Gallery']").length
+	if (size <= 13)
+	{
+		return void(0);
+	}
+	var lastPhotoA = $("a[id^='Gallery']")[size - 1];
+	var lastId = lastPhotoA.id.split("_")[1];
+	if (lastId <= 1)
+	{
+		return void(0);
+	}
+	var url = "/blog/photo/?lastPhotoId=" + lastId;
+
+	function success(data,textStatus)
+	{
+		$.each(data,function(idx,json){
+			$(".lightBoxGallery").append('<a href="'+json.url+'" id="Gallery_'+json.id+'" title="Image from Unsplash" data-gallery=""><img height="200" width="200" src="'+json.url+'"></a>')
+		});
+	}
+	function error(XMLHttpRequest, textStatus, errorThrown)
+	{
+		if (XMLHttpRequest.status == 500) {
+			Message("error","哎呀，服务器出错了");
+		}
+		else{
+			Message("error","获取数据失败");
+		}
+	}
+	commitJson(success,error,{},url,"GET");
+}
+
+
+function refreshShortArticle()
+{	
+	var size = $("div[id^='short_Article']").length
+	if (size < 12)
+	{
+		return void(0);
+	}
+
+	var lastShortArticle = $("div[id^='short_Article']")[size - 1];
+	var lastId = lastShortArticle.id.split("_")[2];
+	if (lastId <= 1)
+	{
+		return void(0);
+	}
+	var url = "/blog/shortArticle/?lastShortArticleId=" + lastId;
+	
+	function success(data,textStatus)
+	{
+		$.each(data.shortArticles,function(idx,json){
+			var shortArticleTemplate = $(".shortArticleTemplate").clone();
+			shortArticleTemplate.find("div.col-lg-4").attr("id","short_Article_" + json.id)
+			shortArticleTemplate.find("span.text-muted").html('<i class="fa fa-clock-o"></i>'+ json.create_time);
+			shortArticleTemplate.find(".article-content").html(json.context);
+			$(".shortArticleList").append(shortArticleTemplate.html());;
+		});
+	}
+	function error(XMLHttpRequest, textStatus, errorThrown)
+	{
+		if (XMLHttpRequest.status == 500) {
+			Message("error","哎呀，服务器出错了");
+		}
+		else{
+			Message("error","获取数据失败");
+		}
+	}
+	commitJson(success,error,{},url,"GET");
+}

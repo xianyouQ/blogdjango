@@ -5,6 +5,7 @@ import json
 
 class UserDetail(models.Model):
 	user = models.OneToOneField(User)
+	username = models.CharField(max_length=150,unique=True)
 	nickname = models.CharField(max_length=200,default="",verbose_name=u"昵称")
 	create_time = models.DateTimeField(auto_now_add=True,verbose_name=u"创建时间")
 	is_active = models.BooleanField(default=False,verbose_name=u"是否通过审核")
@@ -130,6 +131,7 @@ class Message(models.Model):
 		ordering = ["-contact_time"]
 
 class BlogPhoto(models.Model):
+	id = models.AutoField(primary_key=True)
 	blog = models.ForeignKey(Blog)
 	upload_time = models.DateTimeField(auto_now_add=True,verbose_name=u"照片上传时间")
 	photo = models.ImageField(upload_to="userphoto/%Y/%m/%d")

@@ -209,36 +209,50 @@
 
                         <div class="sidebar-title">
                             <h3><i class="fa fa-gears"></i> Settings</h3>
-                            <small><i class="fa fa-tim"></i> You have 14 projects. 10 not completed.</small>
                         </div>
 
-                        <div class="setings-item">
-                    <span>
-                        Show notifications
-                    </span>
+					<div class="setings-item">
+						<span>
+							左边菜单固定
+						</span>
                             <div class="switch">
                                 <div class="onoffswitch">
-                                    <input type="checkbox" name="collapsemenu" class="onoffswitch-checkbox" id="example">
-                                    <label class="onoffswitch-label" for="example">
+                                    <input type="checkbox" class="onoffswitch-checkbox" id="sidebar_fixedsidebar" onchange="blogChange('sidebar_fixedsidebar')">
+                                    <label class="onoffswitch-label" for="sidebar_fixedsidebar">
                                         <span class="onoffswitch-inner"></span>
                                         <span class="onoffswitch-switch"></span>
                                     </label>
                                 </div>
                             </div>
-                        </div>
-                        <div class="setings-item">
-
-
-                        <div class="sidebar-content">
-                            <h4>Settings</h4>
-                            <div class="small">
-                                I belive that. Lorem Ipsum is simply dummy text of the printing and typesetting industry.
-                                And typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.
-                                Over the years, sometimes by accident, sometimes on purpose (injected humour and the like).
+                       </div>
+					<div class="setings-item">
+						<span>
+							导航栏固定
+						</span>
+                            <div class="switch">
+                                <div class="onoffswitch">
+                                    <input type="checkbox" class="onoffswitch-checkbox" id="sidebar_fixednavbar" onchange="blogChange('sidebar_fixednavbar')">
+                                    <label class="onoffswitch-label" for="sidebar_fixednavbar">
+                                        <span class="onoffswitch-inner"></span>
+                                        <span class="onoffswitch-switch"></span>
+                                    </label>
+                                </div>
                             </div>
-                        </div>
-
-                    </div>
+                       </div>
+					<div class="setings-item">
+						<span>
+							左边菜单最小化时消失
+						</span>
+                            <div class="switch">
+                                <div class="onoffswitch">
+                                    <input type="checkbox" class="onoffswitch-checkbox" id="sidebar_hiddensidebar" onchange="blogChange('sidebar_hiddensidebar')">
+                                    <label class="onoffswitch-label" for="sidebar_hiddensidebar">
+                                        <span class="onoffswitch-inner"></span>
+                                        <span class="onoffswitch-switch"></span>
+                                    </label>
+                                </div>
+                            </div>
+                       </div>
                 </div>
 
             </div>

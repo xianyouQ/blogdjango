@@ -39,14 +39,14 @@
     {% endblock %}
 </head>
 
-<body class="navbar">
-    <div id="wrapper">
+<body class="navbar"> <!--mini-fixed-sidebar 菜单固定 fixed-nav fixed-nav-basic nav固定 -->
+    <div id="wrapper ">
        {% block leftmenu %}
        <!-- style.css 有针对 id="page-wrapper"特殊设置,所以把下面这个包括在block里面  -->
         <div class="gray-bg dashbard-1">
         {% endblock %}
         <div class="row border-bottom">
-        <nav class="navbar navbar-static-top" role="navigation" style="margin-bottom: 0">
+        <nav class="navbar navbar-static-top " role="navigation" style="margin-bottom: 0"> <!-- navbar-fixed-top 固定nav navbar-static-top  不固定nav -->
             {% block navhead %}
             <!-导航头-->
             {% endblock %}

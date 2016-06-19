@@ -80,6 +80,7 @@ $(document).ready(function () {
 
     // Minimalize menu
     $('.navbar-minimalize').click(function () {
+		localStorage.setItem("collapse_menu",!$("body").hasClass("mini-navbar"));
         $("body").toggleClass("mini-navbar");
         SmoothlyMenu();
 
@@ -89,28 +90,42 @@ $(document).ready(function () {
     // Fix Bootstrap backdrop issu with animation.css
     $('.modal').appendTo("body");
  
-  
+	//fix mini-fixed-sidebar 
+	$("li[id].menu-li").hover(function(){
+		if($("body").hasClass("mini-fixed-sidebar") && $("body").hasClass("mini-navbar"))
+		{
+			var id = $(this).attr("id").split("-")[1];
+			var size = $(this).height();
+			var logosize = $(".logo-element").height();
+			var top = Number(id) * size + logosize;
+			$(this).find("ul.nav-second-level").css("top",top + "px");
+		}
+		else
+		{
+			$(this).find("ul.nav-second-level").css("top","0");
+		}
+		
+	});
 
     // Fixed Sidebar
     $(window).bind("load", function () {
-        if ($("body").hasClass('fixed-sidebar')) {
+        if ($("body").hasClass('mini-fixed-sidebar')||$("body").hasClass('fixed-sidebar')) {
             $('.sidebar-collapse').slimScroll({
                 height: '100%',
                 railOpacity: 0.9
             });
         }
     });
-
     // Move right sidebar top after scroll
     $(window).scroll(function () {
-        if ($(window).scrollTop() > 0) {
+        if ($(window).scrollTop() > 0 && !$('body').hasClass('fixed-nav')) {
             $('#right-sidebar').addClass('sidebar-top');
         } 
 		else {
             $('#right-sidebar').removeClass('sidebar-top');
         }
+		
     });
-
 
     // Add slimscroll to element
     $('.full-height-scroll').slimscroll({
@@ -120,6 +135,7 @@ $(document).ready(function () {
 	{
 		Message("warning","此站点需要支持html5的浏览器,否则显示会有异常");
 	}
+	else {readLocalStorageChange();}
 });
 
 
