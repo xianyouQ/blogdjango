@@ -1,65 +1,202 @@
-﻿{% extends 'blog/base.html' %}
-{% block jshead %}
-{{ block.super }}
-<script>
-$(document).ready(function(){
-$("li[id].menu-li").hover(function(){
-  var id = $(this).attr("id").split("-")[1];
-  var top = Number(id) * 40;
- $(this).find("ul.nav-second-level").css("top",top + "px");
-	Message("success",top);
-});
-});
+﻿<!DOCTYPE html>
+<html>
 
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title>ADMIN | Dashboard</title>
+    
+    
+
+	<link href="http://libs.baidu.com/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
+    <link href="http://libs.baidu.com/fontawesome/4.0.3/css/font-awesome.min.css" rel="stylesheet">
+	<link href="http://libs.cdnjs.net/files/toastr/2.1.2/toastr.min.css" rel="stylesheet">
+    <!-- <link href="http://libs.cdnjs.net/files/ladda.bootstrap/0.1/ladda.min.css" rel="stylesheet"> -->
+	<!-- <link href="http://libs.cdnjs.net/files/jquery.gritter/1.7.4/css/jquery.gritter.css" rel="stylesheet"> -->
+    <link href="/static/admin/css/animate.css" rel="stylesheet">
+    <link href="/static/admin/css/style.css" rel="stylesheet">
+	
+   
+	<script src="http://libs.cdnjs.net/files/jquery/2.2.4/jquery.min.js"></script>
+	<script src="http://libs.baidu.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
+    <script src="http://libs.cdnjs.net/files/jquery.metismenu/2.5.2/metisMenu.min.js"></script>
+	<script src="http://cdn.bootcss.com/jQuery-slimScroll/1.3.7/jquery.slimscroll.min.js"></script>
+    
+	
+
+    <script src="http://libs.cdnjs.net/files/pace/1.0.2/pace.min.js"></script>
+	<!-- <script src="http://libs.cdnjs.net/files/jquery.ui/1.11.4/jquery-ui.min.js"></script>  跟summernote冲突 -->
+    <!-- <script src="http://libs.cdnjs.net/files/jquery.gritter/1.7.4/js/jquery.gritter.min.js"></script> -->
+	<script src="http://libs.cdnjs.net/files/jquery.cookie/1.4.1/jquery.cookie.min.js"></script>
+
+    <script src="http://libs.cdnjs.net/files/toastr/2.1.2/toastr.min.js"></script>
+  <!--  <script src="http://libs.cdnjs.net/files/ladda.bootstrap/0.1/spin.min.js"></script> -->
+     <!-- <script src="http://libs.cdnjs.net/files/ladda.bootstrap/0.1/ladda.min.js"></script>-->
+    <script src="/static/blog/js/xianyouq.js"></script>
+    <script src="/static/admin/js/inspinia.js"></script>
+    
+<script>
 </script>
-{% endblock %}
-{% block leftmenu %}
+
+</head>
+
+<body class="navbar"> <!--mini-fixed-sidebar 菜单固定 fixed-nav fixed-nav-basic nav固定 -->
+    <div id="wrapper ">
+       
     <nav class="navbar-default navbar-static-side" role="navigation">
         <div class="sidebar-collapse">
             <ul class="nav metismenu" id="side-menu">
-                 {% block menulist %}
-					<li id="li-1" class="menu-li">
-						{% if username %}
-						<a href="/blog/user/{{username}}/"><i class="fa fa-home"></i> <span class="nav-label">首页</span> <span class="fa arrow"></span></a>
-						{% else %}
-						<a href="{% url 'blogdjango:selfIndex' %}"><i class="fa fa-home"></i> <span class="nav-label">首页</span> <span class="fa arrow"></span></a>
-						{% endif %}
-					</li>
-					<li id="li-2" class="menu-li">
-						<a href="{% url 'blogdjango:shortArticle' %}"><i class="fa fa-file-text-o"></i> <span class="nav-label">短篇博文</span> <span class="fa arrow"></span></a>
-												<ul class="nav nav-second-level collapse">
-							<li><a href="{% url 'blogdjango:processPermission' %}">权限管理</a></li>
-							<li><a href="{% url 'blogdjango:userProfile' %}">用户配置</a></li>
-						</ul>
-					</li>
-					<li id="li-3" class="menu-li">
-						<a href="{% url 'blogdjango:addNewActicle' %}"><i class="fa fa-file-text-o"></i> <span class="nav-label">博客文章</span> <span class="fa arrow"></span></a>
-												<ul class="nav nav-second-level collapse">
-							<li><a href="{% url 'blogdjango:processPermission' %}">权限管理</a></li>
-							<li><a href="{% url 'blogdjango:userProfile' %}">用户配置</a></li>
-						</ul>
-					</li>
-					<li id="li-4" class="menu-li">
-						<a href="{% url 'blogdjango:photoView' %}"><i class="fa fa-file-text-o"></i> <span class="nav-label">照片</span> <span class="fa arrow"></span></a>
-												<ul class="nav nav-second-level collapse">
-							<li><a href="{% url 'blogdjango:processPermission' %}">权限管理</a></li>
-							<li><a href="{% url 'blogdjango:userProfile' %}">用户配置</a></li>
-						</ul>
-					</li>
-					<li id="li-5" class="active menu-li">
-						<a href="{% url 'blogdjango:processPermission' %}"><i class="fa fa-cog"></i> <span class="nav-label">博客设置</span><span class="fa arrow"></span></a>
-						<ul class="nav nav-second-level collapse">
-							<li><a href="{% url 'blogdjango:processPermission' %}">权限管理</a></li>
-							<li><a href="{% url 'blogdjango:userProfile' %}">用户配置</a></li>
-						</ul>
-					</li>
-                 {% endblock %}
+                 <li class="nav-header">
+                    <div class="profile-element"> <span>
+                            
+                            <img alt="image" height="60" width="60" class="img-circle" src="/face/2016/06/20/1466404350000.jpg" />
+                            
+                             </span>
+                            <a href="#">
+                            <span class="clear"> <span class="block m-t-xs"> 
+                            
+                            <strong class="font-bold">youxianQ</strong>
+                            
+                             </span></span> 
+                            </a>
+                    </div>
+                      <div class="logo-element">
+                         BLOG
+                       </div>
+                 </li>
+                 
+	<li id="li-1" class="active menu-li">
+		
+		<a href="/blog/index/"><i class="fa fa-home"></i> <span class="nav-label">首页</span> <span class="fa arrow"></span></a>
+		
+	</li>
+	<li id="li-2" class="menu-li">
+		<a href="/blog/shortArticle/"><i class="fa fa-file-text-o"></i> <span class="nav-label">短篇博文</span> <span class="fa arrow"></span></a>
+	</li>
+	<li id="li-3" class="menu-li">
+		<a href="/blog/article/"><i class="fa fa-file-text-o"></i> <span class="nav-label">博客文章</span> <span class="fa arrow"></span></a>
+	</li>
+	<li id="li-4" class="menu-li">
+		<a href="/blog/photo/"><i class="fa fa-file-text-o"></i> <span class="nav-label">照片</span> <span class="fa arrow"></span></a>
+	</li>
+	<li id="li-5" class=" menu-li">
+		<a href="/blog/permission/"><i class="fa fa-cog"></i> <span class="nav-label">博客设置</span><span class="fa arrow"></span></a>
+		<ul class="nav nav-second-level collapse">
+			<li><a href="/blog/permission/">权限管理</a></li>
+			<li><a href="/blog/userProfile/">用户配置</a></li>
+		</ul>
+	</li>
+
               </ul>
             </div>
         </nav>
 
-      
-{% endblock %}
+        <div id="page-wrapper" class="gray-bg dashbard-1">
 
+        <div class="row border-bottom">
+        <nav class="navbar navbar-static-top " role="navigation" style="margin-bottom: 0"> <!-- navbar-fixed-top 固定nav navbar-static-top  不固定nav -->
+            
+        <div class="navbar-header">
+            <a class="navbar-minimalize minimalize-styl-2 btn btn-primary " href="#"><i class="fa fa-bars"></i> </a>
+        </div>
+		
+		
+            <ul class="nav navbar-top-links navbar-right">
+				
+                <li>
+                    <a href="/accounts/logout/">
+                        <i class="fa fa-sign-out"></i> Log out
+                    </a>
+                </li>
+                <li>
+                    <a class="right-sidebar-toggle">
+                        <i class="fa fa-tasks"></i>
+                    </a>
+                </li>
+            </ul>
+
+        </nav>
+        </div>
+	
+
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-lg-10">
+        <h2>Blog</h2>
+        <ol class="breadcrumb">
+            <li>
+                <a href="#">Blog</a>
+            </li>
+
+            <li class="active">
+                <strong>主页</strong>
+            </li>
+        </ol>
+    </div>
+    <div class="col-lg-2">
+
+    </div>
+</div>
+<div class="row wrapper border-bottom white-bg page-heading">
+                <div class="col-lg-12">
+                    <div class="ibox float-e-margins">
+                        <div class="ibox-title">
+                            <h5>最近图片</h5>
+                            <div class="ibox-tools">
+                                <a class="collapse-link">
+                                    <i class="fa fa-chevron-up"></i>
+                                </a>
+                                <a class="close-link">
+                                    <i class="fa fa-times"></i>
+                                </a>
+                            </div>
+                        </div>
+                       
+                        <div class="ibox-content">
+                         
+                            <div class="carousel slide" id="carousel">
+                                <div class="carousel-inner">
+                                 
+                                 
+                                    <div class="item active">
+                                        <img alt="image" class="img-responsive" src="/userphoto/2016/06/20/1466413759.png">
+                                    </div>
+                                  
+                                  
+                                 
+                                      <div class="item">
+                                        <img alt="image" class="img-responsive" src="/userphoto/2016/06/20/1466413726.png">
+                                    </div>
+                                    
+                                  
+                                 
+                                      <div class="item">
+                                        <img alt="image" class="img-responsive" src="/userphoto/2016/06/20/1466413699.png">
+                                    </div>
+                                    
+                                  
+                                </div>
+                                <a data-slide="prev" href="#carousel" class="left carousel-control">
+                                    <span class="icon-prev"></span>
+                                </a>
+                                <a data-slide="next" href="#carousel" class="right carousel-control">
+                                    <span class="icon-next"></span>
+                                </a>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+</div>
+
+
+
+
+
+
+    </div>  
+</div>
 </body>
 </html>

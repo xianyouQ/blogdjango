@@ -130,6 +130,6 @@ STATIC_URL = '/static/'
 LOGIN_REDIRECT_URL="/blog/index/"
 
 NO_PERMISSON_TO_BLOG_TEMPLATE="registration/blog_no_permission.html"
-MEDIA_ROOT="media"
+MEDIA_ROOT="/home/youxianqin/media"
 
-ARTICLE_PHOTO_DIR=os.path.join(MEDIA_ROOT,"article")
+ARTICLE_PHOTO_DIR="article"

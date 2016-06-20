@@ -1,4 +1,17 @@
 {% extends 'blog/base_menu.html' %}
+{% block jshead %}
+{{ block.super  }}
+<script type="text/javascript">
+    $(document).ready(function(){
+        $(".carousel-inner").find("img").each(function(idx,img)
+            {   
+                console.log(img.style.width);
+                img.style.heigth = img.style.width;
+            });
+    });
+</script>
+
+{% endblock %}
 {% block menulist %}
 	<li id="li-1" class="active menu-li">
 		{% if username %}
@@ -27,64 +40,73 @@
 {% block content %}
 {% load static %}
 <div class="row wrapper border-bottom white-bg page-heading">
-    <div class="col-sm-4">
-	{% if blog%}
-        <h2>{{blog.blog_title}}</h2>
-		<small>{{userDetail.signature}}</small>
-	{% endif %}
+    <div class="col-lg-10">
+        <h2>Blog</h2>
+        <ol class="breadcrumb">
+            <li>
+                <a href="#">Blog</a>
+            </li>
+
+            <li class="active">
+                <strong>主页</strong>
+            </li>
+        </ol>
+    </div>
+    <div class="col-lg-2">
+
     </div>
 </div>
-<div class="row">
-    <div class="col-lg-12">
-        <div class="ibox float-e-margins">
-            <div class="ibox-title">
-                <h5>最近图片</h5>
-                <div class="ibox-tools">
-                    <a class="collapse-link">
-                        <i class="fa fa-chevron-up"></i>
-                    </a>
-                    <a class="close-link">
-                        <i class="fa fa-times"></i>
-                    </a>
-                </div>
-            </div>
-            {%  if lastimgs %}
-            <div class="ibox-content">
-                <div class="carousel slide" id="carousel3">
-                    <div class="carousel-inner">
-                     {% for img in lastimgs %}
-                      {% if forloop.counter0|divisibleby:"4" %}
-                        <div class="item gallery active left">
-                            <div class="row">
-                        {% endif %}
-                                <div class="col-sm-6">
-                                    <img alt="image" class="img-responsive" src="{{img.getphotourl}}">
-                                </div>
-                         {% if forloop.counter|divisibleby:"4" %}
+            <div class="row">
+                <div class="col-lg-5">
+                    <div class="ibox float-e-margins">
+                        <div class="ibox-title">
+                            <h5>最近图片</h5>
+                            <div class="ibox-tools">
+                                <a class="collapse-link">
+                                    <i class="fa fa-chevron-up"></i>
+                                </a>
+                                <a class="close-link">
+                                    <i class="fa fa-times"></i>
+                                </a>
                             </div>
                         </div>
-                        {% endif %}
-                    {% endfor %}
-                    <a data-slide="prev" href="#carousel3" class="left carousel-control">
-                        <span class="icon-prev"></span>
-                    </a>
-                    <a data-slide="next" href="#carousel3" class="right carousel-control">
-                        <span class="icon-next"></span>
-                    </a>
+                       
+                        <div class="ibox-content">
+                         {%  if lastimgs %}
+                            <div class="carousel slide" id="carousel">
+                                <div class="carousel-inner">
+                                 {% for img in lastimgs %}
+                                 {% if forloop.counter0 == 0 %}
+                                    <div class="item active">
+                                        <img alt="image" style="width:100%" class="img-responsive" src="{{img.getphotourl}}">
+                                    </div>
+                                  {% else %}
+                                      <div class="item">
+                                        <img alt="image" style="width:100%"  class="img-responsive" src="{{img.getphotourl}}">
+                                    </div>
+                                    {% endif %}
+                                  {% endfor %}
+                                </div>
+                                <a data-slide="prev" href="#carousel" class="left carousel-control">
+                                    <span class="icon-prev"></span>
+                                </a>
+                                <a data-slide="next" href="#carousel" class="right carousel-control">
+                                    <span class="icon-next"></span>
+                                </a>
+                            </div>
+                            {% else %}
+                           <div class="ibox-content">
+                                <p>
+                                    这个人很懒，暂时没有什么可以展示的
+                                </p>
+                            </div>
+                             {% endif %}
+                        </div>
+                    </div>
                 </div>
             </div>
-            {% else %}
-            <div class="ibox-content">
-                <p>
-                        这个人很懒，暂时没有什么可以展示的
-                </p>
-            </div>
-            {% endif %}
-        </div>
-    </div>
-</div>
 
-<div class="wrapper wrapper-content  animated fadeInRight blog">
+<div class="wrapper wrapper-content  animated fadeInRight">
     <div class="row">
 	{% if not shortArticles %}
 	    <div class="col-lg-12">

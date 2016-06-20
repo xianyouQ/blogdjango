@@ -131,3 +131,5 @@ def uploadArticlePhoto(request):
 	else:
 		context["code"] = 405
 	return HttpResponse(json.dumps(context),content_type="application/json",status = context["code"]) 
+def test(request):
+	return TemplateResponse(request,"blog/test.html",{})

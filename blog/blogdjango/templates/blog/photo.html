@@ -132,15 +132,7 @@
                 <div class="lightBoxGallery">
 					{% for photo in photos %}
                     <a href="{{photo.url}}" id="Gallery_{{photo.id}}" title="Image from Unsplash" data-gallery=""><img height="200" width="200" src="{{photo.url}}"></a>
-					{% endfor %}
-					<a href="/static/blog/test.jpg" title="Image from Unsplash" data-gallery=""><img height="200" width="200" src="/static/blog/test.jpg"></a>
-					<a href="/static/blog/test.jpg" title="Image from Unsplash" data-gallery=""><img height="200" width="200" src="/static/blog/test.jpg"></a>
-					<a href="/static/blog/test.jpg" title="Image from Unsplash" data-gallery=""><img height="200" width="200" src="/static/blog/test.jpg"></a>
-					<a href="/static/blog/test.jpg" title="Image from Unsplash" data-gallery=""><img height="200" width="200" src="/static/blog/test.jpg"></a>
-					<a href="/static/blog/test.jpg" title="Image from Unsplash" data-gallery=""><img height="200" width="200" src="/static/blog/test.jpg"></a>
-					<a href="/static/blog/test.jpg" title="Image from Unsplash" data-gallery=""><img height="200" width="200" src="/static/blog/test.jpg"></a>
-					<a href="/static/blog/test.jpg" title="Image from Unsplash" data-gallery=""><img height="200" width="200" src="/static/blog/test.jpg"></a>
-					<a href="/static/blog/test.jpg" title="Image from Unsplash" data-gallery=""><img height="200" width="200" src="/static/blog/test.jpg"></a>				
+					{% endfor %}		
                     <!-- The Gallery as lightbox dialog, should be a child element of the document body -->
                     <div id="blueimp-gallery" class="blueimp-gallery">
                         <div class="slides"></div>

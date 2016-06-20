@@ -27,11 +27,11 @@ class BlogAction:
 			if userName == None: ##获取自己的博客主页数据
 				article = BlogText.objects.select_related('blog__userDetail').filter(blog__userDetail__user=self.user)[0]
 				shortArticles = ShortArticle.objects.filter(blog=article.blog)[0:3]
-				photos = BlogPhoto.objects.filter(blog=article.blog)[0:8]
+				photos = BlogPhoto.objects.filter(blog=article.blog)[0:3]
 			elif self.blog_permission_required(priority["read"],userName):
 				article = BlogText.objects.select_related('blog__userDetail').filter(blog__userDetail__username__exact=userName,is_publish=True)[0]
 				shortArticles = ShortArticle.objects.filter(blog=article.blog)[0:3]
-				photos = BlogPhoto.objects.filter(blog=article.blog)[0:8]
+				photos = BlogPhoto.objects.filter(blog=article.blog)[0:3]
 				context["username"] = userName
 			else:
 				context["denied"] = settings.NO_PERMISSON_TO_BLOG_TEMPLATE
@@ -124,12 +124,14 @@ class BlogAction:
 		"""
 		context = {}
 		try:
-			askPermissons = BlogPermisson.objects.select_related("ask_from_user__user").filter(asked_user__user=self.user).filter(need_confirm=True)
+			mUserDetail = UserDetail.objects.get(user__exact=self.user)
+			askPermissons = BlogPermisson.objects.select_related("ask_from_user__user").filter(asked_user=mUserDetail).filter(need_confirm=True)
 		except:
 			traceback.print_exc()
 			context["code"] = 500
 			return context
 		context["permissons"] = askPermissons
+		context["userDetail"] = mUserDetail
 		context["code"] = 200
 		return context
 		
@@ -264,15 +266,16 @@ class BlogAction:
 		context = {}
 		try:
 			if username == None:
-				Articles = BlogText.objects.filter(blog__userDetail__user=self.user).filter(article_tags__icontains=tag).filter(id__lt=startNum)[0:echpage]
+				Articles = BlogText.objects.select_related("blog__userDetail").filter(blog__userDetail__user=self.user).filter(article_tags__icontains=tag).filter(id__lt=startNum)[0:echpage]
 			elif self.blog_permission_required(priority["read"],userName):
-				Articles = BlogText.objects.filter(blog__userDetailr__username__exact=username).filter(is_publish__exact=True).filter(article_tags__icontains=tag).filter(id__lt=startNum)[0:echpage]
+				Articles = BlogText.objects.select_related("blog__userDetail").filter(blog__userDetailr__username__exact=username).filter(is_publish__exact=True).filter(article_tags__icontains=tag).filter(id__lt=startNum)[0:echpage]
 				context["username"] = username
 			else:
 				context["denied"] = settings.NO_PERMISSON_TO_BLOG_TEMPLATE
 				context["username"] = username				
 			context["code"] = 200
-			context["Articles"] = ModelToJson(Articles)				
+			context["Articles"] = ModelToJson(Articles)
+			context["userDetail"] = 	Articles[0].blog.userDetail
 		except:
 			context["code"] = 500
 			traceback.print_exc()
@@ -318,20 +321,21 @@ class BlogAction:
 		
 	def queryShortArticle(self,username=None,echpage=12,startNum=sys.maxint):
 		"""
-		查询所有的短博文，后续加上分页功能
+		查询所有的短博文
 		"""
 		context = {}
 		try:
 			if username == None:
-				shortArticles = ShortArticle.objects.filter(blog__userDetail__user=self.user).filter(id__lt=startNum)[0:echpage]
+				shortArticles = ShortArticle.objects.select_related("blog__userDetail").filter(blog__userDetail__user=self.user).filter(id__lt=startNum)[0:echpage]
 			elif self.blog_permission_required(priority["read"],userName):
-				shortArticles = ShortArticle.objects.filter(blog__userDetail__username__exact=username).filter(id__lt=startNum)[0:echpage]
+				shortArticles = ShortArticle.objects.select_related("blog__userDetail").filter(blog__userDetail__username__exact=username).filter(id__lt=startNum)[0:echpage]
 				context["username"] = username
 			else:
 				context["denied"] = settings.NO_PERMISSON_TO_BLOG_TEMPLATE
 				context["username"] = username	
 			context["code"] = 200
 			context["shortArticles"] = ModelToJson(shortArticles)
+			context["userDetail"] = 	shortArticles[0].blog.userDetail
 		except:
 			context["code"] = 500
 			traceback.print_exc()
@@ -350,7 +354,7 @@ class BlogAction:
 			mUserDetail.head_photo = ContentFile(photoData,picName)
 			mUserDetail.save()
 			context["code"] = 200
-			context["photoUrl"] = mUserDetail.head_photo.url
+			context["photoUrl"] = mUserDetail.getheadphotourl()
 		except KeyError:
 			context["code"] = 400
 		except:
@@ -394,15 +398,16 @@ class BlogAction:
 		context = {}
 		try:
 			if username == None:
-				photos = BlogPhoto.objects.filter(blog__userDetail__user=self.user).filter(id__lt=startNum)[0:echpage]
+				photos = BlogPhoto.objects.select_related("blog__userDetail").filter(blog__userDetail__user=self.user).filter(id__lt=startNum)[0:echpage]
 			elif self.blog_permission_required(priority["read"],userName):
-				photos = BlogPhoto.objects.filter(blog__userDetail__username__exact=username).filter(id__lt=startNum)[0:echpage]
+				photos = BlogPhoto.objects.select_related("blog__userDetail").filter(blog__userDetail__username__exact=username).filter(id__lt=startNum)[0:echpage]
 				context["username"] = username
 			else:
 				context["denied"] = settings.NO_PERMISSON_TO_BLOG_TEMPLATE
 				context["username"] = username	
 			context["code"] = 200
 			context["photos"] = []
+			context["userDetail"] = 	photos[0].blog.userDetail
 			for photo in photos:
 				newphoto = {}
 				newphoto["id"] = photo.id
@@ -424,7 +429,7 @@ class BlogAction:
 			filename = int(time.time())
 			strstr = "%Y" + os.path.sep + "%m" + os.path.sep + "%d"
 			path=time.strftime(strstr, time.localtime() )
-			truepath = os.path.join(article_photo_dir, path)
+			truepath = os.path.join(settings.MEDIA_ROOT,article_photo_dir, path)
 			if not os.path.isdir(truepath):
 				os.makedirs(truepath)
 			fp = open(os.path.join(truepath,str(filename) +".jpg"), 'wb')
@@ -432,10 +437,11 @@ class BlogAction:
 				fp.write(chunk)
 			fp.close()
 			context["code"] = 200
-			context["url"] = path + os.path.sep + str(filename) + ".jpg"
+			context["url"] = os.path.sep + article_photo_dir + os.path.sep + path + os.path.sep + str(filename) + ".jpg"
 		except KeyError:
 			context["code"] = 400
 		except:
+			traceback.print_exc()
 			context["code"] = 500
 		return context
 	def uploadUserDetail(self,requestContext):
@@ -468,5 +474,3 @@ class BlogAction:
 		except:
 			context["code"] = 500
 		return context
-	def toJson(obj):
-		pass

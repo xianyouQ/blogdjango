@@ -89,7 +89,9 @@
 				$(this).removeAttr("disabled");
 				if (data)
 				{
-				//$("div.profile-element > img").attr("src",url);
+                    
+				$("div.profile-element img").attr("src",data.photoUrl);
+                  console.log($("div.profile-element img").html());
 				}
 			};
 			var error = function(XMLHttpRequest, textStatus, errorThrown)

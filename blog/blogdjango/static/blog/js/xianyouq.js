@@ -129,6 +129,7 @@ function startEditor()
 			FileUpload(file,"/blog/uploadArticlePhoto/",function(data){
 				if(data)
 				{
+
 					 $(".summernote").summernote("insertImage", data.url);
 				}
 			},function(XMLHttpRequest, textStatus, errorThrown){
@@ -633,4 +634,12 @@ function refreshShortArticle()
 		}
 	}
 	commitJson(success,error,{},url,"GET");
+}
+
+function refreshUserData(username)
+{
+	if(typeof(username) == "undefined")
+	{
+		localStorage.setItem("username",) 
+	}
 }

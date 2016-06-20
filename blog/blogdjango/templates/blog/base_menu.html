@@ -5,20 +5,10 @@
             <ul class="nav metismenu" id="side-menu">
                  <li class="nav-header">
                     <div class="profile-element"> <span>
-                            {%  if username %}
-                                {% if userimg %}
-                            <img alt="image" height="60" width="60" class="img-circle" src="{{userimg}}" />
-                                {% else %}
-                                <img alt="image" height="60" width="60" class="img-circle" src="/static/blog/default.jpg" />
-                                {% endif %}
-                            {% else %}
-                                {% if user.userimg %}
-                                <img alt="image" height="60" width="60" class="img-circle" src="{{user.userimg}}" />
-                                {% else %}
-                                <img alt="image" height="60" width="60" class="img-circle" src="/static/blog/default.jpg" />
-                                {% endif %}
+                            {% if userDetail %}
+                            <img alt="image" height="60" width="60" class="img-circle" src="{{userDetail.getheadphotourl}}" />
+                            {% endif %}
                              </span>
-                               {% endif %}
                             <a href="#">
                             <span class="clear"> <span class="block m-t-xs"> 
                             {%  if username %}
