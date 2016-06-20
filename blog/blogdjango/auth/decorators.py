@@ -2,7 +2,7 @@
 from functools import wraps
 from django.core.exceptions import PermissionDenied
 from django.utils.decorators import available_attrs
-from django.http import HttpResponseRedirect
+
 from blogdjango import models
 from django.contrib.auth.views import redirect_to_login
 from django.contrib.auth import REDIRECT_FIELD_NAME

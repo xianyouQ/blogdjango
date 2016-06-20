@@ -187,8 +187,8 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="image-crop">
-                                {% if user.head_photo %}
-                                    <img src="{{user.head_photo.url}}">
+                                {% if userDetail %}
+                                    <img src="{{userDetail.head_photo}}">
                                     {% else %}
                                     <img src="/static/blog/default.jpg">
                                     {% endif %}

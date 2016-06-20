@@ -3,11 +3,9 @@
 {{ block.super  }}
 <script type="text/javascript">
     $(document).ready(function(){
-        $(".carousel-inner").find("img").each(function(idx,img)
-            {   
-                console.log(img.style.width);
-                img.style.heigth = img.style.width;
-            });
+		$('.carousel').carousel({
+			interval: 5000
+		});
     });
 </script>
 
@@ -78,11 +76,11 @@
                                  {% for img in lastimgs %}
                                  {% if forloop.counter0 == 0 %}
                                     <div class="item active">
-                                        <img alt="image" style="width:100%" class="img-responsive" src="{{img.getphotourl}}">
+                                        <img alt="image" style="width:600px;heigth:600px" class="img-responsive" src="{{img.getphotourl}}">
                                     </div>
                                   {% else %}
                                       <div class="item">
-                                        <img alt="image" style="width:100%"  class="img-responsive" src="{{img.getphotourl}}">
+                                        <img alt="image" style="width:600px;heigth:600px"  class="img-responsive" src="{{img.getphotourl}}">
                                     </div>
                                     {% endif %}
                                   {% endfor %}

@@ -39,7 +39,8 @@ class BlogAction:
 			context["lastArticle"] = article
 			context["shortArticles"] = shortArticles
 			context["blog"] = article.blog
-			context["userDetail"] = article.blog.userDetail
+			context["userDetail"] = ModelToJson(article.blog.userDetail)
+			context["userDetail"]["head_photo"] = article.blog.userDetail.getheadphotourl()
 			context["lastimgs"] = photos
 			context["code"] ="200"
 		except Exception:
@@ -69,16 +70,19 @@ class BlogAction:
 					comments[comment.id] = []
 					newComment = {}
 					newComment["comment"] = ModelToJson(comment)
-					newComment["user"] = comment.comment_user.username
+					newComment["user"] = ModelToJson(comment.comment_user)
+					newComment["user"]["head_photo"] = comment.comment_user.getheadphotourl()
 					comments[comment.id].append(newComment)
 				else:
 					newComment = {}
 					newComment["comment"] = ModelToJson(comment)
-					newComment["user"] = comment.comment_user.username
+					newComment["user"] = ModelToJson(comment.comment_user)
+					newComment["user"]["head_photo"] = comment.comment_user.getheadphotourl()
 					comments[comment.parent_comment.id].append(newComment)  #是否会导致多次查询数据库
 			context["comment"] = comments
 			context["code"] = 200
 		except KeyError:
+			traceback.print_exc()
 			context["code"] = 400
 			return context
 		except:
@@ -131,7 +135,8 @@ class BlogAction:
 			context["code"] = 500
 			return context
 		context["permissons"] = askPermissons
-		context["userDetail"] = mUserDetail
+		context["userDetail"] = ModelToJson(mUserDetail)
+		context["userDetail"]["head_photo"] = mUserDetail.getheadphotourl()
 		context["code"] = 200
 		return context
 		
@@ -275,7 +280,8 @@ class BlogAction:
 				context["username"] = username				
 			context["code"] = 200
 			context["Articles"] = ModelToJson(Articles)
-			context["userDetail"] = 	Articles[0].blog.userDetail
+			context["userDetail"] = ModelToJson(Articles[0].blog.userDetail)
+			context["userDetail"]["head_photo"] = Articles[0].blog.userDetail.getheadphotourl()
 		except:
 			context["code"] = 500
 			traceback.print_exc()
@@ -335,7 +341,8 @@ class BlogAction:
 				context["username"] = username	
 			context["code"] = 200
 			context["shortArticles"] = ModelToJson(shortArticles)
-			context["userDetail"] = 	shortArticles[0].blog.userDetail
+			context["userDetail"] = ModelToJson(shortArticles[0].blog.userDetail)
+			context["userDetail"]["head_photo"] = shortArticles[0].blog.userDetail.getheadphotourl()
 		except:
 			context["code"] = 500
 			traceback.print_exc()
@@ -358,6 +365,7 @@ class BlogAction:
 		except KeyError:
 			context["code"] = 400
 		except:
+			traceback.print_exc()
 			context["code"] = 500
 		return context
 	
@@ -407,7 +415,8 @@ class BlogAction:
 				context["username"] = username	
 			context["code"] = 200
 			context["photos"] = []
-			context["userDetail"] = 	photos[0].blog.userDetail
+			context["userDetail"] = ModelToJson(photos[0].blog.userDetail)
+			context["userDetail"]["head_photo"] = photos[0].blog.userDetail.getheadphotourl()
 			for photo in photos:
 				newphoto = {}
 				newphoto["id"] = photo.id
@@ -469,7 +478,8 @@ class BlogAction:
 		context = {}
 		try:
 			mUserDetail = UserDetail.objects.get(user__exact=self.user)
-			context["userDetail"] = mUserDetail
+			context["userDetail"] = ModelToJson(mUserDetail)
+			context["userDetail"]["head_photo"] = mUserDetail.getheadphotourl()
 			context["code"] = 200
 		except:
 			context["code"] = 500

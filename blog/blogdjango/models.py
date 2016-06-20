@@ -19,7 +19,10 @@ class UserDetail(models.Model):
 	def __unicode__(self):
 		return self.user.username  
 	def getheadphotourl(self):
-		return "/" + self.head_photo.url
+		try:
+			return "/" + self.head_photo.url
+		except ValueError:
+			return "/face/default.jpg"
 
 	class Meta:
 		db_table = "user_detail"

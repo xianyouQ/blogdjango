@@ -8,6 +8,7 @@ from blogdjango.blog.blogAction import BlogAction
 from django.views.decorators.csrf import csrf_protect
 from django.template.response import TemplateResponse
 from django.core.exceptions import PermissionDenied
+from django.http import HttpResponseRedirect
 import json
 
 # Create your views here.
@@ -22,6 +23,8 @@ def selfIndex(request):
 
 @account_active_required()
 def userIndex(request,username):
+	if username == request.user.username:
+		return HttpResponseRedirect("/blog/index/")
 	mblogAction = BlogAction(request.user)
 	context = mblogAction.queryIndexData(username)
 	if context.has_key("denied"):

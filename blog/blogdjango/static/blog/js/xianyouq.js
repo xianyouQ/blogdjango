@@ -169,8 +169,8 @@ function cancel()
 function returnToArticleList()
 {
 	toggleHide();
-	$(".social-feed-box div").remove(".commentBox");
-	$(".social-feed-box").addClass("hidden");
+	$(".social-footer div").remove();
+	$(".social-footer").addClass("hidden");
 }
 function toggleHide()
 {
@@ -182,64 +182,59 @@ function toggleHide()
 function queryCommentSuccessHandle(data,textStatus)
 {
 	
-	var commentTemplate = $(".social-feed-box").clone(true);
-	var commentStr="";
+	
 	console.log(data.comment);
 	for (var commentParentId in data.comment)
 	{
 		
 		 $.each(data.comment[commentParentId],function(n,json){
-			commentTemplate.find("a.comment-User").html(json.user);
+			var commentTemplate = $("div.comment-template").clone(true);
+			commentTemplate.find("div.social-comment > a").attr("href","/blog/user/" + json.user.username + "/");
+			commentTemplate.find("div.social-comment > a > img").attr("src",json.user.head_photo);
+			commentTemplate.find("div.media-body a.comment-User").attr("src","/blog/user/" + json.user.username + "/").html(json.user.username).after(" "+json.comment.context);
 	 		commentTemplate.find("small.text-muted").html(json.comment.comment_time);
 	 		commentTemplate.find("small.commentParentId").html(commentParentId);
-	 		commentTemplate.find("p.comment-content").html(json.comment.context);
 
-	 		commentTemplate.children().removeClass("hidden");
-			commentTemplate.children().addClass("commentBox")
 	 	if (json.comment.id == commentParentId)
 	 	{
-			commentTemplate.children().removeClass("pull-right");
-	 		commentTemplate.children().addClass("pull-left");
+			$(".social-footer").append(commentTemplate.html());
 	 	}
 	 	else
 	 	{
-			commentTemplate.children().removeClass("pull-left");
-	 		commentTemplate.children().addClass("pull-right");
+			$(".social-footer > div.social-comment:last-child").append(commentTemplate.html());
 		}	
-			commentStr = commentStr + commentTemplate.html();
 		 });
 	}
-	$(".social-feed-box").append(commentStr);
-	$(".social-feed-box").removeClass("hidden");
+	$(".social-footer").append($(".comment-reply").html())
+	$(".social-footer").removeClass("hidden");
 		
-	$(".social-feed-box").find("button.answer-btn").click(function(){
-		
-			var username = $(this).closest("div.commentBox").find("a.comment-User").html();
-			var parentId = $(this).closest("div.commentBox").find("small.commentParentId").html();
+	$(".social-footer").find("a.answer-a").click(function(){
+			var username = $(this).closest("div.social-comment").find("a.comment-User").html();
+			var parentId = $(this).closest("div.social-comment").find("small.commentParentId").html();
 			$("#commentText").attr("placeholder","@" + username);
-			$("#commentText").attr("rows",3);
 			$("#commentParentId").attr("value",parentId);
 			$("#commentText").focus();
+			console.log(username+" "+parentId + " " + $("#commentText").attr("placeholder"));
 	}); 
 			
 }
 
-
-function commentTextfocus()
-{
-	$("#commentText").attr("rows",3);
-}
-
 function commentTextblur()
-{
+{	
+	console.log("blur");
 	if ($("#commentText").val().length > 0 )
 	{
 		
 		return void(0);
 	}
 	$("#commentText").attr("placeholder","在这里写评论")
-	$("#commentText").attr("rows",1);
 	$("#commentParentId").attr("value",undefined)
+}
+
+function commentTextfocus()
+{	
+	console.log("focus");
+	
 }
 function commitComment(articleId,username)
 {
@@ -634,12 +629,4 @@ function refreshShortArticle()
 		}
 	}
 	commitJson(success,error,{},url,"GET");
-}
-
-function refreshUserData(username)
-{
-	if(typeof(username) == "undefined")
-	{
-		localStorage.setItem("username",) 
-	}
 }
