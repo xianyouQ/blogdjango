@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from django.template.response import TemplateResponse
 from django.shortcuts import render_to_response
 from django.contrib.auth.forms import UserCreationForm,PasswordChangeForm
-from blogdjango.models import UserDetail,Blog
+from blogdjango.models import UserDetail
 from django.http import HttpResponseRedirect
 from django.contrib.auth import authenticate,login,update_session_auth_hash
 from django.views.decorators.csrf import csrf_protect
@@ -14,6 +14,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import resolve_url
 from django.utils.translation import ugettext as _
 import json
+from blog import settings
 
 # Create your views here.
 
@@ -29,9 +30,13 @@ def userRegister(request):
 			form.save()
 			user = authenticate(username=request.POST['username'], password=request.POST['password1'])
 			login(request, user)
+			if not settings.OPEN_REGISTER:
+				user.is_active = False
+				print "haha"
+				user.save()
 			user_detail = UserDetail()
 			user_detail.user = user
-			user_detail.username = username=request.POST['username']
+			user_detail.username = request.POST['username']
 			user_detail.save()
 			return HttpResponseRedirect("/blog/index/")
 		else:

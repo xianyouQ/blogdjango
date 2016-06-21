@@ -8,8 +8,6 @@ class UserDetail(models.Model):
 	username = models.CharField(max_length=150,unique=True)
 	nickname = models.CharField(max_length=200,default="",verbose_name=u"昵称")
 	create_time = models.DateTimeField(auto_now_add=True,verbose_name=u"创建时间")
-	is_active = models.BooleanField(default=False,verbose_name=u"是否通过审核")
-	need_confirm = models.BooleanField(default=True,verbose_name=u"需要审核")
 	access_confirm = models.BooleanField(default=True,verbose_name=u"访问权限控制")
 	friends = models.ManyToManyField("self",through="Friends",symmetrical=False,related_name="Permission")
 	contact_user = models.ManyToManyField("self",through="Message",symmetrical=False,related_name="Contact")  ###对称关系的话，through表会怎么表示
@@ -93,10 +91,12 @@ class Comment(models.Model):
 		ordering = ["comment_time"]
 		
 class ShortComment(models.Model):
+	id = models.AutoField(primary_key=True)
 	shortarticle = models.ForeignKey(ShortArticle)
 	parent_comment = models.ForeignKey("self",blank=True,null=True,related_name="children_comments")
 	context = models.TextField()
-	comment_user = models.ForeignKey(UserDetail,blank=True,null=True,on_delete=models.SET_NULL)
+	comment_user = models.ForeignKey(UserDetail,blank=True,null=True,on_delete=models.SET_NULL,related_name="short_comment_from")
+	comment_to_user = models.ForeignKey(UserDetail,blank=True,null=True,on_delete=models.SET_NULL,related_name="short_comment_to")
 	comment_time = models.DateTimeField(auto_now_add=True,verbose_name=u"评论时间")
 
 	class Meta:

@@ -53,16 +53,16 @@
 							{% for account in accounts %}
                             <tr>
                                 <td class="project-title">
-                                    <a href="#">{{account.user.username}}</a>
+                                    <a href="#">{{account.username}}</a>
                                 </td>
 								 <td class="project-title">
-                                    <small>{{account.create_time}}</small>
+                                    <small>{{account.date_joined}}</small>
                                 </td>
                                 <td class="project-actions">
 									<div class="switch">
 										<div class="onoffswitch">
-											<input type="checkbox" class="onoffswitch-checkbox" id="{{account.user.username}}" value="{{account.user.username}}" name="useractivecheckbox">
-											<label class="onoffswitch-label" for="{{account.user.username}}">
+											<input type="checkbox" class="onoffswitch-checkbox" id="{{account.username}}" value="{{account.username}}" name="useractivecheckbox">
+											<label class="onoffswitch-label" for="{{account.username}}">
 												<span class="onoffswitch-inner"></span>
 												<span class="onoffswitch-switch"></span>
 											</label>

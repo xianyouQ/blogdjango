@@ -1,5 +1,5 @@
 # encoding=utf8
-from blogdjango.models import UserDetail
+from django.contrib.auth.models import User
 import traceback
 import json
 
@@ -16,11 +16,11 @@ class adminAction:
 		"""
 		context = {}
 		try:
-			queryaccounts = UserDetail.objects.select_related("user").filter(need_confirm__exact=True)
+			queryaccounts = User.objects.filter(is_active=False)
 		except Exception:
-			context["error"] = "Internal Server Error"
+			context["code"] = 500
 			return context
-		accounts = []
+		context["code"] = 200
 		context["accounts"] = queryaccounts
 		return context
 
@@ -32,7 +32,7 @@ class adminAction:
 		for is_active,usernameStr in requestContext.items():
 			usernameList = usernameStr.split(",")
 			try:
-				changenum = UserDetail.objects.filter(user__username__in=usernameList).update(is_active=is_active,need_confirm=False)
+				changenum = User.objects.filter(username__in=usernameList).update(is_active=is_active)
 				context[is_active]=changenum
 			except Exception:
 				traceback.print_exc()
