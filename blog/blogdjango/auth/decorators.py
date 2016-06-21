@@ -43,7 +43,7 @@ def account_active_required(redirect_template="registration/accounts_no_active.h
 	检查账号是否激活，如果没有登陆会要求登陆，如果没有会根据redirect_template返回对应页面 或者抛出PermissionDenied
 	"""
 	def check_perms(user,*args,**kwargs):
-		return user.userdetail.is_active
+		return user.is_active
 
 	return user_permisson_test(check_perms,Login_url="/accounts/login/",redirect_template=redirect_template)
 	

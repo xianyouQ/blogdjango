@@ -183,7 +183,6 @@ function queryCommentSuccessHandle(data,textStatus)
 {
 	
 	
-	console.log(data.comment);
 	for (var commentParentId in data.comment)
 	{
 		
@@ -222,6 +221,8 @@ function queryCommentSuccessHandle(data,textStatus)
 function commentTextblur()
 {	
 	console.log("blur");
+	console.log($("#commentText").val());
+	console.log($("#commentText").attr("placeholder"));
 	if ($("#commentText").val().length > 0 )
 	{
 		
@@ -238,9 +239,9 @@ function commentTextfocus()
 }
 function commitComment(articleId,username)
 {
-	var username;
 	var placeholder = $("#commentText").attr("placeholder")
 	var content = $("#commentText").val();
+	console.log(content);
 	if(content.length == 0)
 		{
 			Message("warning","您尚未输入任何内容");
@@ -283,7 +284,7 @@ function queryComments(articleId,username)
 
 function opendetail(ArticleId,username)
 {
-	console.log(ArticleId);
+
 	if(typeof(ArticleId)=="undefined")
 	{
 		Message("error","数据异常,请尝试重新刷新");
@@ -368,15 +369,19 @@ function saveArticle(is_publish)
 		function success(data,textStatus,json)
 		{
 			ArticleSuccessHandle(data,textStatus);
-			var listsize = $(".shortArticleList").children(".col-lg-12").length;
+			var listsize = $(".shortArticleList").children(".ibox-content").length;
 			if (listsize > 0)
 			{
-				$(".shortArticleList").children(".col-lg-12").remove();
+				$(".shortArticleList").children(".ibox-content").remove();
 			}
 			var shortArticleTemplate = $(".shortArticleTemplate").clone();
-			shortArticleTemplate.find("div.col-lg-4").attr("id","short_Article_" + json.id)
-			shortArticleTemplate.find("span.text-muted").html('<i class="fa fa-clock-o"></i>'+ data.create_time);
-			shortArticleTemplate.find(".article-content").html(json.content);
+			shortArticleTemplate.find("div.social-feed-separated").attr("id","short_Article_" + data.id);
+			shortArticleTemplate.find("div.social-feed-separated > .social-avatar > a").attr("href","/blog/user/" + data.userDetail.username + "/");
+			shortArticleTemplate.find("img.photo-img").attr("src",data.userDetail.head_photo);
+			shortArticleTemplate.find("a.name-a").html(data.userDetail.username);
+			shortArticleTemplate.find("small.text-muted").html(data.create_time);
+			shortArticleTemplate.find(".social-body").html(json.content);
+			console.log(shortArticleTemplate.html());
 			$(".shortArticleList").prepend(shortArticleTemplate.html());;
 		}
     commitJson(success,ArticleErrorHandle,json,"/blog/shortArticle/","POST");
@@ -596,7 +601,7 @@ function refreshPhoto()
 function refreshShortArticle()
 {	
 	var size = $("div[id^='short_Article']").length
-	if (size < 12)
+	if (size < 6)
 	{
 		return void(0);
 	}
@@ -613,9 +618,12 @@ function refreshShortArticle()
 	{
 		$.each(data.shortArticles,function(idx,json){
 			var shortArticleTemplate = $(".shortArticleTemplate").clone();
-			shortArticleTemplate.find("div.col-lg-4").attr("id","short_Article_" + json.id)
-			shortArticleTemplate.find("span.text-muted").html('<i class="fa fa-clock-o"></i>'+ json.create_time);
-			shortArticleTemplate.find(".article-content").html(json.context);
+			shortArticleTemplate.find("div.social-feed-separated").attr("id","short_Article_" + json.id);
+			shortArticleTemplate.find("div.social-feed-separated > .social-avatar > a").attr("href","/blog/user/" + data.userDetail.username + "/");
+			shortArticleTemplate.find("img.photo-img").attr("src",data.userDetail.head_photo);
+			shortArticleTemplate.find("a.name-a").html(data.userDetail.username);
+			shortArticleTemplate.find("small.text-muted").html(json.create_time);
+			shortArticleTemplate.find(".social-body").html(json.context);
 			$(".shortArticleList").append(shortArticleTemplate.html());;
 		});
 	}

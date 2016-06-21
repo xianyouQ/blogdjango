@@ -33,9 +33,6 @@ def userRegister(request):
 			user_detail.user = user
 			user_detail.username = username=request.POST['username']
 			user_detail.save()
-			new_blog = Blog()
-			new_blog.userDetail = user_detail
-			new_blog.save()
 			return HttpResponseRedirect("/blog/index/")
 		else:
 			for messagelist in json.loads(form.errors.as_json()).itervalues():

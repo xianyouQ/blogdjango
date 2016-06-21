@@ -25,22 +25,26 @@ class BlogAction:
 		context = {}
 		try:
 			if userName == None: ##获取自己的博客主页数据
-				article = BlogText.objects.select_related('blog__userDetail').filter(blog__userDetail__user=self.user)[0]
-				shortArticles = ShortArticle.objects.filter(blog=article.blog)[0:3]
-				photos = BlogPhoto.objects.filter(blog=article.blog)[0:3]
-			elif self.blog_permission_required(priority["read"],userName):
-				article = BlogText.objects.select_related('blog__userDetail').filter(blog__userDetail__username__exact=userName,is_publish=True)[0]
-				shortArticles = ShortArticle.objects.filter(blog=article.blog)[0:3]
-				photos = BlogPhoto.objects.filter(blog=article.blog)[0:3]
-				context["username"] = userName
+				article = BlogText.objects.select_related('userDetail').filter(userDetail__user=self.user)[0]
+				shortArticles = ShortArticle.objects.filter(userDetail=article.userDetail)[0:3]
+				photos = BlogPhoto.objects.filter(userDetail=article.userDetail)[0:3]
+				mUserDetail = article.userDetail
 			else:
-				context["denied"] = settings.NO_PERMISSON_TO_BLOG_TEMPLATE
-				context["username"] = userName
+				mUserDetail,access = self.blog_permission_required(userName):
+				if access:
+					article = BlogText.objects.filter(userDetail__exact=mUserDetail,is_publish=True)[0]
+					shortArticles = ShortArticle.objects.filter(userDetail__exact=mUserDetail)[0:3]
+					photos = BlogPhoto.objects.filter(userDetail__exact=mUserDetail)[0:3]
+					context["username"] = userName
+				#elif access == None:
+				#	pass
+				else:
+					context["denied"] = settings.NO_PERMISSON_TO_BLOG_TEMPLATE
+					context["username"] = userName
 			context["lastArticle"] = article
 			context["shortArticles"] = shortArticles
-			context["blog"] = article.blog
-			context["userDetail"] = ModelToJson(article.blog.userDetail)
-			context["userDetail"]["head_photo"] = article.blog.userDetail.getheadphotourl()
+			context["userDetail"] = ModelToJson(mUserDetail)
+			context["userDetail"]["head_photo"] = mUserDetail.getheadphotourl()
 			context["lastimgs"] = photos
 			context["code"] ="200"
 		except Exception:
@@ -57,13 +61,17 @@ class BlogAction:
 		userName = requestContext.get("username",None)
 		try:
 			if userName == None: ##获取自己的评论
-				querycomments = Comment.objects.select_related("comment_user").filter(blogtext__id__exact=requestContext["articleId"]).filter(blogtext__blog__userDetail__user=self.user)
-			elif self.blog_permission_required(priority["read"],userName):
-				querycomments = Comment.objects.select_related("comment_user").filter(blogtext__id__exact=requestContext["articleId"]).filter(blogtext__blog__userDetail__user__username__exact=userName)
-				context["username"] = userName
+				querycomments = Comment.objects.select_related("comment_user").filter(blogtext__id__exact=requestContext["articleId"]).filter(blogtext__userDetail__user=self.user)
 			else:
-				context["denied"] = settings.NO_PERMISSON_TO_BLOG_TEMPLATE
-				context["username"] = userName
+				mUserDetail,access = self.blog_permission_required(userName):
+				if access:
+					querycomments = Comment.objects.select_related("comment_user").filter(blogtext__id__exact=requestContext["articleId"]).filter(blogtext__userDetail__username__exact=userName)
+					context["username"] = userName
+
+				else:
+					context["denied"] = settings.NO_PERMISSON_TO_BLOG_TEMPLATE
+					context["username"] = userName
+
 			comments = {}
 			for comment in querycomments:
 				if comment.parent_comment == None:
@@ -102,15 +110,14 @@ class BlogAction:
 				context["code"] = 400
 				return context
 			userDetail = UserDetail.objects.get(username__exact=userName)
-			#askPermisson,created = BlogPermisson.objects.get_or_create(ask_from_user__exact=mUserDetail,asked_user__exact=userDetail)
 			try:
-				askPermisson = BlogPermisson.objects.get(ask_from_user__user__exact=self.user,asked_user__exact=userDetail)
-				if askPermisson.need_confirm == False and askPermisson.blog_priority == priority["denied"]:
+				askPermisson = Friends.objects.get(ask_from_user__user__exact=self.user,asked_user__exact=userDetail)
+				if askPermisson.need_confirm == False and not askPermisson.blog_priority:
 					context["code"] = 403
 					return context
-			except BlogPermisson.DoesNotExist:
+			except Friends.DoesNotExist:
 				mUserDetail = UserDetail.objects.get(user__exact=self.user)
-				askPermisson = BlogPermisson(ask_from_user=mUserDetail,asked_user=userDetail)
+				askPermisson = Friends(ask_from_user=mUserDetail,asked_user=userDetail)
 				askPermisson.save()
 		except UserDetail.DoesNotExist:
 			context["code"] = 404
@@ -129,7 +136,7 @@ class BlogAction:
 		context = {}
 		try:
 			mUserDetail = UserDetail.objects.get(user__exact=self.user)
-			askPermissons = BlogPermisson.objects.select_related("ask_from_user__user").filter(asked_user=mUserDetail).filter(need_confirm=True)
+			askPermissons = Friends.objects.select_related("ask_from_user").filter(asked_user=mUserDetail).filter(need_confirm=True)
 		except:
 			traceback.print_exc()
 			context["code"] = 500
@@ -150,7 +157,7 @@ class BlogAction:
 			usernameList = usernameStr.split(",")
 			print usernameList
 			try:
-				changenum = BlogPermisson.objects.filter(asked_user__user=self.user).filter(ask_from_user__username__in=usernameList).update(blog_priority=priority,need_confirm=False)
+				changenum = Friends.objects.filter(asked_user__user=self.user).filter(ask_from_user__username__in=usernameList).update(blog_priority=priority,need_confirm=False)
 				context[priority]=changenum
 			except Exception:
 				traceback.print_exc()
@@ -176,8 +183,14 @@ class BlogAction:
 			newComment = Comment()
 			if "parentId" in requestContext:
 				if userName == None: 
-					parentComment = Comment.objects.select_related("blogtext").filter(blogtext__blog__userDetail__user__exact=self.user). \
+					parentComment = Comment.objects.select_related("blogtext").filter(blogtext__userDetail__user__exact=self.user). \
 					filter(blogtext__id__exact=requestContext["articleId"]).filter(id__exact=requestContext["parentId"])[0]
+				else: 
+					UserDetail,access = self.blog_permission_required(userName)
+					if access:
+						parentComment = Comment.objects.select_related("blogtext").filter(blogtext__blog__userDetail__username__exact=username). \
+						get(blogtext__id__exact=requestContext["articleId"]).filter(id__exact=requestContext["parentId"])[0]
+						context["username"] = userName						
 				elif self.blog_permission_required(priority["write"],username):
 					parentComment = Comment.objects.select_related("blogtext").filter(blogtext__blog__userDetail__username__exact=username). \
 					get(blogtext__id__exact=requestContext["articleId"]).filter(id__exact=requestContext["parentId"])[0]
@@ -289,19 +302,25 @@ class BlogAction:
 		return context
 
 
-	def blog_permission_required(self,permission,username):
+	def blog_permission_required(self,username):
 		"""
 		检查对某个账户blog的访问权限，如果没有会根据redirect_template返回对应页面,或者抛出PermissionDenied
 		"""
 
 		try:
-			dbpermission = BlogPermisson.objects.filter(ask_from_user__user=self.user).filter(asked_user__username__exact=username).values("blog_priority")
-			if len(dbpermission) > 0 and dbpermission[0].blog_priority >= permission:
-				return True
+			mUserDetail = UserDetail.objects.get(userDetail__username=username)
+			if mUserDetail.access_confirm:
+				dbpermission = Friends.objects.filter(ask_from_user__user=self.user).filter(asked_user__exact=mUserDetail).values("blog_priority")
+				if  len(dbpermission) > 0 and dbpermission[0].access_confirm and blog_priority:
+					return mUserDetail,True
+				else:
+					return mUserDetail,False
 			else:
-				return False
+				return mUserDetail,True
+		except UserDetail.DoesNotExist:
+				return None,False
 		except Exception,e:
-				return False
+				return mUserDetail,None
 				
 	def addNewShortArticle(self,requestContext):
 		"""
@@ -312,12 +331,15 @@ class BlogAction:
 			if not requestContext.get("content","").strip():
 				context["code"] = 404
 				return context
-			blog = Blog.objects.get(userDetail__user=self.user)
+			blog = Blog.objects.select_related("userDetail").get(userDetail__user=self.user)
 			mShortArticle = ShortArticle()
 			mShortArticle.blog = blog
 			mShortArticle.context = requestContext["content"]
 			mShortArticle.save()
+			context["id"] = mShortArticle.id
 			context["create_time"] = str(mShortArticle.create_time)
+			context["userDetail"] = ModelToJson(blog.userDetail)
+			context["userDetail"]["head_photo"] = blog.userDetail.getheadphotourl()
 		except KeyError:
 			context["code"] = 400
 		except:
@@ -325,7 +347,7 @@ class BlogAction:
 		context["code"] = 200
 		return  context
 		
-	def queryShortArticle(self,username=None,echpage=12,startNum=sys.maxint):
+	def queryShortArticle(self,username=None,echpage=6,startNum=sys.maxint):
 		"""
 		查询所有的短博文
 		"""

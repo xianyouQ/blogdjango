@@ -83,79 +83,96 @@ $(document).ready(function(){
     </div>
     </div>
 </div>
-		<div class="hidden shortArticleTemplate">
-            <div class="col-lg-4">
-            <div class="ibox">
-			<div class="ibox-title">
-                <div class="ibox-tools">
-                    <a class="collapse-link">
-                        <i class="fa fa-chevron-up"></i>
-                    </a>
-                    <a class="close-link">
-                        <i class="fa fa-times"></i>
+     <div class="hidden shortArticleTemplate">
+            <div class="social-feed-separated">
+    
+                <div class="social-avatar">
+                    <a href="">
+                        <img class="photo-img" alt="image" src="">
                     </a>
                 </div>
-            </div>
-                <div class="ibox-content">
-                    <div class="small m-b-xs">
-                        <span class="text-muted"><i class="fa fa-clock-o"></i></span>
+    
+                <div class="social-feed-box">
+    
+                    <div class="social-avatar">
+                        <a class="name-a" href="#">
+                            Andrew Williams
+                        </a>
+                        <small class="text-muted">Today 4:21 pm - 12.06.2014</small>
                     </div>
-                    <div class="article-content">
+                    <div class="social-body">
+                    </div>
+                    <div class="social-footer">
+                        <div class="social-comment">
+                            <a href="" class="pull-left">
+                                <img alt="image" src="">
+                            </a>
+                            <div class="media-body">
+                                <a href="#">
+                                    Andrew Williams
+                                </a>
+                                Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet. It uses a dictionary of over 200 Latin words.
+                                <br/>
+                                <small class="text-muted">12.06.2014</small>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-		</div>
-		</div>
-
-<div class="wrapper wrapper-content shortArticleList">
-	{% if not shortArticles %}
-	    <div class="col-lg-12">
-            <div class="ibox">
-			<div class="ibox-title">
-                <div class="ibox-tools">
-					<h5>全部短博文</h5>
-                    <a class="collapse-link">
-                        <i class="fa fa-chevron-up"></i>
-                    </a>
-                    <a class="close-link">
-                        <i class="fa fa-times"></i>
-                    </a>
-                </div>
-            </div>
+        </div>
+<div class="wrapper wrapper-content  animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-12 shortArticleList">
+            {% if not shortArticles %}
                 <div class="ibox-content">
                     <p>
                         这个人很懒，暂时没有什么可以展示的
                     </p>
                 </div>
-            </div>
-		</div>
-	{% endif %}
-	{% for shortArticle in shortArticles %}
-        <div class="col-lg-4" id="short_Article_{{shortArticle.id}}">
-            <div class="ibox">
-			<div class="ibox-title">
-                <div class="ibox-tools">
-                    <a class="collapse-link">
-                        <i class="fa fa-chevron-up"></i>
-                    </a>
-                    <a class="close-link">
-                        <i class="fa fa-times"></i>
+            {% endif %}
+            {% for shortArticle in shortArticles %}
+             <div class="social-feed-separated" id="short_Article_{{shortArticle.id}}">
+    
+                <div class="social-avatar">
+                    <a href="/blog/user/{{userDetail.username}}/">
+                        <img alt="image" src="{{userDetail.head_photo}}">
                     </a>
                 </div>
-            </div>
-                <div class="ibox-content">
-                    <div class="small m-b-xs">
-                        <span class="text-muted"><i class="fa fa-clock-o"></i> {{shortArticle.create_time}}</span>
+    
+                <div class="social-feed-box">
+    
+                    <div class="social-avatar">
+                        <a href="/blog/user/{{userDetail.username}}/">
+                            {{userDetail.username}}
+                        </a>
+                        <small class="text-muted">{{shortArticle.create_time}}</small>
                     </div>
-                    <div class="article-content">
-					{% autoescape off %} 
-                        {{shortArticle.context}}
-					{% endautoescape %}
+                    <div class="social-body">
+                        
+                            {% autoescape off %} 
+                                {{shortArticle.context}}
+                            {% endautoescape %}
+                        
+                    </div>
+                    <div class="social-footer">
+                        <div class="social-comment">
+                            <a href="" class="pull-left">
+                                <img alt="image" src="">
+                            </a>
+                            <div class="media-body">
+                                <a href="#">
+                                    Andrew Williams
+                                </a>
+                                Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet. It uses a dictionary of over 200 Latin words.
+                                <br/>
+                                <small class="text-muted">12.06.2014</small>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-		</div>
-	{% endfor %}
+            {% endfor %}
+        </div>
+    </div>
 </div>
-
 {% endblock %}

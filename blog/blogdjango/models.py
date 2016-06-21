@@ -11,10 +11,11 @@ class UserDetail(models.Model):
 	is_active = models.BooleanField(default=False,verbose_name=u"是否通过审核")
 	need_confirm = models.BooleanField(default=True,verbose_name=u"需要审核")
 	access_confirm = models.BooleanField(default=True,verbose_name=u"访问权限控制")
-	askuser = models.ManyToManyField("self",through="BlogPermisson",symmetrical=False,related_name="Permission")
+	friends = models.ManyToManyField("self",through="Friends",symmetrical=False,related_name="Permission")
 	contact_user = models.ManyToManyField("self",through="Message",symmetrical=False,related_name="Contact")  ###对称关系的话，through表会怎么表示
 	signature = models.CharField(max_length=400,default="",verbose_name=u"个性签名")
 	head_photo = models.ImageField(upload_to="face/%Y/%m/%d",null=True)
+	blog_title = models.CharField(max_length=200,default="",verbose_name=u"blog名称")
 	
 	def __unicode__(self):
 		return self.user.username  
@@ -30,42 +31,24 @@ class UserDetail(models.Model):
 		ordering = ["create_time"]
 
 
-class Blog(models.Model):
-	userDetail = models.OneToOneField(UserDetail)
-	create_time = models.DateTimeField(auto_now_add=True,verbose_name=u"创建时间")
-	blog_title = models.CharField(max_length=200,default="",verbose_name=u"blog名称")
 
-	def __unicode__(self):
-		return self.blog_title  
-
-	class Meta:
-		db_table = "blog"
-		verbose_name = "博客"
-		ordering = ["create_time"]
-
-class BlogPermisson(models.Model):
-	priority_level = (
-        (0, '无读权限'),
-        (1, '可读'),
-        (2, '可评论')
-	)
-	blog_priority = models.SmallIntegerField(choices=priority_level,default=0,verbose_name="权限")
-	ask_from_user = models.ForeignKey(UserDetail,related_name="blog_permissons")
-	asked_user = models.ForeignKey(UserDetail,related_name="blog_asked_permisson")
-	ask_time = models.DateTimeField(auto_now_add=True,verbose_name=u"请求权限时间")
+class Friends(models.Model):
+	blog_priority = models.BooleanField(default=False,verbose_name="权限")
+	ask_from_user = models.ForeignKey(UserDetail,related_name="asking_user")
+	asked_user = models.ForeignKey(UserDetail,related_name="asked_user")
+	ask_time = models.DateTimeField(auto_now_add=True,verbose_name=u"请求好友时间")
 	need_confirm = models.BooleanField(default=True,verbose_name=u"需要审核")
 
-	def __unicode__(self):
-		return self.ask_from_user.user.username + "'s priority for " + self.asked_user.user.username ##可以这么写?
+
 	class Meta:
-		db_table = "blog_permisson"
+		db_table = "blog_friends"
 		verbose_name = "博客权限"
 		ordering = ["ask_time"]
 		
 
 class BlogText(models.Model):
 	id = models.AutoField(primary_key=True)
-	blog = models.ForeignKey(Blog) ##考虑是否删除
+	userDetail = models.ForeignKey(UserDetail)
 	article_tags = models.CharField(max_length=400,default="",verbose_name=u"blogText tag")
 	create_time = models.DateTimeField(auto_now_add=True,verbose_name=u"文档创建日期")
 	context = models.TextField(verbose_name=u"blogText内容")
@@ -84,7 +67,7 @@ class BlogText(models.Model):
 		
 class ShortArticle(models.Model):
 	id = models.AutoField(primary_key=True)
-	blog = models.ForeignKey(Blog)
+	userDetail = models.ForeignKey(UserDetail)
 	create_time = models.DateTimeField(auto_now_add=True,verbose_name=u"文档创建日期")
 	context = models.TextField(verbose_name=u"内容")
 	short_text_title = models.CharField(max_length=400,default="",verbose_name=u"名称")
@@ -135,7 +118,7 @@ class Message(models.Model):
 
 class BlogPhoto(models.Model):
 	id = models.AutoField(primary_key=True)
-	blog = models.ForeignKey(Blog)
+	userDetail = models.ForeignKey(UserDetail)
 	upload_time = models.DateTimeField(auto_now_add=True,verbose_name=u"照片上传时间")
 	photo = models.ImageField(upload_to="userphoto/%Y/%m/%d")
 
