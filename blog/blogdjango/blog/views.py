@@ -42,6 +42,19 @@ def Comment(request):
 	if context.has_key("denied"):
 		return TemplateResponse(request,context["denied"],context)
 	return HttpResponse(json.dumps(context),content_type="application/json",status = context["code"])
+	
+	
+@csrf_protect
+@account_active_required()
+def shortComment(request):
+	mblogAction = BlogAction(request.user)
+	if request.method == 'POST':
+		context = mblogAction.addShortNewComment(request.POST)
+		if context.has_key("denied"):
+			return TemplateResponse(request,context["denied"],context)
+	else:
+		context["code"] = 405
+	return HttpResponse(json.dumps(context),content_type="application/json",status = context["code"])
 
 @account_active_required()	
 def askPermission(request,username):

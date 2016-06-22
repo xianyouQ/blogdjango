@@ -7,7 +7,7 @@ def ModelToJson(obj):
 	"""
 	模型转成json
 	"""
-	if isinstance(obj,QuerySet):
+	if isinstance(obj,QuerySet) or isinstance(obj,list):
 		result = []
 		for item in obj:
 			itemjsonsource = json.loads(serialize('json',[item])[1:-1])

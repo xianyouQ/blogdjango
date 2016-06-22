@@ -5,6 +5,7 @@ urlpatterns = [
 	url(r'^index/$',views.selfIndex,name="selfIndex"),
 	url(r'^test/$',views.test),
 	url(r'^comment/$',views.Comment),
+	url(r'^shortcomment/$',views.shortComment),
 	url(r'^user/(?P<username>[a-zA-Z0-9]+)/$',views.userIndex),
 	url(r'^user/(?P<username>[a-zA-Z0-9]+)/permission/',views.askPermission),
 	url(r'^article/$',views.addNewActicle,name="addNewActicle"),

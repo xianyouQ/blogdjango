@@ -87,7 +87,7 @@ class BlogAction:
 					newComment["comment"] = ModelToJson(comment)
 					newComment["user"] = ModelToJson(comment.comment_user)
 					newComment["user"]["head_photo"] = comment.comment_user.getheadphotourl()
-					comments[comment.parent_comment.id].append(newComment)  #是否会导致多次查询数据库
+					comments[newComment["comment"]["parent_comment"]].append(newComment)
 			context["comment"] = comments
 			context["code"] = 200
 		except KeyError:
@@ -159,6 +159,8 @@ class BlogAction:
 			print usernameList
 			try:
 				changenum = Friends.objects.filter(asked_user__user=self.user).filter(ask_from_user__username__in=usernameList).update(blog_priority=priority,need_confirm=False)
+				if priority:
+					pass   #批量操作
 				context[priority]=changenum
 			except Exception:
 				traceback.print_exc()
@@ -431,29 +433,34 @@ class BlogAction:
 				else:
 					context["denied"] = settings.NO_PERMISSON_TO_BLOG_TEMPLATE
 					context["username"] = username
-			shortComments = ShortComment.objects.select_related("comment_user").filter(shortarticle__in=shortArticles)
-			"""
-			comments = {}
-			for comment in shortComments:
-				if comment.parent_comment == None:
-					comments[comment.id] = []
-					comments["shortarticle"] = comment.
-					newComment = {}
-					newComment["comment"] = ModelToJson(comment)
-					newComment["user"] = ModelToJson(comment.comment_user)
-					newComment["user"]["head_photo"] = comment.comment_user.getheadphotourl()
-					comments[comment.id].append(newComment)
-				else:
-					newComment = {}
-					newComment["comment"] = ModelToJson(comment)
-					newComment["user"] = ModelToJson(comment.comment_user)
-					newComment["user"]["head_photo"] = comment.comment_user.getheadphotourl()
-					comments[comment.parent_comment.id].append(newComment)  #是否会导致多次查询数据库
-			"""
+			mshortArticles = list(shortArticles) 
+			##必须要加，不然会报(1235, "This version of MySQL doesn't yet support 'LIMIT & IN/ALL/ANY/SOME subquery'")，
+			#可能跟queryset的惰性有关，导致下一个查询出现了select * from a where a.b in (select b from c limit 10)，mysql认为这样的sql不合法。
+			queryShortComments = ShortComment.objects.select_related("comment_user").filter(shortarticle__in=mshortArticles)
+			context["shortArticles"] = []
+			for shortArticle in shortArticles:
+				parentCommentList = {}
+				for comment in queryShortComments:
+					if comment.shortarticle != shortArticle:
+						continue
+					if comment.parent_comment == None:
+						parentCommentList[comment.id] = []
+						newComment = {}
+						newComment["comment"] = ModelToJson(comment)
+						newComment["user"] = ModelToJson(comment.comment_user)
+						newComment["user"]["head_photo"] = comment.comment_user.getheadphotourl()
+						parentCommentList[comment.id].append(newComment)
+					else:
+						newComment = {}
+						newComment["comment"] = ModelToJson(comment)
+						newComment["user"] = ModelToJson(comment.comment_user)
+						newComment["user"]["head_photo"] = comment.comment_user.getheadphotourl()
+						parentCommentList[newComment["comment"]["parent_comment"]].append(newComment)
+				newShortArticle = {}
+				newShortArticle["shortArticle"] = ModelToJson(shortArticle)
+				newShortArticle["comments"] = parentCommentList
+				context["shortArticles"].append(newShortArticle)
 			context["code"] = 200
-			context["shortArticles"] = ModelToJson(shortArticles)
-			for shortArticle in context["shortArticles"]:
-				print shortArticle
 			context["userDetail"] = ModelToJson(mUserDetail)
 			context["userDetail"]["head_photo"] =mUserDetail.getheadphotourl()
 		except:

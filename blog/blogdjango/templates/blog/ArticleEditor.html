@@ -69,13 +69,13 @@ $(document).ready(function(){
 <div class="comment-template hidden">
 	<div class="social-comment">
 		<a href="" class="pull-left">
-			<img height="40" width="40"  alt="image" src="img/a7.jpg">
+			<img height="40" width="40"  alt="image" src="">
 		</a>
 		<div class="media-body">
 			<a class="comment-User" href="JavaScript:void(0);">
 			</a>
 			<br/>
-			<a  class="small answer-a"><i class="fa"></i>回复</a>
+			<a  class="small answer-a"></i>回复</a>
 			<small class="text-muted">10.07.2014</small>
 			<small class="commentParentId hidden"></small>
 		</div>
@@ -88,8 +88,8 @@ $(document).ready(function(){
 			<img alt="image" src="{{userDetail.head_photo}}">
 		</a>
 		<div class="media-body">
-			<input type="hidden" name="parentId" id="commentParentId" value="undefined">
-			<textarea class="form-control" id="commentText" placeholder="在这里写评论"  onblur="commentTextblur()" onfocus="commentTextfocus()"></textarea>
+			<input type="hidden" id="commentParentId" value="undefined">
+			<textarea class="form-control" id="commentTextArea" placeholder="在这里写评论"  onblur="commentTextblur()" onfocus="commentTextfocus()"></textarea>
 			<button class="btn btn-primary  btn-xs" id="commitCommentBtn" type="button">评论</button>
 		</div>
 	</div>

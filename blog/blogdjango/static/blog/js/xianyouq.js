@@ -210,25 +210,22 @@ function queryCommentSuccessHandle(data,textStatus)
 	$(".social-footer").find("a.answer-a").click(function(){
 			var username = $(this).closest("div.social-comment").find("a.comment-User").html();
 			var parentId = $(this).closest("div.social-comment").find("small.commentParentId").html();
-			$("#commentText").attr("placeholder","@" + username);
+			$("#commentTextArea").attr("placeholder","@" + username);
 			$("#commentParentId").attr("value",parentId);
-			$("#commentText").focus();
-			console.log(username+" "+parentId + " " + $("#commentText").attr("placeholder"));
+			$("#commentTextArea").focus();
+			console.log(username+" "+parentId + " " + $("#commentTextArea").attr("placeholder"));
 	}); 
 			
 }
 
 function commentTextblur()
 {	
-	console.log("blur");
-	console.log($("#commentText").val());
-	console.log($("#commentText").attr("placeholder"));
-	if ($("#commentText").val().length > 0 )
+	if ($("#commentTextArea").val().length > 0 )
 	{
 		
 		return void(0);
 	}
-	$("#commentText").attr("placeholder","在这里写评论")
+	$("#commentTextArea").attr("placeholder","在这里写评论")
 	$("#commentParentId").attr("value",undefined)
 }
 
@@ -239,9 +236,8 @@ function commentTextfocus()
 }
 function commitComment(articleId,username)
 {
-	var placeholder = $("#commentText").attr("placeholder")
-	var content = $("#commentText").val();
-	console.log(content);
+	var placeholder = $("#commentTextArea").attr("placeholder")
+	var content = $("#commentTextArea").val();
 	if(content.length == 0)
 		{
 			Message("warning","您尚未输入任何内容");
@@ -268,11 +264,70 @@ function commitComment(articleId,username)
 			"message":content
 		}
 	}
+	function success(data,textStatus,json)  //后续改进
+	{
+		Message("success","评论成功");
+	}
 	commitJson(ArticleSuccessHandle,ArticleErrorHandle,json,"/blog/comment/","POST");
 
 }
 
+function commitshortComment(shortArticleId,username)
+{
+	var placeholder = $("#short_Article_" + shortArticleId + " textarea").attr("placeholder")
+	var content =  $("#short_Article_" + shortArticleId + " textarea").val();
+	console.log(content);
+	if(content.length == 0)
+		{
+			Message("warning","您尚未输入任何内容");
+			return void(0)
+		}
+	var json ;
+	if (placeholder == "在这里写评论")
+	{
+		json = {
+			"username":username,
+			"shortarticleId":shortArticleId,
+			"message":content
+		}
+	}
+	else
+	{
+		var parentId = $("#short_Article_" + shortArticleId +" .shortCommentParentId").attr("value");
+		toUser = placeholder.split("@")[1];
+		json = {
+			"username":username,
+			"shortarticleId":shortArticleId,
+			"parentId":parentId,
+			"toUser":toUser,
+			"message":content
+		}
+	}
+	function success(data,textStatus,json) //后续改进
+	{
+		Message("success","评论成功");
+	}
+	commitJson(ArticleSuccessHandle,ArticleErrorHandle,json,"/blog/shortcomment/","POST");
 
+}
+
+function shortCommentReply(shortArticleId,parentId,username)
+{
+	$("#short_Article_" + shortArticleId + " textarea").attr("placeholder","@" + username);
+	$("#short_Article_" + shortArticleId + " textarea").focus();
+	$("#short_Article_" + shortArticleId + " .shortCommentParentId").attr("value",parentId);
+}
+
+function shortTextAreaBlur(shortArticleId)
+{
+	if ($("#short_Article_" + shortArticleId + " textarea").val().length > 0 )
+	{
+		
+		return void(0);
+	}
+	$("#short_Article_" + shortArticleId + " textarea").attr("placeholder","在这里写评论")
+	$("#short_Article_" + shortArticleId + " .shortCommentParentId").attr("value",undefined)
+}
 function queryComments(articleId,username)
 {
 	var json = {
@@ -357,7 +412,7 @@ function saveArticle(is_publish)
  }
  function saveShortArticle() 
 {
-        var aHTML = $('.summernote').summernote('code'); //save HTML If you need(aHTML: array).
+        var aHTML = $('.summernote').summernote('code');
 		if(aHTML.length == 0)
 		{
 			Message("warning","您尚未输入任何内容");
@@ -381,7 +436,8 @@ function saveArticle(is_publish)
 			shortArticleTemplate.find("a.name-a").html(data.userDetail.username);
 			shortArticleTemplate.find("small.text-muted").html(data.create_time);
 			shortArticleTemplate.find(".social-body").html(json.content);
-			console.log(shortArticleTemplate.html());
+			shortArticleTemplate.find(".textarea").attr("onblur","shortTextAreaBlur(" + data.id + ")");
+			shortArticleTemplate.find(".shortArticleTemplateSubmit").attr("onclick","commitshortComment("+data.id+")");
 			$(".shortArticleList").prepend(shortArticleTemplate.html());;
 		}
     commitJson(success,ArticleErrorHandle,json,"/blog/shortArticle/","POST");
