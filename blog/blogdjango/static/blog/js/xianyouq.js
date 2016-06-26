@@ -204,7 +204,9 @@ function queryCommentSuccessHandle(data,textStatus)
 		}	
 		 });
 	}
-	$(".social-footer").append($(".comment-reply").html())
+	var commentReplyTemplate = $("div.comment-reply").clone(true);
+	commentReplyTemplate.find("textarea").attr("id","commentTextArea");
+	$(".social-footer").append(commentReplyTemplate.html())
 	$(".social-footer").removeClass("hidden");
 		
 	$(".social-footer").find("a.answer-a").click(function(){
@@ -219,10 +221,9 @@ function queryCommentSuccessHandle(data,textStatus)
 }
 
 function commentTextblur()
-{	
+{
 	if ($("#commentTextArea").val().length > 0 )
 	{
-		
 		return void(0);
 	}
 	$("#commentTextArea").attr("placeholder","在这里写评论")
@@ -305,6 +306,13 @@ function commitshortComment(shortArticleId,username)
 	}
 	function success(data,textStatus,json) //后续改进
 	{
+		/*
+		var shortArticleCommentTemplate = $(".shortArticleCommentTemplate").clone(true);
+			shortArticleCommentTemplate.find("div.social-comment > a").attr("href","/blog/user/" + json.user.username + "/");
+			shortArticleCommentTemplate.find("div.social-comment > a > img").attr("src",json.user.head_photo);
+			shortArticleCommentTemplate.find("div.media-body a.comment-User").attr("src","/blog/user/" + json.user.username + "/").html(json.user.username).after(" "+json.comment.context);
+	 		shortArticleCommentTemplate.find("small.text-muted").html(json.comment.comment_time);
+			*/
 		Message("success","评论成功");
 	}
 	commitJson(ArticleSuccessHandle,ArticleErrorHandle,json,"/blog/shortcomment/","POST");

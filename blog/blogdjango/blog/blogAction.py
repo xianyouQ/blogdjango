@@ -106,6 +106,7 @@ class BlogAction:
 		请求查看某个blog的权限
 		"""
 		context = {}
+		print userName
 		try:
 			if self.user.username == userName:
 				context["code"] = 400
@@ -117,10 +118,11 @@ class BlogAction:
 					context["code"] = 403
 					return context
 			except Friends.DoesNotExist:
-				mUserDetail = UserDetail.objects.get(user__exact=self.user)
+				mUserDetail = UserDetail.objects.get(username__exact=self.user.username)
 				askPermisson = Friends(ask_from_user=mUserDetail,asked_user=userDetail)
 				askPermisson.save()
 		except UserDetail.DoesNotExist:
+			traceback.print_exc()
 			context["code"] = 404
 			return context
 		except:
@@ -156,7 +158,6 @@ class BlogAction:
 		context = {}
 		for priority,usernameStr in requestContext.items():
 			usernameList = usernameStr.split(",")
-			print usernameList
 			try:
 				changenum = Friends.objects.filter(asked_user__user=self.user).filter(ask_from_user__username__in=usernameList).update(blog_priority=priority,need_confirm=False)
 				if priority:
