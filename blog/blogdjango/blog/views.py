@@ -72,6 +72,16 @@ def processPermission(request):
 		context = mblogAction.processAskedPermission(request.POST)
 		return HttpResponse(json.dumps(context),content_type="application/json",status = context["code"])
 	return TemplateResponse(request,"blog/Permission.html",context,status = context["code"])
+	
+@csrf_protect
+@account_active_required()
+def processBlogPermission(request):
+	mblogAction = BlogAction(request.user)
+	if request.method == 'POST':
+		context = mblogAction.processBlogPermission(request.POST)
+	else:
+		context["code"] = 405
+	return HttpResponse(json.dumps(context),content_type="application/json",status = context["code"])
 
 @csrf_protect
 @account_active_required()

@@ -45,7 +45,6 @@ class BlogAction:
 			context["lastArticle"] = article
 			context["shortArticles"] = shortArticles
 			context["userDetail"] = ModelToJson(mUserDetail)
-			context["userDetail"]["head_photo"] = mUserDetail.getheadphotourl()
 			context["lastimgs"] = photos
 			context["code"] ="200"
 		except Exception:
@@ -80,13 +79,11 @@ class BlogAction:
 					newComment = {}
 					newComment["comment"] = ModelToJson(comment)
 					newComment["user"] = ModelToJson(comment.comment_user)
-					newComment["user"]["head_photo"] = comment.comment_user.getheadphotourl()
 					comments[comment.id].append(newComment)
 				else:
 					newComment = {}
 					newComment["comment"] = ModelToJson(comment)
 					newComment["user"] = ModelToJson(comment.comment_user)
-					newComment["user"]["head_photo"] = comment.comment_user.getheadphotourl()
 					comments[newComment["comment"]["parent_comment"]].append(newComment)
 			context["comment"] = comments
 			context["code"] = 200
@@ -146,7 +143,6 @@ class BlogAction:
 			return context
 		context["permissons"] = askPermissons
 		context["userDetail"] = ModelToJson(mUserDetail)
-		context["userDetail"]["head_photo"] = mUserDetail.getheadphotourl()
 		context["code"] = 200
 		return context
 		
@@ -172,6 +168,28 @@ class BlogAction:
 			
 			
 			
+	def processBlogPermission(self,requestContext):
+		"""
+		启/停权限控制
+		"""
+		context = {}
+		
+		try:
+			update = requestContext["permission"]
+			if update == "true":
+				changenum = UserDetail.objects.filter(user__exact=self.user).update(access_confirm=True)
+			else:
+				changenum = UserDetail.objects.filter(user__exact=self.user).update(access_confirm=False)
+			if changenum != 1:  #如果值本来就 不变，会是1的吗
+				context["code"] = 404
+			else:
+				context["code"] = 200
+		except KeyError:
+			context["code"] = 400
+		except:
+			traceback.print_exc()
+			context["code"] = 500
+		return context
 	
 	def addNewComment(self,requestContext):
 		"""
@@ -360,7 +378,6 @@ class BlogAction:
 			context["code"] = 200
 			context["Articles"] = ModelToJson(Articles)
 			context["userDetail"] = ModelToJson(userDetail)
-			context["userDetail"]["head_photo"] = userDetail.getheadphotourl()
 		except:
 			context["code"] = 500
 			traceback.print_exc()
@@ -405,7 +422,6 @@ class BlogAction:
 			context["id"] = mShortArticle.id
 			context["create_time"] = str(mShortArticle.create_time)
 			context["userDetail"] = ModelToJson(mUserDetail)
-			context["userDetail"]["head_photo"] = mUserDetail.getheadphotourl()
 		except KeyError:
 			context["code"] = 400
 		except:
@@ -449,13 +465,11 @@ class BlogAction:
 						newComment = {}
 						newComment["comment"] = ModelToJson(comment)
 						newComment["user"] = ModelToJson(comment.comment_user)
-						newComment["user"]["head_photo"] = comment.comment_user.getheadphotourl()
 						parentCommentList[comment.id].append(newComment)
 					else:
 						newComment = {}
 						newComment["comment"] = ModelToJson(comment)
 						newComment["user"] = ModelToJson(comment.comment_user)
-						newComment["user"]["head_photo"] = comment.comment_user.getheadphotourl()
 						parentCommentList[newComment["comment"]["parent_comment"]].append(newComment)
 				newShortArticle = {}
 				newShortArticle["shortArticle"] = ModelToJson(shortArticle)
@@ -463,7 +477,6 @@ class BlogAction:
 				context["shortArticles"].append(newShortArticle)
 			context["code"] = 200
 			context["userDetail"] = ModelToJson(mUserDetail)
-			context["userDetail"]["head_photo"] =mUserDetail.getheadphotourl()
 		except:
 			context["code"] = 500
 			traceback.print_exc()
@@ -543,11 +556,10 @@ class BlogAction:
 			context["code"] = 200
 			context["photos"] = []
 			context["userDetail"] = ModelToJson(mUserDetail)
-			context["userDetail"]["head_photo"] =mUserDetail.getheadphotourl()
 			for photo in photos:
 				newphoto = {}
 				newphoto["id"] = photo.id
-				newphoto["url"] = photo.getphotourl
+				newphoto["url"] = photo.getphotourl()
 				context["photos"].append(newphoto)
 		except:
 			context["code"] = 500
@@ -606,7 +618,6 @@ class BlogAction:
 		try:
 			mUserDetail = UserDetail.objects.get(user__exact=self.user)
 			context["userDetail"] = ModelToJson(mUserDetail)
-			context["userDetail"]["head_photo"] = mUserDetail.getheadphotourl()
 			context["code"] = 200
 		except:
 			context["code"] = 500

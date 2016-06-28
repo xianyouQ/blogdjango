@@ -28,6 +28,28 @@ $(document).ready(function(){
 		commitJson(commitSuccess,commitError,json,"{% url 'blogdjango:processPermission' %}","POST");
 	}
 	);
+	
+	$("#blogPermissionSwitch").change(function(){
+		var checked =$(this).is(':checked');
+		var json = {
+			"permission" : checked
+		}
+		function commitSuccess(data,textStatus)
+		{
+			if(data)
+			{
+				Message("success","成功提交");
+			}   
+		}
+		function commitError(XMLHttpRequest, textStatus, errorThrown)
+		{
+			if (XMLHttpRequest.status == 500) {
+				Message("error","哎呀，服务器出错了");
+			} 
+		}
+		commitJson(commitSuccess,commitError,json,"{% url 'blogdjango:processBlogPermission' %}","POST");
+	});
+	
 });
 
 </script>
@@ -90,14 +112,19 @@ $(document).ready(function(){
                         </div>
                     </div>
                     <div class="ibox-content">
-                        <a href="#">开启blog的权限控制</a>
-                                        <div class="onoffswitch">
-                                            <input type="checkbox" class="onoffswitch-checkbox" id="blogPermissionSwitch" value="blogPermissionSwitch">
-                                            <label class="onoffswitch-label">
-                                                <span class="onoffswitch-inner"></span>
-                                                <span class="onoffswitch-switch"></span>
-                                            </label>
-                                        </div>
+					<form class="form-horizontal" role="form">
+						<div class="form-group">
+						 <label class="control-label" for="name">开启blog的权限控制</label>
+                  
+							<div class="onoffswitch">
+								<input type="checkbox" class="onoffswitch-checkbox" id="blogPermissionSwitch">
+								<label class="onoffswitch-label" for="blogPermissionSwitch">
+									<span class="onoffswitch-inner"></span>
+									<span class="onoffswitch-switch"></span>
+								</label>
+							</div>
+						</div>
+					</form>
                     </div>
                 </div>
             </div>
