@@ -24,23 +24,19 @@ class BlogAction:
 		try:
 			if userName == None: ##获取自己的博客主页数据
 				shortArticles = ShortArticle.objects.select_related('userDetail').filter(userDetail__user=self.user)[0:3]
-				article = BlogText.objects.filter(userDetail__user=self.user)[0]
+				article = BlogText.objects.filter(userDetail__user=self.user)[0:1]
 				photos = BlogPhoto.objects.filter(userDetail__user=self.user)[0:3]
 				if len(shortArticles) == 0:
 					mUserDetail = UserDetail.objects.get(user__exact=self.user)
 				else:
 					mUserDetail = shortArticles[0].userDetail
 			else:
-				mUserDetail,access = self.blog_permission_required(userName)   ##以下部分似乎有bug,分页查找，没查询到直接不跑剩余的，而且也没抛任何异常
+				mUserDetail,access = self.blog_permission_required(userName)
 				if access:
 					context["username"] = userName
-					article = BlogText.objects.filter(userDetail__exact=mUserDetail,is_publish=True)[0]
 					shortArticles = ShortArticle.objects.filter(userDetail__exact=mUserDetail)[0:3]
+					article = BlogText.objects.filter(userDetail__exact=mUserDetail,is_publish=True)[0:1]
 					photos = BlogPhoto.objects.filter(userDetail__exact=mUserDetail)[0:3]
-					print "ceshi"
-
-				#elif access == None:
-				#	pass
 				else:
 					context["denied"] = settings.NO_PERMISSON_TO_BLOG_TEMPLATE
 					context["username"] = userName

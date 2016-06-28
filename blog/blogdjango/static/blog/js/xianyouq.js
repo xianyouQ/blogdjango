@@ -268,12 +268,20 @@ function commitComment(articleId,username)
 	function success(data,textStatus,json)  //后续改进
 	{
 		Message("success","评论成功");
+		/*
+			var commentTemplate = $("div.comment-template").clone(true);
+			commentTemplate.find("div.social-comment > a").attr("href","/blog/user/" + json.user.username + "/");
+			commentTemplate.find("div.social-comment > a > img").attr("src",json.user.head_photo);
+			commentTemplate.find("div.media-body a.comment-User").attr("src","/blog/user/" + json.user.username + "/").html(json.user.username).after(" "+json.comment.context);
+	 		commentTemplate.find("small.text-muted").html(json.comment.comment_time);
+	 		commentTemplate.find("small.commentParentId").html(commentParentId);
+		*/
 	}
 	commitJson(ArticleSuccessHandle,ArticleErrorHandle,json,"/blog/comment/","POST");
 
 }
 
-function commitshortComment(shortArticleId,username)
+function commitshortComment(shortArticleId,selfusername,username)
 {
 	var placeholder = $("#short_Article_" + shortArticleId + " textarea").attr("placeholder")
 	var content =  $("#short_Article_" + shortArticleId + " textarea").val();
@@ -306,16 +314,14 @@ function commitshortComment(shortArticleId,username)
 	}
 	function success(data,textStatus,json) //后续改进
 	{
-		/*
+		
 		var shortArticleCommentTemplate = $(".shortArticleCommentTemplate").clone(true);
-			shortArticleCommentTemplate.find("div.social-comment > a").attr("href","/blog/user/" + json.user.username + "/");
-			shortArticleCommentTemplate.find("div.social-comment > a > img").attr("src",json.user.head_photo);
-			shortArticleCommentTemplate.find("div.media-body a.comment-User").attr("src","/blog/user/" + json.user.username + "/").html(json.user.username).after(" "+json.comment.context);
-	 		shortArticleCommentTemplate.find("small.text-muted").html(json.comment.comment_time);
-			*/
-		Message("success","评论成功");
+		shortArticleCommentTemplate.find("div.media-body a.comment-User").after(" "+json.message);
+		shortArticleCommentTemplate.find("div.media-body a.small").attr("onclick","shortCommentReply(" + json.shortArticleId + "," + json.parentId + ",'" + selfusername+ "')");
+	 	shortArticleCommentTemplate.find("small.text-muted").html(data.comment_time);
+		$("#shortArticle_comment_" + json.parentId).append(shortArticleCommentTemplate.html());
 	}
-	commitJson(ArticleSuccessHandle,ArticleErrorHandle,json,"/blog/shortcomment/","POST");
+	commitJson(success,ArticleErrorHandle,json,"/blog/shortcomment/","POST");
 
 }
 

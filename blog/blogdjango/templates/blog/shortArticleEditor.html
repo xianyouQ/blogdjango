@@ -101,12 +101,12 @@ $(document).ready(function(){
 
 <div class="hidden shortArticleCommentTemplate">
 	<div class="social-comment">
-		<a href="#" class="pull-left">
-			<img alt="image" src="#">
+		<a href="/blog/index/" class="pull-left">
+			<img alt="image" src="{{selfUserDetail.head_photo}}">
 		</a>
 		<div class="media-body">
-			<a class="comment-User" href="#">
-				
+			<a class="comment-User" href="/blog/index/">
+				{{selfUserDetail.username}}
 			</a>
 			
 			<br/>
@@ -189,7 +189,7 @@ $(document).ready(function(){
                     </div>
                     <div class="social-footer">
 					{% for parentId,commentList in mshortArticle.comments.items %}
-                        <div class="social-comment">
+                        <div class="social-comment" id="shortArticle_comment_{{parentId}}">
 						{% for commentItem in commentList %}
 							{% if forloop.counter0 == 0 %}
                             <a href="/blog/user/{{commentItem.user.username}}/" class="pull-left">
@@ -235,9 +235,9 @@ $(document).ready(function(){
 								<textarea class="form-control" onblur="shortTextAreaBlur({{mshortArticle.shortArticle.id}})" placeholder="在这里写评论"></textarea>
 								<input type="hidden" name="parentId" class="shortCommentParentId" value="undefined">
 								{% if username %}
-								<button class="btn btn-primary  btn-xs" onclick="commitshortComment({{mshortArticle.shortArticle.id}},'{{username}}')" type="button">评论</button>
+								<button class="btn btn-primary  btn-xs" onclick="commitshortComment({{mshortArticle.shortArticle.id}},'{{selfUserDetail.username}}','{{username}}')" type="button">评论</button>
 								{% else %}
-								<button class="btn btn-primary  btn-xs" onclick="commitshortComment({{mshortArticle.shortArticle.id}})" type="button">评论</button>
+								<button class="btn btn-primary  btn-xs" onclick="commitshortComment({{mshortArticle.shortArticle.id}},'{{selfUserDetail.username}}')" type="button">评论</button>
 								{% endif %}
 							</div>
 						</div>
