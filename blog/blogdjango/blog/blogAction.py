@@ -31,12 +31,14 @@ class BlogAction:
 				else:
 					mUserDetail = shortArticles[0].userDetail
 			else:
-				mUserDetail,access = self.blog_permission_required(userName)
+				mUserDetail,access = self.blog_permission_required(userName)   ##以下部分似乎有bug,分页查找，没查询到直接不跑剩余的，而且也没抛任何异常
 				if access:
+					context["username"] = userName
 					article = BlogText.objects.filter(userDetail__exact=mUserDetail,is_publish=True)[0]
 					shortArticles = ShortArticle.objects.filter(userDetail__exact=mUserDetail)[0:3]
 					photos = BlogPhoto.objects.filter(userDetail__exact=mUserDetail)[0:3]
-					context["username"] = userName
+					print "ceshi"
+
 				#elif access == None:
 				#	pass
 				else:
@@ -211,7 +213,7 @@ class BlogAction:
 					userDetail,access = self.blog_permission_required(userName)
 					if access:
 						parentComment = Comment.objects.select_related("blogtext").filter(blogtext__userDetail__exact=userDetail). \
-						get(blogtext__id__exact=requestContext["articleId"]).filter(id__exact=requestContext["parentId"])[0]
+						filter(blogtext__id__exact=requestContext["articleId"]).filter(id__exact=requestContext["parentId"])[0]
 						context["username"] = userName						
 					else:
 						context["denied"] = settings.NO_PERMISSON_TO_BLOG_TEMPLATE
@@ -228,10 +230,10 @@ class BlogAction:
 					userDetail,access = self.blog_permission_required(userName)
 					if access:
 						blogText = BlogText.objects.filter(userDetail__exact=userDetail).filter(id__exact=requestContext["articleId"])[0]
-						context["username"] = username
+						context["username"] = userName
 					else:
 						context["denied"] = settings.NO_PERMISSON_TO_BLOG_TEMPLATE
-						context["username"] = username
+						context["username"] = userName
 						return context
 				newComment.blogtext = blogText
 			newComment.context = requestContext["message"]
@@ -267,8 +269,8 @@ class BlogAction:
 				else: 
 					userDetail,access = self.blog_permission_required(userName)
 					if access:
-						parentShortComment = Comment.objects.select_related("shortarticle").filter(shortarticle__userDetail__exact=userDetail). \
-						get(blogtext__id__exact=requestContext["shortarticleId"]).filter(id__exact=requestContext["parentId"])[0]
+						parentShortComment = ShortComment.objects.select_related("shortarticle").filter(shortarticle__userDetail__exact=userDetail). \
+						filter(shortarticle__id__exact=requestContext["shortarticleId"]).filter(id__exact=requestContext["parentId"])[0]
 						context["username"] = userName						
 					else:
 						context["denied"] = settings.NO_PERMISSON_TO_BLOG_TEMPLATE
@@ -285,10 +287,10 @@ class BlogAction:
 					userDetail,access = self.blog_permission_required(userName)
 					if access:
 						shortArticle = ShortArticle.objects.filter(userDetail__exact=userDetail).filter(id__exact=requestContext["shortarticleId"])[0]
-						context["username"] = username
+						context["username"] = userName
 					else:
 						context["denied"] = settings.NO_PERMISSON_TO_BLOG_TEMPLATE
-						context["username"] = username
+						context["username"] = userName
 						return context
 				newShortComment.shortarticle = shortArticle
 			newShortComment.context = requestContext["message"]
@@ -368,9 +370,11 @@ class BlogAction:
 				else:
 					userDetail = Articles[0].userDetail
 			else: 
-				userDetail,access = self.blog_permission_required(userName)
+				userDetail,access = self.blog_permission_required(username)
 				if access:
-					Articles = BlogText.objects.filter(userDetailr__exact=userDetail).filter(is_publish__exact=True).filter(article_tags__icontains=tag).filter(id__lt=startNum)[0:echpage]
+					Articles = BlogText.objects.filter(userDetail__exact=userDetail).filter(is_publish__exact=True).filter(article_tags__icontains=tag).filter(id__lt=startNum)[0:echpage]
+					selfUserDetail = UserDetail.objects.get(user__exact=self.user)
+					context["selfUserDetail"] = ModelToJson(selfUserDetail)
 					context["username"] = username
 				else:
 					context["denied"] = settings.NO_PERMISSON_TO_BLOG_TEMPLATE
@@ -393,7 +397,7 @@ class BlogAction:
 		try:
 			mUserDetail = UserDetail.objects.get(username=username)
 			if mUserDetail.access_confirm:
-				dbpermission = Friends.objects.filter(ask_from_user__user=self.user).filter(asked_user__exact=mUserDetail).values("blog_priority")
+				dbpermission = Friends.objects.select_related("ask_from_user").filter(ask_from_user__user=self.user).filter(asked_user__exact=mUserDetail).values("blog_priority")
 				if  len(dbpermission) > 0 and dbpermission[0].access_confirm and blog_priority:
 					return mUserDetail,True
 				else:
@@ -444,9 +448,11 @@ class BlogAction:
 					mUserDetail = shortArticles[0].userDetail
 			else:
 				mUserDetail,success = self.blog_permission_required(username)
-				if succes:
+				if success:
+					selfUserDetail = UserDetail.objects.get(user__exact=self.user)
 					shortArticles = ShortArticle.objects.filter(userDetail__exact=mUserDetail).filter(id__lt=startNum)[0:echpage]
 					context["username"] = username
+					context["selfUserDetail"] = ModelToJson(selfUserDetail)
 				else:
 					context["denied"] = settings.NO_PERMISSON_TO_BLOG_TEMPLATE
 					context["username"] = username

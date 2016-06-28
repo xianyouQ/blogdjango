@@ -117,7 +117,11 @@ $(document).ready(function(){
 						 <label class="control-label" for="name">开启blog的权限控制</label>
                   
 							<div class="onoffswitch">
+							{% if userDetail.access_confirm %}
+								<input type="checkbox" class="onoffswitch-checkbox" id="blogPermissionSwitch" checked="checked">
+								{% else %}
 								<input type="checkbox" class="onoffswitch-checkbox" id="blogPermissionSwitch">
+								{% endif %}
 								<label class="onoffswitch-label" for="blogPermissionSwitch">
 									<span class="onoffswitch-inner"></span>
 									<span class="onoffswitch-switch"></span>

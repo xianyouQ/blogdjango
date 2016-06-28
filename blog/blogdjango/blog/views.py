@@ -98,6 +98,19 @@ def addNewActicle(request):
 		return TemplateResponse(request,"blog/ArticleEditor.html",context,status = context["code"])
 		
 @account_active_required()
+def userActicle(request,username):
+	mblogAction = BlogAction(request.user)
+	if request.method == 'POST':
+		context["code"] = 405
+		return HttpResponse(json.dumps(context),content_type="application/json",status = context["code"])
+	else:
+		if "lastArticleId" in request.GET:
+			context = mblogAction.queryArticle(tag=request.GET.get("tag-search",""),username=username,startNum=request.GET.get("lastArticleId"))
+			return HttpResponse(json.dumps(context),content_type="application/json",status = context["code"])
+		context = mblogAction.queryArticle(tag=request.GET.get("tag-search",""),username=username)
+		return TemplateResponse(request,"blog/ArticleEditor.html",context,status = context["code"])
+		
+@account_active_required()
 def shortArticle(request):
 	mblogAction = BlogAction(request.user)
 	if request.method == 'POST':
@@ -108,6 +121,19 @@ def shortArticle(request):
 			context = mblogAction.queryShortArticle(startNum=request.GET.get("lastShortArticleId"))
 			return HttpResponse(json.dumps(context),content_type="application/json",status = context["code"])
 		context = mblogAction.queryShortArticle()
+		return TemplateResponse(request,"blog/shortArticleEditor.html",context,status = context["code"])
+		
+@account_active_required()
+def userShortArticle(request,username):
+	mblogAction = BlogAction(request.user)
+	if request.method == 'POST':
+		context["code"] = 405
+		return HttpResponse(json.dumps(context),content_type="application/json",status = context["code"])
+	else:
+		if "lastShortArticleId" in request.GET:
+			context = mblogAction.queryShortArticle(startNum=request.GET.get("lastShortArticleId"),username=username)
+			return HttpResponse(json.dumps(context),content_type="application/json",status = context["code"])
+		context = mblogAction.queryShortArticle(username=username)
 		return TemplateResponse(request,"blog/shortArticleEditor.html",context,status = context["code"])
 		
 def test(request):
@@ -147,6 +173,19 @@ def photoView(request):
 		context = mblogAction.requeryPhoto()
 	return TemplateResponse(request,"blog/photo.html",context,status = context["code"])
 
+	
+@account_active_required()	
+def userPhotoView(request,username):
+	mblogAction = BlogAction(request.user)
+	if request.method == 'POST':
+		context["code"] = 405
+		return HttpResponse(json.dumps(context),content_type="application/json",status = context["code"])
+	else:
+		if "lastPhotoId" in request.GET:
+			context = mblogAction.requeryPhoto(startNum=request.GET.get("lastPhotoId"),username=username)
+			return HttpResponse(json.dumps(context),content_type="application/json",status = context["code"])
+		context = mblogAction.requeryPhoto(username=username)
+	return TemplateResponse(request,"blog/photo.html",context,status = context["code"])
 
 @csrf_protect
 @account_active_required()

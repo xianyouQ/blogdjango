@@ -360,7 +360,7 @@ function opendetail(ArticleId,username)
 	$(".article_detail").find("div.limitline").addClass("detail-content");
 	$(".article_detail").find("div.limitline").removeClass("limitline");
 	$(".article_detail").attr("id","article_detail_"+ArticleId);
-    $("#commitCommentBtn").attr("onclick","commitComment(" + ArticleId + ", " +username +")");
+    $("#commitCommentBtn").attr("onclick","commitComment(" + ArticleId + ", '" +username +"')");
 	queryComments(ArticleId,username)
 }
 

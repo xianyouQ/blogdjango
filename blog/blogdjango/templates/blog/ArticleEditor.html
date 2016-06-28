@@ -24,21 +24,35 @@ $(document).ready(function(){
 		{% endif %}
 	</li>
 	<li id="li-2" class="menu-li">
+		{% if username %}
+		<a href="/blog/user/{{username}}/shortArticle/"><i class="fa fa-home"></i> <span class="nav-label">短篇博文</span> <span class="fa arrow"></span></a>
+		{% else %}
 		<a href="{% url 'blogdjango:shortArticle' %}"><i class="fa fa-file-text-o"></i> <span class="nav-label">短篇博文</span> <span class="fa arrow"></span></a>
+		{% endif %}
 	</li>
 	<li id="li-3" class="active menu-li">
+		{% if username %}
+		<a href="/blog/user/{{username}}/article/"><i class="fa fa-home"></i> <span class="nav-label">博客文章</span> <span class="fa arrow"></span></a>
+		{% else %}
 		<a href="{% url 'blogdjango:addNewActicle' %}"><i class="fa fa-file-text-o"></i> <span class="nav-label">博客文章</span> <span class="fa arrow"></span></a>
+		{% endif %}
 	</li>
 	<li id="li-4" class="menu-li">
+		{% if username %}
+		<a href="/blog/user/{{username}}/photo/"><i class="fa fa-home"></i> <span class="nav-label">照片</span> <span class="fa arrow"></span></a>
+		{% else %}
 		<a href="{% url 'blogdjango:photoView' %}"><i class="fa fa-file-text-o"></i> <span class="nav-label">照片</span> <span class="fa arrow"></span></a>
+		{% endif %}
 	</li>
-	<li id="li-5" class="menu-li">
+	{% if not username %}
+	<li id="li-5" class=" menu-li">
 		<a href="{% url 'blogdjango:processPermission' %}"><i class="fa fa-cog"></i> <span class="nav-label">博客设置</span><span class="fa arrow"></span></a>
 		<ul class="nav nav-second-level collapse">
 			<li><a href="{% url 'blogdjango:processPermission' %}">权限管理</a></li>
 			<li><a href="{% url 'blogdjango:userProfile' %}">用户配置</a></li>
 		</ul>
 	</li>
+	{% endif %}
 {% endblock %}
 {% block searchform %}
 <form role="search" class="navbar-form-custom" action="">
@@ -75,7 +89,7 @@ $(document).ready(function(){
 			<a class="comment-User" href="JavaScript:void(0);">
 			</a>
 			<br/>
-			<a  class="small answer-a"></i>回复</a>
+			<a class="small answer-a"></i>回复</a>
 			<small class="text-muted">10.07.2014</small>
 			<small class="commentParentId hidden"></small>
 		</div>
@@ -85,7 +99,11 @@ $(document).ready(function(){
 <div class="comment-reply hidden">
 	<div class="social-comment">
 		<a href="/blog/index/" class="pull-left">
+			{% if username %}
+			<img alt="image" src="{{selfUserDetail.head_photo}}">
+			{% else %}
 			<img alt="image" src="{{userDetail.head_photo}}">
+			{% endif %}
 		</a>
 		<div class="media-body">
 			<input type="hidden" id="commentParentId" value="undefined">
@@ -99,7 +117,9 @@ $(document).ready(function(){
         <div class="col-lg-12">
             <div class="ibox">
 			    <div class="ibox-tools">
-                        <button  class="btn btn-primary  btn-xs" onclick="reEditor()" type="button">修改</button>
+					{% if not username %}
+                    <button  class="btn btn-primary  btn-xs" onclick="reEditor()" type="button">修改</button>
+					{% endif %}
 					<button  class="btn btn-primary  btn-xs" onclick="returnToArticleList()" type="button">返回文章列表</button>
 				</div>
                 <div class="ibox-content">
@@ -119,6 +139,7 @@ $(document).ready(function(){
     </div>
 </div>
 
+{% if not username %}
 <div class="wrapper wrapper-content detail-dismiss">
     <div class="row">
         <div class="col-lg-12">
@@ -155,7 +176,7 @@ $(document).ready(function(){
     </div>
     </div>
 </div>
-
+{% endif %}
 <!-- moban -->
 <div class="hidden articleTemplate">
         <div class="col-lg-12">
@@ -263,7 +284,7 @@ $(document).ready(function(){
                             </div>
                         </div>
                         {% if username %}
-                        <button class="btn btn-primary  btn-xs" onclick="opendetail({{Article.id}},{{username}})" type="button">查看详情</button>
+                        <button class="btn btn-primary  btn-xs" onclick="opendetail({{Article.id}},'{{username}}')" type="button">查看详情</button>
                         {% else %}
                         <button class="btn btn-primary  btn-xs" onclick="opendetail({{Article.id}})" type="button">查看详情</button>
                         {% endif %}
