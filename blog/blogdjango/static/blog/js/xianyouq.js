@@ -178,6 +178,13 @@ function toggleHide()
 }
 
 
+function CommentReply(parentId,username)
+{
+	$("#commentTextArea").attr("placeholder","@" + username);
+	$("#commentParentId").attr("value",parentId);
+	$("#commentTextArea").focus();
+}
+
 
 function queryCommentSuccessHandle(data,textStatus)
 {
@@ -192,10 +199,10 @@ function queryCommentSuccessHandle(data,textStatus)
 			commentTemplate.find("div.social-comment > a > img").attr("src",json.user.head_photo);
 			commentTemplate.find("div.media-body a.comment-User").attr("src","/blog/user/" + json.user.username + "/").html(json.user.username).after(" "+json.comment.context);
 	 		commentTemplate.find("small.text-muted").html(json.comment.comment_time);
-	 		commentTemplate.find("small.commentParentId").html(commentParentId);
-
+			commentTemplate.find("a.answer-a").attr("onclick","CommentReply("+ commentParentId +",'"+ json.user.username+ "')");
 	 	if (json.comment.id == commentParentId)
 	 	{
+			commentTemplate.find("div.social-comment").attr("id","Article_comment_" + commentParentId);
 			$(".social-footer").append(commentTemplate.html());
 	 	}
 	 	else
@@ -204,20 +211,10 @@ function queryCommentSuccessHandle(data,textStatus)
 		}	
 		 });
 	}
-	var commentReplyTemplate = $("div.comment-reply").clone(true);
+	var commentReplyTemplate = $("div.comment-reply-template").clone(true);
 	commentReplyTemplate.find("textarea").attr("id","commentTextArea");
 	$(".social-footer").append(commentReplyTemplate.html())
 	$(".social-footer").removeClass("hidden");
-		
-	$(".social-footer").find("a.answer-a").click(function(){
-			var username = $(this).closest("div.social-comment").find("a.comment-User").html();
-			var parentId = $(this).closest("div.social-comment").find("small.commentParentId").html();
-			$("#commentTextArea").attr("placeholder","@" + username);
-			$("#commentParentId").attr("value",parentId);
-			$("#commentTextArea").focus();
-			console.log(username+" "+parentId + " " + $("#commentTextArea").attr("placeholder"));
-	}); 
-			
 }
 
 function commentTextblur()
@@ -235,7 +232,7 @@ function commentTextfocus()
 	console.log("focus");
 	
 }
-function commitComment(articleId,username)
+function commitComment(articleId,selfusername,username)
 {
 	var placeholder = $("#commentTextArea").attr("placeholder")
 	var content = $("#commentTextArea").val();
@@ -266,18 +263,22 @@ function commitComment(articleId,username)
 		}
 	}
 	function success(data,textStatus,json)  //后续改进
-	{
-		Message("success","评论成功");
-		/*
+	{	
 			var commentTemplate = $("div.comment-template").clone(true);
-			commentTemplate.find("div.social-comment > a").attr("href","/blog/user/" + json.user.username + "/");
-			commentTemplate.find("div.social-comment > a > img").attr("src",json.user.head_photo);
-			commentTemplate.find("div.media-body a.comment-User").attr("src","/blog/user/" + json.user.username + "/").html(json.user.username).after(" "+json.comment.context);
-	 		commentTemplate.find("small.text-muted").html(json.comment.comment_time);
-	 		commentTemplate.find("small.commentParentId").html(commentParentId);
-		*/
+			commentTemplate.find("div.media-body a.comment-User").after(" "+json.message);
+	 		commentTemplate.find("small.text-muted").html(data.comment_time);
+			if(json.parentId)
+			{
+				commentTemplate.find("a.answer-a").attr("onclick","CommentReply("+ json.parentId +",'"+ selfusername+ "')");
+				$("#Article_comment_" + json.parentId).append(commentTemplate.html());
+			}
+			else{
+				commentTemplate.find("a.answer-a").attr("onclick","CommentReply("+ data.newId +",'"+ selfusername + "')"); 
+				$("div.social-footer div.comment-reply").before(commentTemplate.html());
+				
+			}
 	}
-	commitJson(ArticleSuccessHandle,ArticleErrorHandle,json,"/blog/comment/","POST");
+	commitJson(success,ArticleErrorHandle,json,"/blog/comment/","POST");
 
 }
 
@@ -312,14 +313,24 @@ function commitshortComment(shortArticleId,selfusername,username)
 			"message":content
 		}
 	}
-	function success(data,textStatus,json) //后续改进
+	function success(data,textStatus,json)
 	{
 		
 		var shortArticleCommentTemplate = $(".shortArticleCommentTemplate").clone(true);
 		shortArticleCommentTemplate.find("div.media-body a.comment-User").after(" "+json.message);
-		shortArticleCommentTemplate.find("div.media-body a.small").attr("onclick","shortCommentReply(" + json.shortArticleId + "," + json.parentId + ",'" + selfusername+ "')");
 	 	shortArticleCommentTemplate.find("small.text-muted").html(data.comment_time);
-		$("#shortArticle_comment_" + json.parentId).append(shortArticleCommentTemplate.html());
+		if(json.parentId){
+			shortArticleCommentTemplate.find("div.media-body a.small").attr("onclick","shortCommentReply(" + json.shortarticleId + "," + json.parentId + ",'" + selfusername+ "')");
+			$("#shortArticle_comment_" + json.parentId).append(shortArticleCommentTemplate.html());
+		}
+		else{
+			shortArticleCommentTemplate.find("div.media-body a.small").attr("onclick","shortCommentReply(" + json.shortarticleId + "," + data.newId + ",'" + selfusername+ "')");
+			$("#short_Article_" + json.shortarticleId +" div.shortComment-reply").before(shortArticleCommentTemplate.html());
+		}
+		$("#short_Article_" + json.shortarticleId + " textarea").attr("placeholder","在这里写评论")
+		$("#short_Article_" + json.shortarticleId + " .shortCommentParentId").attr("value",undefined);
+		$("#short_Article_" + json.shortarticleId + " textarea").val("");
+		
 	}
 	commitJson(success,ArticleErrorHandle,json,"/blog/shortcomment/","POST");
 
@@ -339,8 +350,8 @@ function shortTextAreaBlur(shortArticleId)
 		
 		return void(0);
 	}
-	$("#short_Article_" + shortArticleId + " textarea").attr("placeholder","在这里写评论")
-	$("#short_Article_" + shortArticleId + " .shortCommentParentId").attr("value",undefined)
+	$("#short_Article_" + shortArticleId + " textarea").attr("placeholder","在这里写评论");
+	$("#short_Article_" + shortArticleId + " .shortCommentParentId").attr("value",undefined);
 }
 function queryComments(articleId,username)
 {

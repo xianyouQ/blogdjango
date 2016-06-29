@@ -82,22 +82,22 @@ $(document).ready(function(){
 
 <div class="comment-template hidden">
 	<div class="social-comment">
-		<a href="" class="pull-left">
-			<img alt="image" src="">
+		<a href="/blog/index/" class="pull-left">
+			<img alt="image" src="{{selfUserDetail.head_photo}}">
 		</a>
 		<div class="media-body">
-			<a class="comment-User" href="JavaScript:void(0);">
+			<a class="comment-User" href="/blog/index/">
+				{{selfUserDetail.username}}
 			</a>
 			<br/>
 			<a class="small answer-a"></i>回复</a>
 			<small class="text-muted">10.07.2014</small>
-			<small class="commentParentId hidden"></small>
 		</div>
 	</div>
 </div>
 
-<div class="comment-reply hidden">
-	<div class="social-comment">
+<div class="comment-reply-template hidden">
+	<div class="social-comment comment-reply">
 		<a href="/blog/index/" class="pull-left">
 			{% if username %}
 			<img alt="image" src="{{selfUserDetail.head_photo}}">
