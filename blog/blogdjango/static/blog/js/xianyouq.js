@@ -186,6 +186,7 @@ function CommentReply(parentId,username)
 }
 
 
+
 function queryCommentSuccessHandle(data,textStatus)
 {
 	
@@ -199,7 +200,7 @@ function queryCommentSuccessHandle(data,textStatus)
 			commentTemplate.find("div.social-comment > a > img").attr("src",json.user.head_photo);
 			commentTemplate.find("div.media-body a.comment-User").attr("src","/blog/user/" + json.user.username + "/").html(json.user.username).after(" "+json.comment.context);
 	 		commentTemplate.find("small.text-muted").html(json.comment.comment_time);
-			commentTemplate.find("a.answer-a").attr("onclick","CommentReply("+ commentParentId +",'"+ json.user.username+ "')");
+			commentTemplate.find("small.commentParentId").html(commentParentId);
 	 	if (json.comment.id == commentParentId)
 	 	{
 			commentTemplate.find("div.social-comment").attr("id","Article_comment_" + commentParentId);
@@ -215,6 +216,13 @@ function queryCommentSuccessHandle(data,textStatus)
 	commentReplyTemplate.find("textarea").attr("id","commentTextArea");
 	$(".social-footer").append(commentReplyTemplate.html())
 	$(".social-footer").removeClass("hidden");
+	$("div.social-footer a.answer-a").click(function(){
+ 			var username = $.trim($(this).closest("div.social-comment").find("a.comment-User").html());
+ 			var parentId = $(this).closest("div.social-comment").find("small.commentParentId").html();
+ 			$("#commentTextArea").attr("placeholder","@" + username);
+ 			$("#commentParentId").attr("value",parentId);
+ 			$("#commentTextArea").focus();
+			}); 
 }
 
 function commentTextblur()
@@ -232,7 +240,7 @@ function commentTextfocus()
 	console.log("focus");
 	
 }
-function commitComment(articleId,selfusername,username)
+function commitComment(articleId,username)
 {
 	var placeholder = $("#commentTextArea").attr("placeholder")
 	var content = $("#commentTextArea").val();
@@ -269,14 +277,20 @@ function commitComment(articleId,selfusername,username)
 	 		commentTemplate.find("small.text-muted").html(data.comment_time);
 			if(json.parentId)
 			{
-				commentTemplate.find("a.answer-a").attr("onclick","CommentReply("+ json.parentId +",'"+ selfusername+ "')");
+		
 				$("#Article_comment_" + json.parentId).append(commentTemplate.html());
 			}
 			else{
-				commentTemplate.find("a.answer-a").attr("onclick","CommentReply("+ data.newId +",'"+ selfusername + "')"); 
 				$("div.social-footer div.comment-reply").before(commentTemplate.html());
 				
 			}
+			$("div.social-footer a.answer-a").click(function(){
+ 			var username = $.trim($(this).closest("div.social-comment").find("a.comment-User").html());
+ 			var parentId = $(this).closest("div.social-comment").find("small.commentParentId").html();
+ 			$("#commentTextArea").attr("placeholder","@" + username);
+ 			$("#commentParentId").attr("value",parentId);
+ 			$("#commentTextArea").focus();
+			}); 
 	}
 	commitJson(success,ArticleErrorHandle,json,"/blog/comment/","POST");
 
@@ -377,7 +391,14 @@ function opendetail(ArticleId,username)
 	$(".article_detail").find("div.limitline").addClass("detail-content");
 	$(".article_detail").find("div.limitline").removeClass("limitline");
 	$(".article_detail").attr("id","article_detail_"+ArticleId);
-    $("#commitCommentBtn").attr("onclick","commitComment(" + ArticleId + ", '" +username +"')");
+	if(typeof(username)=="undefined")
+	{
+		$("#commitCommentBtn").attr("onclick","commitComment(" + ArticleId + ")");
+	}
+	else{
+		$("#commitCommentBtn").attr("onclick","commitComment(" + ArticleId + ", '" +username +"')");
+	}
+    
 	queryComments(ArticleId,username)
 }
 

@@ -83,15 +83,24 @@ $(document).ready(function(){
 <div class="comment-template hidden">
 	<div class="social-comment">
 		<a href="/blog/index/" class="pull-left">
+			{% if username %}
 			<img alt="image" src="{{selfUserDetail.head_photo}}">
+			{% else %}
+			<img alt="image" src="{{userDetail.head_photo}}">
+			{% endif %}
 		</a>
 		<div class="media-body">
 			<a class="comment-User" href="/blog/index/">
+			{% if username %}
 				{{selfUserDetail.username}}
+			{% else %}
+				{{userDetail.username}}
+			{% endif %}
 			</a>
 			<br/>
 			<a class="small answer-a"></i>回复</a>
 			<small class="text-muted">10.07.2014</small>
+			<small class="commentParentId hidden"></small>
 		</div>
 	</div>
 </div>
