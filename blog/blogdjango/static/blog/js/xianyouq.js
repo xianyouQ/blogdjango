@@ -235,11 +235,6 @@ function commentTextblur()
 	$("#commentParentId").attr("value",undefined)
 }
 
-function commentTextfocus()
-{	
-	console.log("focus");
-	
-}
 function commitComment(articleId,username)
 {
 	var placeholder = $("#commentTextArea").attr("placeholder")
@@ -300,7 +295,6 @@ function commitshortComment(shortArticleId,selfusername,username)
 {
 	var placeholder = $("#short_Article_" + shortArticleId + " textarea").attr("placeholder")
 	var content =  $("#short_Article_" + shortArticleId + " textarea").val();
-	console.log(content);
 	if(content.length == 0)
 		{
 			Message("warning","您尚未输入任何内容");
@@ -338,6 +332,7 @@ function commitshortComment(shortArticleId,selfusername,username)
 			$("#shortArticle_comment_" + json.parentId).append(shortArticleCommentTemplate.html());
 		}
 		else{
+			shortArticleCommentTemplate.find("div.social-comment").attr("id","shortArticle_comment_" + data.newId);
 			shortArticleCommentTemplate.find("div.media-body a.small").attr("onclick","shortCommentReply(" + json.shortarticleId + "," + data.newId + ",'" + selfusername+ "')");
 			$("#short_Article_" + json.shortarticleId +" div.shortComment-reply").before(shortArticleCommentTemplate.html());
 		}
@@ -456,7 +451,7 @@ function saveArticle(is_publish)
         };
         commitJson(success,ArticleErrorHandle,json,"/blog/article/","POST");
  }
- function saveShortArticle() 
+ function saveShortArticle(username) 
 {
         var aHTML = $('.summernote').summernote('code');
 		if(aHTML.length == 0)
@@ -483,8 +478,8 @@ function saveArticle(is_publish)
 			shortArticleTemplate.find("small.text-muted").html(data.create_time);
 			shortArticleTemplate.find(".social-body").html(json.content);
 			shortArticleTemplate.find(".textarea").attr("onblur","shortTextAreaBlur(" + data.id + ")");
-			shortArticleTemplate.find(".shortArticleTemplateSubmit").attr("onclick","commitshortComment("+data.id+")");
-			$(".shortArticleList").prepend(shortArticleTemplate.html());;
+			shortArticleTemplate.find(".shortArticleTemplateSubmit").attr("onclick","commitshortComment("+data.id+",'" + data.userDetail.username + "')");
+			$(".shortArticleList").prepend(shortArticleTemplate.html());
 		}
     commitJson(success,ArticleErrorHandle,json,"/blog/shortArticle/","POST");
 }
@@ -645,7 +640,6 @@ function refreshArticle()
 			articleTemplate.find("div.limitline").html(json.context);
 			articleTemplate.find("#article_list_template").attr("id","article_list_" + json.id);
 			articleTemplate.find("button").attr("onclick","opendetail(" + json.id + ")");
-			console.log(json.article_tags);
 			var tags = json.article_tags.split(',');
 			for (var tag in tags)
 			{
@@ -710,7 +704,7 @@ function refreshShortArticle()
 
 	var lastShortArticle = $("div[id^='short_Article']")[size - 1];
 	var lastId = lastShortArticle.id.split("_")[2];
-	if (lastId <= 1)
+	if (lastId <= 1 || typeof(lastId)=="undefined")
 	{
 		return void(0);
 	}
@@ -720,13 +714,25 @@ function refreshShortArticle()
 	{
 		$.each(data.shortArticles,function(idx,json){
 			var shortArticleTemplate = $(".shortArticleTemplate").clone();
-			shortArticleTemplate.find("div.social-feed-separated").attr("id","short_Article_" + json.id);
+			shortArticleTemplate.find("div.social-feed-separated").attr("id","short_Article_" + json.shortArticle.id);
 			shortArticleTemplate.find("div.social-feed-separated > .social-avatar > a").attr("href","/blog/user/" + data.userDetail.username + "/");
 			shortArticleTemplate.find("img.photo-img").attr("src",data.userDetail.head_photo);
 			shortArticleTemplate.find("a.name-a").html(data.userDetail.username);
-			shortArticleTemplate.find("small.text-muted").html(json.create_time);
-			shortArticleTemplate.find(".social-body").html(json.context);
-			$(".shortArticleList").append(shortArticleTemplate.html());;
+			shortArticleTemplate.find("small.text-muted").html(json.shortArticle.create_time);
+			shortArticleTemplate.find(".social-body").html(json.shortArticle.context);
+			$.each(json.comments,function(key,value)
+			{
+				var parentCommentId = key;
+				$.each(value,function(inneridx,innerjson)
+				{
+					
+				}
+				);
+			};
+
+			
+			
+			$(".shortArticleList").append(shortArticleTemplate.html());
 		});
 	}
 	function error(XMLHttpRequest, textStatus, errorThrown)
