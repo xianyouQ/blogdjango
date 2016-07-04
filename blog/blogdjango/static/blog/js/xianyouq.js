@@ -618,7 +618,7 @@ function refreshArticle()
 	}
 	var lastArticleDiv = $("div[id^='article_list']")[size - 1];
 	var lastId = lastArticleDiv.id.split("_")[2];
-	if (lastId <= 1)
+	if (lastId <= 1 || typeof(lastId)=="undefined")
 	{
 		return void(0);
 	}
@@ -669,7 +669,7 @@ function refreshPhoto()
 	}
 	var lastPhotoA = $("a[id^='Gallery']")[size - 1];
 	var lastId = lastPhotoA.id.split("_")[1];
-	if (lastId <= 1)
+	if (lastId <= 1 || typeof(lastId)=="undefined")
 	{
 		return void(0);
 	}
@@ -725,13 +725,31 @@ function refreshShortArticle()
 				var parentCommentId = key;
 				$.each(value,function(inneridx,innerjson)
 				{
+					var shortArticleCommentTemplate = $(".shortArticleCommentTemplate").clone();
+					shortArticleCommentTemplate.find("div.social-comment > a").attr("href","/blog/user/" + innerjson.user.username);
+					shortArticleCommentTemplate.find("div.social-comment > a > img").attr("src", innerjson.user.head_photo); 
+					shortArticleCommentTemplate.find("div.media-body a.comment-User").attr("href","/blog/user/" + innerjson.user.username).html(innerjson.user.username).after(" " + innerjson.comment.context);
+					shortArticleCommentTemplate.find("small.text-muted").html(innerjson.comment.comment_time);
+					shortArticleCommentTemplate.find("div.media-body a.small").attr("onclick","shortCommentReply(" + json.shortArticle.id + "," + parentCommentId + ",'" + innerjson.user.username+ "')");
+					if(innerjson.comment.id == parentCommentId){
+						shortArticleCommentTemplate.find("div.social-comment").attr("id","shortArticle_comment_" + parentCommentId);
+						shortArticleTemplate.find("div.shortComment-reply").before(shortArticleCommentTemplate.html());
+					}
+					else{
+						
+						shortArticleTemplate.find("div.social-comment#shortArticle_comment_" + parentCommentId).append(shortArticleCommentTemplate.html());
+					}
 					
 				}
 				);
-			};
-
-			
-			
+			}
+			);
+			if(data.selfUserDetail){
+				shortArticleTemplate.find(".shortArticleTemplateSubmit").attr("onclick","commitshortComment("+ json.shortArticle.id +",'" + data.selfUserDetail.username + "')");
+			}
+			else{
+				shortArticleTemplate.find(".shortArticleTemplateSubmit").attr("onclick","commitshortComment("+ json.shortArticle.id +",'" + data.userDetail.username + "')");
+			}
 			$(".shortArticleList").append(shortArticleTemplate.html());
 		});
 	}

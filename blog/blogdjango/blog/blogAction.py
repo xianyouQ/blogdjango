@@ -40,7 +40,7 @@ class BlogAction:
 				else:
 					context["denied"] = settings.NO_PERMISSON_TO_BLOG_TEMPLATE
 					context["username"] = userName
-			context["lastArticle"] = article
+			context["lastArticle"] = article[0]
 			context["shortArticles"] = shortArticles
 			context["userDetail"] = ModelToJson(mUserDetail)
 			context["lastimgs"] = photos
