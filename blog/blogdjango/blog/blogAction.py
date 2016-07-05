@@ -40,8 +40,8 @@ class BlogAction:
 				else:
 					context["denied"] = settings.NO_PERMISSON_TO_BLOG_TEMPLATE
 					context["username"] = userName
-			context["lastArticle"] = article[0]
-			context["shortArticles"] = shortArticles
+			context["lastArticle"] = ModelToJson(article[0])
+			context["shortArticles"] = ModelToJson(shortArticles)
 			context["userDetail"] = ModelToJson(mUserDetail)
 			context["lastimgs"] = photos
 			context["code"] ="200"
@@ -155,7 +155,10 @@ class BlogAction:
 			try:
 				changenum = Friends.objects.filter(asked_user__user=self.user).filter(ask_from_user__username__in=usernameList).update(blog_priority=priority,need_confirm=False)
 				if priority:
-					pass   #批量操作
+					selfUserDetail = UserDetail.objects.get(user_exact=self.user)
+					for username in usernameList:
+						asked_user = UserDetail.objects.get(username_exact=username)
+						Friends.objects.update_or_create(ask_from_user=selfUserDetail, asked_user=asked_user, need_confirm=False,blog_priority=True)
 				context[priority]=changenum
 			except Exception:
 				traceback.print_exc()

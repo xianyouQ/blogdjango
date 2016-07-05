@@ -9,6 +9,21 @@ function Message(type,message,timeout) {
         toastr[type](message);
 
     }
+	
+function toLocalTimeStr(str)
+{
+	var dt=Date.parse(str);
+	var newDate = new Date(dt);
+	return newDate.toLocaleDateString() + " " + newDate.toLocaleTimeString();
+}
+function toLocalTime()
+{
+	$(".tolocaltime").each(function(key,value){
+		var newstr = toLocalTimeStr($.trim($(value).html()));
+		$(value).html(newstr);
+	}
+	);
+}
     // check if browser support HTML5 local storage
 function localStorageSupport() {
     return (('localStorage' in window) && window['localStorage'] !== null)
@@ -199,7 +214,7 @@ function queryCommentSuccessHandle(data,textStatus)
 			commentTemplate.find("div.social-comment > a").attr("href","/blog/user/" + json.user.username + "/");
 			commentTemplate.find("div.social-comment > a > img").attr("src",json.user.head_photo);
 			commentTemplate.find("div.media-body a.comment-User").attr("src","/blog/user/" + json.user.username + "/").html(json.user.username).after(" "+json.comment.context);
-	 		commentTemplate.find("small.text-muted").html(json.comment.comment_time);
+	 		commentTemplate.find("small.text-muted").html(toLocalTimeStr(json.comment.comment_time));
 			commentTemplate.find("small.commentParentId").html(commentParentId);
 	 	if (json.comment.id == commentParentId)
 	 	{
@@ -269,7 +284,7 @@ function commitComment(articleId,username)
 	{	
 			var commentTemplate = $("div.comment-template").clone(true);
 			commentTemplate.find("div.media-body a.comment-User").after(" "+json.message);
-	 		commentTemplate.find("small.text-muted").html(data.comment_time);
+	 		commentTemplate.find("small.text-muted").html(toLocalTimeStr(data.comment_time));
 			if(json.parentId)
 			{
 		
@@ -326,7 +341,7 @@ function commitshortComment(shortArticleId,selfusername,username)
 		
 		var shortArticleCommentTemplate = $(".shortArticleCommentTemplate").clone(true);
 		shortArticleCommentTemplate.find("div.media-body a.comment-User").after(" "+json.message);
-	 	shortArticleCommentTemplate.find("small.text-muted").html(data.comment_time);
+	 	shortArticleCommentTemplate.find("small.text-muted").html(toLocalTimeStr(data.comment_time));
 		if(json.parentId){
 			shortArticleCommentTemplate.find("div.media-body a.small").attr("onclick","shortCommentReply(" + json.shortarticleId + "," + json.parentId + ",'" + selfusername+ "')");
 			$("#shortArticle_comment_" + json.parentId).append(shortArticleCommentTemplate.html());
@@ -435,7 +450,7 @@ function saveArticle(is_publish)
 			}
 			else{
             var articleTemplate = $(".articleTemplate").clone();
-			articleTemplate.find("span.text-muted").html('<i class="fa fa-clock-o"></i>'+ data.create_time);
+			articleTemplate.find("span.text-muted").html('<i class="fa fa-clock-o"></i>'+ toLocalTimeStr(data.create_time));
 			articleTemplate.find("h1").html(json.title);
 			articleTemplate.find("div.limitline").html(json.content);
 			articleTemplate.find("#article_list_template").attr("id","article_list_" + data.articleId);
@@ -475,7 +490,7 @@ function saveArticle(is_publish)
 			shortArticleTemplate.find("div.social-feed-separated > .social-avatar > a").attr("href","/blog/user/" + data.userDetail.username + "/");
 			shortArticleTemplate.find("img.photo-img").attr("src",data.userDetail.head_photo);
 			shortArticleTemplate.find("a.name-a").html(data.userDetail.username);
-			shortArticleTemplate.find("small.text-muted").html(data.create_time);
+			shortArticleTemplate.find("small.text-muted").html(toLocalTimeStr(data.create_time));
 			shortArticleTemplate.find(".social-body").html(json.content);
 			shortArticleTemplate.find(".textarea").attr("onblur","shortTextAreaBlur(" + data.id + ")");
 			shortArticleTemplate.find(".shortArticleTemplateSubmit").attr("onclick","commitshortComment("+data.id+",'" + data.userDetail.username + "')");
@@ -635,7 +650,7 @@ function refreshArticle()
 	{
 		$.each(data.Articles,function(idx,json){
 			var articleTemplate = $(".articleTemplate").clone();
-			articleTemplate.find("span.text-muted").html('<i class="fa fa-clock-o"></i>'+ json.create_time);
+			articleTemplate.find("span.text-muted").html('<i class="fa fa-clock-o"></i>'+ toLocalTimeStr(json.create_time));
 			articleTemplate.find("h1").html(json.blog_text_title);
 			articleTemplate.find("div.limitline").html(json.context);
 			articleTemplate.find("#article_list_template").attr("id","article_list_" + json.id);
@@ -718,7 +733,7 @@ function refreshShortArticle()
 			shortArticleTemplate.find("div.social-feed-separated > .social-avatar > a").attr("href","/blog/user/" + data.userDetail.username + "/");
 			shortArticleTemplate.find("img.photo-img").attr("src",data.userDetail.head_photo);
 			shortArticleTemplate.find("a.name-a").html(data.userDetail.username);
-			shortArticleTemplate.find("small.text-muted").html(json.shortArticle.create_time);
+			shortArticleTemplate.find("small.text-muted").html(toLocalTimeStr(json.shortArticle.create_time));
 			shortArticleTemplate.find(".social-body").html(json.shortArticle.context);
 			$.each(json.comments,function(key,value)
 			{
@@ -729,7 +744,7 @@ function refreshShortArticle()
 					shortArticleCommentTemplate.find("div.social-comment > a").attr("href","/blog/user/" + innerjson.user.username);
 					shortArticleCommentTemplate.find("div.social-comment > a > img").attr("src", innerjson.user.head_photo); 
 					shortArticleCommentTemplate.find("div.media-body a.comment-User").attr("href","/blog/user/" + innerjson.user.username).html(innerjson.user.username).after(" " + innerjson.comment.context);
-					shortArticleCommentTemplate.find("small.text-muted").html(innerjson.comment.comment_time);
+					shortArticleCommentTemplate.find("small.text-muted").html(toLocalTimeStr(innerjson.comment.comment_time));
 					shortArticleCommentTemplate.find("div.media-body a.small").attr("onclick","shortCommentReply(" + json.shortArticle.id + "," + parentCommentId + ",'" + innerjson.user.username+ "')");
 					if(innerjson.comment.id == parentCommentId){
 						shortArticleCommentTemplate.find("div.social-comment").attr("id","shortArticle_comment_" + parentCommentId);

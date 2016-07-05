@@ -16,28 +16,33 @@ $(document).ready(function(){
 </script>
 {% endblock %}
 {% block menulist %}
-	<li id="li-1" class="menu-li">
+{% if not username %}
+	<li id="li-1" class="active menu-li">
+		<a href="{% url 'blogdjango:processPermission' %}"><i class="fa fa-cog"></i> <span class="nav-label">好友动态</span><span class="fa arrow"></span></a>
+	</li>
+{% endif %}
+	<li id="li-2" class="menu-li">
 		{% if username %}
 		<a href="/blog/user/{{username}}/"><i class="fa fa-home"></i> <span class="nav-label">首页</span> <span class="fa arrow"></span></a>
 		{% else %}
 		<a href="{% url 'blogdjango:selfIndex' %}"><i class="fa fa-home"></i> <span class="nav-label">首页</span> <span class="fa arrow"></span></a>
 		{% endif %}
 	</li>
-	<li id="li-2" class="menu-li">
+	<li id="li-3" class="menu-li">
 		{% if username %}
 		<a href="/blog/user/{{username}}/shortArticle/"><i class="fa fa-home"></i> <span class="nav-label">短篇博文</span> <span class="fa arrow"></span></a>
 		{% else %}
 		<a href="{% url 'blogdjango:shortArticle' %}"><i class="fa fa-file-text-o"></i> <span class="nav-label">短篇博文</span> <span class="fa arrow"></span></a>
 		{% endif %}
 	</li>
-	<li id="li-3" class="active menu-li">
+	<li id="li-4" class="active menu-li">
 		{% if username %}
 		<a href="/blog/user/{{username}}/article/"><i class="fa fa-home"></i> <span class="nav-label">博客文章</span> <span class="fa arrow"></span></a>
 		{% else %}
 		<a href="{% url 'blogdjango:addNewActicle' %}"><i class="fa fa-file-text-o"></i> <span class="nav-label">博客文章</span> <span class="fa arrow"></span></a>
 		{% endif %}
 	</li>
-	<li id="li-4" class="menu-li">
+	<li id="li-5" class="menu-li">
 		{% if username %}
 		<a href="/blog/user/{{username}}/photo/"><i class="fa fa-home"></i> <span class="nav-label">照片</span> <span class="fa arrow"></span></a>
 		{% else %}
@@ -45,7 +50,7 @@ $(document).ready(function(){
 		{% endif %}
 	</li>
 	{% if not username %}
-	<li id="li-5" class=" menu-li">
+	<li id="li-6" class=" menu-li">
 		<a href="{% url 'blogdjango:processPermission' %}"><i class="fa fa-cog"></i> <span class="nav-label">博客设置</span><span class="fa arrow"></span></a>
 		<ul class="nav nav-second-level collapse">
 			<li><a href="{% url 'blogdjango:processPermission' %}">权限管理</a></li>
@@ -99,7 +104,7 @@ $(document).ready(function(){
 			</a>
 			<br/>
 			<a class="small answer-a"></i>回复</a>
-			<small class="text-muted">10.07.2014</small>
+			<small class="text-muted tolocaltime">10.07.2014</small>
 			<small class="commentParentId hidden"></small>
 		</div>
 	</div>
@@ -203,7 +208,7 @@ $(document).ready(function(){
                 <div class="ibox-content">
                         <div id="article_list_template">
                             <div class="text-center article-title">
-                            <span class="text-muted"><i class="fa fa-clock-o"></i> create_time</span>
+                            <span class="text-muted tolocaltime">create_time</span>
                                 <h1>
                                   blog_text_title
                                 </h1>
@@ -270,7 +275,7 @@ $(document).ready(function(){
                 <div class="ibox-content">
 						<div id="article_list_{{Article.id}}">
                             <div class="text-center article-title">
-                            <span class="text-muted"><i class="fa fa-clock-o"></i> {{Article.create_time}}</span>
+                            <span class="text-muted tolocaltime">{{Article.create_time}}</span>
                                 <h1>
                                     {{Article.blog_text_title}}
                                 </h1>

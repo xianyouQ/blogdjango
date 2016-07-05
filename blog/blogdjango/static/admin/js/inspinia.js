@@ -94,10 +94,15 @@ $(document).ready(function () {
 	$("li[id].menu-li").hover(function(){
 		if($("body").hasClass("mini-fixed-sidebar") && $("body").hasClass("mini-navbar"))
 		{
-			var id = $(this).attr("id").split("-")[1];
+			if ($("li[id=li-1].menu-li")){
+				var id = Number($(this).attr("id").split("-")[1]);
+			}
+			else{
+				var id = Number($(this).attr("id").split("-")[1]) - 1;
+			}
 			var size = $(this).height();
 			var logosize = $(".logo-element").height();
-			var top = Number(id) * size + logosize;
+			var top = id * size + logosize;
 			$(this).find("ul.nav-second-level").css("top",top + "px");
 		}
 		else
@@ -135,7 +140,10 @@ $(document).ready(function () {
 	{
 		Message("warning","此站点需要支持html5的浏览器,否则显示会有异常");
 	}
-	else {readLocalStorageChange();}
+	else {
+		readLocalStorageChange();
+		}
+	toLocalTime();
 });
 
 
