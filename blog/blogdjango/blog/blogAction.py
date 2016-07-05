@@ -15,7 +15,45 @@ class BlogAction:
 	def __init__(self,user):
 		self.user = user
 
-	
+	def queryFriendDynamic(self,echpage=5,startNum=sys.maxint):
+		"""
+		查询好友动态
+		"""
+		context = {}
+		try:
+			mUserDetail = UserDetail.objects.get(user__exact=self.user)
+			myFriends = Friends.objects.select_related("asked_user").filter(ask_from_user__exact=mUserDetail)
+			asked_users = [Friend.asked_user for Friend in myFriends]
+			mshortArticles = ShortArticle.objects.select_related("userDetail").filter(userDetail__in=asked_users).filter(id__lt=startNum)[0:echpage]
+			queryShortComments = ShortComment.objects.select_related("comment_user").filter(shortarticle__in=mshortArticles)
+			context["shortArticles"] = []
+			for shortArticle in mshortArticles:
+				parentCommentList = {}
+				for comment in queryShortComments:
+					if comment.shortarticle != shortArticle:
+						continue
+					if comment.parent_comment == None:
+						parentCommentList[comment.id] = []
+						newComment = {}
+						newComment["comment"] = ModelToJson(comment)
+						newComment["user"] = ModelToJson(comment.comment_user)
+						parentCommentList[comment.id].append(newComment)
+					else:
+						newComment = {}
+						newComment["comment"] = ModelToJson(comment)
+						newComment["user"] = ModelToJson(comment.comment_user)
+						parentCommentList[newComment["comment"]["parent_comment"]].append(newComment)
+				newShortArticle = {}
+				newShortArticle["shortArticle"] = ModelToJson(shortArticle)
+				newShortArticle["userDetail"] = ModelToJson(shortArticle.userDetail)
+				newShortArticle["comments"] = parentCommentList
+				context["shortArticles"].append(newShortArticle)
+			context["code"] = 200
+			context["userDetail"] = ModelToJson(mUserDetail)
+		except:
+			context["code"] = 500
+		
+		return context
 	def queryIndexData(self,userName=None):
 		"""
 		根据用户(名)获取其主页数据

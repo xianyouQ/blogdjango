@@ -2,6 +2,7 @@ from django.conf.urls import url,include
 from blogdjango.blog import views
 from django.contrib.auth.views import login
 urlpatterns = [
+	url(r'^friendDynamic/$',views.FriendDymic,name="FriendDymic"),
 	url(r'^index/$',views.selfIndex,name="selfIndex"),
 	url(r'^comment/$',views.Comment),
 	url(r'^shortcomment/$',views.shortComment),

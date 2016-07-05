@@ -13,7 +13,15 @@ import json
 
 # Create your views here.
 
-
+@account_active_required()
+def FriendDymic(request):
+	mblogAction = BlogAction(request.user)
+	if "lastShortArticleId" in request.GET:
+		context = mblogAction.queryFriendDynamic(startNum = request.GET.get("lastArticleId"))
+	else:
+		context = mblogAction.queryFriendDynamic()
+	return TemplateResponse(request,"blog/FriendDynamic.html",context,status = context["code"])
+	
 
 @account_active_required()
 def selfIndex(request):

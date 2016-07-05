@@ -19,7 +19,7 @@ $(document).ready(function(){
 {% block menulist %}
 {% if not username %}
 	<li id="li-1" class="menu-li">
-		<a href="{% url 'blogdjango:processPermission' %}"><i class="fa fa-users"></i> <span class="nav-label">好友动态</span><span class="fa arrow"></span></a>
+		<a href="{% url 'blogdjango:FriendDymic' %}"><i class="fa fa-users"></i> <span class="nav-label">好友动态</span><span class="fa arrow"></span></a>
 	</li>
 {% endif %}
 	<li id="li-2" class="menu-li">
@@ -250,7 +250,7 @@ $(document).ready(function(){
 								{% if username %}
 								<button class="btn btn-primary  btn-xs" onclick="commitshortComment({{mshortArticle.shortArticle.id}},'{{selfUserDetail.username}}','{{username}}')" type="button">评论</button>
 								{% else %}
-								<button class="btn btn-primary  btn-xs" onclick="commitshortComment({{mshortArticle.shortArticle.id}},'{{selfUserDetail.username}}')" type="button">评论</button>
+								<button class="btn btn-primary  btn-xs" onclick="commitshortComment({{mshortArticle.shortArticle.id}},'{{userDetail.username}}')" type="button">评论</button>
 								{% endif %}
 							</div>
 						</div>
