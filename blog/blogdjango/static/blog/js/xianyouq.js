@@ -558,6 +558,38 @@ function userActive(){
 	  commitJson(success,error,json,"/admin/users/","POST");
 }
 
+function friendActive(){
+		$("#blogPermissionSubmit").attr({disabled:"true"});
+		var obj=document.getElementsByName('friendActivecheckbox');
+		var able = "";
+		var disable = ""
+		for(var i=0; i<obj.length; i++){    
+		if(obj[i].checked) able+=obj[i].value+',';
+		else {
+			disable+=obj[i].value+',';
+		}
+	} 
+	 var json = {
+		 "1":able,
+		 "0":disable,
+	 };
+	 function success(data, textStatus) {
+		if(data)
+		{
+			Message("success","成功提交");
+		}	
+	};
+	function error(XMLHttpRequest, textStatus, errorThrown) {
+		if (XMLHttpRequest.status == 500) {
+			Message("error","哎呀，服务器出错了");
+		}
+		else{
+			Message("error","提交失败");
+		}
+	};
+	  commitJson(success,error,json,"/blog/permission/","POST");
+}
+
 function blogChange(id)
 {
 	var key = id.split("_")[1];

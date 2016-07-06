@@ -25,7 +25,7 @@ class BlogAction:
 			myFriends = Friends.objects.select_related("asked_user").filter(ask_from_user__exact=mUserDetail)
 			asked_users = [Friend.asked_user for Friend in myFriends]
 			mshortArticles = ShortArticle.objects.select_related("userDetail").filter(userDetail__in=asked_users).filter(id__lt=startNum)[0:echpage]
-			queryShortComments = ShortComment.objects.select_related("comment_user").filter(shortarticle__in=mshortArticles)
+			queryShortComments = ShortComment.objects.select_related("comment_user").filter(shortarticle__in=list(mshortArticles))
 			context["shortArticles"] = []
 			for shortArticle in mshortArticles:
 				parentCommentList = {}
@@ -51,6 +51,7 @@ class BlogAction:
 			context["code"] = 200
 			context["userDetail"] = ModelToJson(mUserDetail)
 		except:
+			traceback.print_exc()
 			context["code"] = 500
 		
 		return context
@@ -73,6 +74,7 @@ class BlogAction:
 				if access:
 					context["username"] = userName
 					shortArticles = ShortArticle.objects.filter(userDetail__exact=mUserDetail)[0:3]
+					print shortArticles
 					article = BlogText.objects.filter(userDetail__exact=mUserDetail,is_publish=True)[0:1]
 					photos = BlogPhoto.objects.filter(userDetail__exact=mUserDetail)[0:3]
 				else:
@@ -193,10 +195,13 @@ class BlogAction:
 			try:
 				changenum = Friends.objects.filter(asked_user__user=self.user).filter(ask_from_user__username__in=usernameList).update(blog_priority=priority,need_confirm=False)
 				if priority:
-					selfUserDetail = UserDetail.objects.get(user_exact=self.user)
+					selfUserDetail = UserDetail.objects.get(user__exact=self.user)
 					for username in usernameList:
-						asked_user = UserDetail.objects.get(username_exact=username)
-						Friends.objects.update_or_create(ask_from_user=selfUserDetail, asked_user=asked_user, need_confirm=False,blog_priority=True)
+						try:
+							asked_user = UserDetail.objects.get(username_exact=username)
+							Friends.objects.update_or_create(ask_from_user=selfUserDetail, asked_user=asked_user, need_confirm=False,blog_priority=True)
+						except UserDetail.DoesNotExist:
+							continue
 				context[priority]=changenum
 			except Exception:
 				traceback.print_exc()
@@ -434,17 +439,20 @@ class BlogAction:
 		try:
 			mUserDetail = UserDetail.objects.get(username=username)
 			if mUserDetail.access_confirm:
-				dbpermission = Friends.objects.select_related("ask_from_user").filter(ask_from_user__user=self.user).filter(asked_user__exact=mUserDetail).values("blog_priority")
-				if  len(dbpermission) > 0 and dbpermission[0].access_confirm and blog_priority:
+				dbpermission = Friends.objects.get(ask_from_user__user=self.user,asked_user__exact=mUserDetail)
+				if dbpermission.blog_priority:
 					return mUserDetail,True
 				else:
 					return mUserDetail,False
 			else:
 				return mUserDetail,True
 		except UserDetail.DoesNotExist:
-				return None,False
+			return None,False
+		except Friends.DoesNotExist:
+			return mUserDetail,False
 		except Exception,e:
-				return mUserDetail,None
+			traceback.print_exc()
+			return mUserDetail,None
 				
 	def addNewShortArticle(self,requestContext):
 		"""

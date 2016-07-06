@@ -3,32 +3,7 @@
 {% block jshead %}
 {{ block.super  }}
 <script>
-$(document).ready(function(){
-	$("#blogPermissionSubmit").click(function()
-	{	
-		function commitSuccess(data,textStatus)
-		{
-			if(data)
-			{
-				Message("success","成功提交");
-			}   
-		}
-		function commitError(XMLHttpRequest, textStatus, errorThrown)
-		{
-			if (XMLHttpRequest.status == 500) {
-				Message("error","哎呀，服务器出错了");
-			} 
-		}
-		var json = {"0":"","1":"","2":""};
-		$(".form-group").each(function(){
-		var result = $(this).find("input[type='radio']:checked").val();
-		var username = $(this).find("input[type='radio']:checked").attr("name");
-		json[result] = json[result] + "," + username;
-		});
-		commitJson(commitSuccess,commitError,json,"{% url 'blogdjango:processPermission' %}","POST");
-	}
-	);
-	
+$(document).ready(function(){	
 	$("#blogPermissionSwitch").change(function(){
 		var checked =$(this).is(':checked');
 		var json = {
@@ -159,7 +134,7 @@ $(document).ready(function(){
 
             <div class="ibox">
                     <div class="ibox-title  back-change">
-                        <h5>新的权限申请</h5>
+                        <h5>新的好友申请</h5>
                         <div class="ibox-tools">
                             <a class="collapse-link">
                                 <i class="fa fa-chevron-up"></i>
@@ -174,8 +149,8 @@ $(document).ready(function(){
                             <tbody>
                             <tr>
                                     <th>用户名</th>
-                                    <th>权限申请时间</th>
-                                    <th>权限分配</th>
+                                    <th>申请时间</th>
+                                    <th>是否同意</th>
                             </tr>
                             {% for permission in permissons %}
                             <tr>
@@ -185,21 +160,23 @@ $(document).ready(function(){
                                  <td class="project-title">
                                     <small>{{permission.ask_time}}</small>
                                 </td>
-                                <td >
-                                 <form method="get" class="form-horizontal">
-                                    <div class="form-group">
-                                    <label> <input type="radio" value="0" name="{{permission.ask_from_user.user.username}}"> <i></i> 拒绝 </label>
-                                    <label> <input type="radio" value="1" name="{{permission.ask_from_user.user.username}}"> <i></i> 可访问</label>
-                                    <label> <input type="radio" value="2" name="{{permission.ask_from_user.user.username}}" checked="checked"> <i></i> 可评论</label>
-                                    </div>
-                                    </form>
-                                </td>
+                                <td class="project-actions">
+									<div class="switch">
+										<div class="onoffswitch">
+											<input type="checkbox" class="onoffswitch-checkbox" id="{{permission.ask_from_user.user.username}}" value="{{permission.ask_from_user.user.username}}" name="friendActivecheckbox">
+											<label class="onoffswitch-label" for="{{permission.ask_from_user.user.username}}">
+												<span class="onoffswitch-inner"></span>
+												<span class="onoffswitch-switch"></span>
+											</label>
+										</div>
+									</div>
+                                </td>                                
                             </tr>
                             {% endfor %}
                             </tbody>
                         </table>
                 <div class="text-center">
-                        <a data-toggle="modal" class="btn btn-primary" href="#" id="blogPermissionSubmit">提交</a>
+                        <a data-toggle="modal" class="btn btn-primary" href="#" id="blogPermissionSubmit" onclick="friendActive()">提交</a>
                 </div>
                 </div>
             </div>
