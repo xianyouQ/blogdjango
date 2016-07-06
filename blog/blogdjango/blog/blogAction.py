@@ -198,7 +198,7 @@ class BlogAction:
 					selfUserDetail = UserDetail.objects.get(user__exact=self.user)
 					for username in usernameList:
 						try:
-							asked_user = UserDetail.objects.get(username_exact=username)
+							asked_user = UserDetail.objects.get(username__exact=username)
 							Friends.objects.update_or_create(ask_from_user=selfUserDetail, asked_user=asked_user, need_confirm=False,blog_priority=True)
 						except UserDetail.DoesNotExist:
 							continue
