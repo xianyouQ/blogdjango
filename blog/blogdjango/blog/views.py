@@ -17,7 +17,8 @@ import json
 def FriendDymic(request):
 	mblogAction = BlogAction(request.user)
 	if "lastShortArticleId" in request.GET:
-		context = mblogAction.queryFriendDynamic(startNum = request.GET.get("lastArticleId"))
+		context = mblogAction.queryFriendDynamic(startNum = request.GET.get("lastShortArticleId"))
+		return HttpResponse(json.dumps(context),content_type="application/json",status = context["code"])
 	else:
 		context = mblogAction.queryFriendDynamic()
 	return TemplateResponse(request,"blog/FriendDynamic.html",context,status = context["code"])
@@ -107,6 +108,8 @@ def addNewActicle(request):
 		
 @account_active_required()
 def userActicle(request,username):
+	if username == request.user.username:
+		return HttpResponseRedirect("/blog/article/")
 	mblogAction = BlogAction(request.user)
 	if request.method == 'POST':
 		context["code"] = 405
@@ -114,8 +117,12 @@ def userActicle(request,username):
 	else:
 		if "lastArticleId" in request.GET:
 			context = mblogAction.queryArticle(tag=request.GET.get("tag-search",""),username=username,startNum=request.GET.get("lastArticleId"))
+			if context.has_key("denied"):
+				return TemplateResponse(request,context["denied"],context)
 			return HttpResponse(json.dumps(context),content_type="application/json",status = context["code"])
 		context = mblogAction.queryArticle(tag=request.GET.get("tag-search",""),username=username)
+		if context.has_key("denied"):
+			return TemplateResponse(request,context["denied"],context)
 		return TemplateResponse(request,"blog/ArticleEditor.html",context,status = context["code"])
 		
 @account_active_required()
@@ -133,6 +140,8 @@ def shortArticle(request):
 		
 @account_active_required()
 def userShortArticle(request,username):
+	if username == request.user.username:
+		return HttpResponseRedirect("/blog/shortArticle/")
 	mblogAction = BlogAction(request.user)
 	if request.method == 'POST':
 		context["code"] = 405
@@ -140,8 +149,12 @@ def userShortArticle(request,username):
 	else:
 		if "lastShortArticleId" in request.GET:
 			context = mblogAction.queryShortArticle(startNum=request.GET.get("lastShortArticleId"),username=username)
+			if context.has_key("denied"):
+				return TemplateResponse(request,context["denied"],context)
 			return HttpResponse(json.dumps(context),content_type="application/json",status = context["code"])
 		context = mblogAction.queryShortArticle(username=username)
+		if context.has_key("denied"):
+			return TemplateResponse(request,context["denied"],context)
 		return TemplateResponse(request,"blog/shortArticleEditor.html",context,status = context["code"])
 		
 def test(request):
@@ -184,6 +197,8 @@ def photoView(request):
 	
 @account_active_required()	
 def userPhotoView(request,username):
+	if username == request.user.username:
+		return HttpResponseRedirect("/blog/photo/")
 	mblogAction = BlogAction(request.user)
 	if request.method == 'POST':
 		context["code"] = 405
@@ -191,8 +206,12 @@ def userPhotoView(request,username):
 	else:
 		if "lastPhotoId" in request.GET:
 			context = mblogAction.requeryPhoto(startNum=request.GET.get("lastPhotoId"),username=username)
+			if context.has_key("denied"):
+				return TemplateResponse(request,context["denied"],context)
 			return HttpResponse(json.dumps(context),content_type="application/json",status = context["code"])
 		context = mblogAction.requeryPhoto(username=username)
+		if context.has_key("denied"):
+			return TemplateResponse(request,context["denied"],context)
 	return TemplateResponse(request,"blog/photo.html",context,status = context["code"])
 
 @csrf_protect

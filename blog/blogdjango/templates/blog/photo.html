@@ -45,7 +45,11 @@
         }
 	$(window).scroll(function () {
     if ($(document).scrollTop() >= $(document).height() - $(window).height()) {
-                    refreshPhoto();
+				{% if username %}
+                    refreshPhoto('{{username}}');
+				{% else %}
+					refreshPhoto();
+				{% endif %}
 			}
 		
 	});

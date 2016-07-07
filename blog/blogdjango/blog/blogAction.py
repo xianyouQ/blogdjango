@@ -15,7 +15,7 @@ class BlogAction:
 	def __init__(self,user):
 		self.user = user
 
-	def queryFriendDynamic(self,echpage=5,startNum=sys.maxint):
+	def queryFriendDynamic(self,echpage=6,startNum=sys.maxint):
 		"""
 		查询好友动态
 		"""
@@ -74,12 +74,13 @@ class BlogAction:
 				if access:
 					context["username"] = userName
 					shortArticles = ShortArticle.objects.filter(userDetail__exact=mUserDetail)[0:3]
-					print shortArticles
 					article = BlogText.objects.filter(userDetail__exact=mUserDetail,is_publish=True)[0:1]
 					photos = BlogPhoto.objects.filter(userDetail__exact=mUserDetail)[0:3]
 				else:
 					context["denied"] = settings.NO_PERMISSON_TO_BLOG_TEMPLATE
 					context["username"] = userName
+					context["code"] = 403
+					return context
 			context["lastArticle"] = ModelToJson(article[0])
 			context["shortArticles"] = ModelToJson(shortArticles)
 			context["userDetail"] = ModelToJson(mUserDetail)
@@ -109,7 +110,8 @@ class BlogAction:
 				else:
 					context["denied"] = settings.NO_PERMISSON_TO_BLOG_TEMPLATE
 					context["username"] = userName
-
+					context["code"] = 403
+					return context
 			comments = {}
 			for comment in querycomments:
 				if comment.parent_comment == None:
@@ -260,6 +262,7 @@ class BlogAction:
 					else:
 						context["denied"] = settings.NO_PERMISSON_TO_BLOG_TEMPLATE
 						context["username"] = userName
+						context["code"] = 403
 						return context
 				newComment.blogtext = parentComment.blogtext
 				newComment.parent_comment = parentComment
@@ -276,6 +279,7 @@ class BlogAction:
 					else:
 						context["denied"] = settings.NO_PERMISSON_TO_BLOG_TEMPLATE
 						context["username"] = userName
+						context["code"] = 403
 						return context
 				newComment.blogtext = blogText
 			newComment.context = requestContext["message"]
@@ -317,6 +321,7 @@ class BlogAction:
 					else:
 						context["denied"] = settings.NO_PERMISSON_TO_BLOG_TEMPLATE
 						context["username"] = userName
+						context["code"] = 403
 						return context
 				newShortComment.shortarticle = parentShortComment.shortarticle
 				newShortComment.parent_comment = parentShortComment
@@ -333,6 +338,7 @@ class BlogAction:
 					else:
 						context["denied"] = settings.NO_PERMISSON_TO_BLOG_TEMPLATE
 						context["username"] = userName
+						context["code"] = 403
 						return context
 				newShortComment.shortarticle = shortArticle
 			newShortComment.context = requestContext["message"]
@@ -414,13 +420,16 @@ class BlogAction:
 			else: 
 				userDetail,access = self.blog_permission_required(username)
 				if access:
+					print "hahaha"
 					Articles = BlogText.objects.filter(userDetail__exact=userDetail).filter(is_publish__exact=True).filter(article_tags__icontains=tag).filter(id__lt=startNum)[0:echpage]
 					selfUserDetail = UserDetail.objects.get(user__exact=self.user)
 					context["selfUserDetail"] = ModelToJson(selfUserDetail)
 					context["username"] = username
 				else:
 					context["denied"] = settings.NO_PERMISSON_TO_BLOG_TEMPLATE
-					context["username"] = username				
+					context["username"] = username
+					context["code"] = 403
+					return context
 			context["code"] = 200
 			context["Articles"] = ModelToJson(Articles)
 			context["userDetail"] = ModelToJson(userDetail)
@@ -501,6 +510,8 @@ class BlogAction:
 				else:
 					context["denied"] = settings.NO_PERMISSON_TO_BLOG_TEMPLATE
 					context["username"] = username
+					context["code"] = 403
+					return context
 			mshortArticles = list(shortArticles) 
 			##必须要加，不然会报(1235, "This version of MySQL doesn't yet support 'LIMIT & IN/ALL/ANY/SOME subquery'")，
 			#可能跟queryset的惰性有关，导致下一个查询出现了select * from a where a.b in (select b from c limit 10)，mysql认为这样的sql不合法。
@@ -603,7 +614,9 @@ class BlogAction:
 					context["username"] = username
 				else:
 					context["denied"] = settings.NO_PERMISSON_TO_BLOG_TEMPLATE
-					context["username"] = username	
+					context["username"] = username
+					context["code"] = 403
+					return context
 			context["code"] = 200
 			context["photos"] = []
 			context["userDetail"] = ModelToJson(mUserDetail)

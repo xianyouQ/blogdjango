@@ -1,7 +1,7 @@
 # encoding=utf8
 from django.core.serializers import serialize
 from django.db.models.query import QuerySet
-from blogdjango.models import BlogText,UserDetail
+from blogdjango.models import BlogText,UserDetail,Comment,ShortComment
 import json
 
 def ModelToJson(obj):

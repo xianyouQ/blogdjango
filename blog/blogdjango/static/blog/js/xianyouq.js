@@ -309,7 +309,7 @@ function commitComment(articleId,username)
 function commitshortComment(shortArticleId,selfusername,username)
 {
 	var placeholder = $("#short_Article_" + shortArticleId + " textarea").attr("placeholder")
-	var content =  $("#short_Article_" + shortArticleId + " textarea").val();
+	var content =  text($("#short_Article_" + shortArticleId + " textarea").val());
 	if(content.length == 0)
 		{
 			Message("warning","您尚未输入任何内容");
@@ -328,6 +328,7 @@ function commitshortComment(shortArticleId,selfusername,username)
 	{
 		var parentId = $("#short_Article_" + shortArticleId +" .shortCommentParentId").attr("value");
 		toUser = placeholder.split("@")[1];
+		content = "<a class=\"small\" href=\"/blog/user/" + toUser + "/\">@" + toUser + "</a>  " + content
 		json = {
 			"username":username,
 			"shortarticleId":shortArticleId,
@@ -492,7 +493,7 @@ function saveArticle(is_publish)
 			shortArticleTemplate.find("a.name-a").html(data.userDetail.username);
 			shortArticleTemplate.find("small.text-muted").html(toLocalTimeStr(data.create_time));
 			shortArticleTemplate.find(".social-body").html(json.content);
-			shortArticleTemplate.find(".textarea").attr("onblur","shortTextAreaBlur(" + data.id + ")");
+			shortArticleTemplate.find("textarea").attr("onblur","shortTextAreaBlur(" + data.id + ")");
 			shortArticleTemplate.find(".shortArticleTemplateSubmit").attr("onclick","commitshortComment("+data.id+",'" + data.userDetail.username + "')");
 			$(".shortArticleList").prepend(shortArticleTemplate.html());
 		}
@@ -655,7 +656,7 @@ function readLocalStorageChange(updatekey){
 	$("input[id$='hiddensidebar']").attr("checked",checkvalue(localStorage.getItem("hiddensidebar")));
 }
 
-function refreshArticle()
+function refreshArticle(username)
 {
 	var size = $("div[id^='article_list']").length
 	
@@ -670,13 +671,15 @@ function refreshArticle()
 		return void(0);
 	}
 	var tag = $.getUrlParam("tag-search");
+	if(typeof(username) == 'undefined'){
+		var url = "/blog/article/?lastArticleId=" + lastId;
+	}
+	else{
+		var url = "/blog/user/" + username + "/article/?lastArticleId=" + lastId;
+	}
 	if(tag != null )
 	{
-		var url = "/blog/article/?tag-search=" + tag + "&lastArticleId=" + lastId;
-	}
-	else
-	{
-		var url = "/blog/article/?lastArticleId=" + lastId;
+		url = url + "&tag-search=" + tag;
 	}
 	function success(data,textStatus)
 	{
@@ -707,7 +710,7 @@ function refreshArticle()
 	commitJson(success,error,{},url,"GET");
 }
 
-function refreshPhoto()
+function refreshPhoto(username)
 {
 	var size = $("a[id^='Gallery']").length
 	if (size <= 13)
@@ -720,7 +723,12 @@ function refreshPhoto()
 	{
 		return void(0);
 	}
-	var url = "/blog/photo/?lastPhotoId=" + lastId;
+	if(typeof(username) == 'undefined'){
+		var url = "/blog/photo/?lastPhotoId=" + lastId;
+	}
+	else{
+		var url = "/blog/user/" + username + "/photo/?lastPhotoId=" + lastId;
+	}
 
 	function success(data,textStatus)
 	{
@@ -741,7 +749,7 @@ function refreshPhoto()
 }
 
 
-function refreshShortArticle()
+function refreshShortArticle(username)
 {	
 	var size = $("div[id^='short_Article']").length
 	if (size < 6)
@@ -755,8 +763,12 @@ function refreshShortArticle()
 	{
 		return void(0);
 	}
-	var url = "/blog/shortArticle/?lastShortArticleId=" + lastId;
-	
+	if(typeof(username) == 'undefined'){
+		var url = "/blog/shortArticle/?lastShortArticleId=" + lastId;
+	}
+	else{
+		var url = "/blog/user/" + username + "/shortArticle/?lastShortArticleId=" + lastId;
+	}
 	function success(data,textStatus)
 	{
 		$.each(data.shortArticles,function(idx,json){
@@ -767,6 +779,7 @@ function refreshShortArticle()
 			shortArticleTemplate.find("a.name-a").html(data.userDetail.username);
 			shortArticleTemplate.find("small.text-muted").html(toLocalTimeStr(json.shortArticle.create_time));
 			shortArticleTemplate.find(".social-body").html(json.shortArticle.context);
+			shortArticleTemplate.find("textarea").attr("onblur","shortTextAreaBlur(" + json.shortArticle.id + ")");
 			$.each(json.comments,function(key,value)
 			{
 				var parentCommentId = key;
@@ -792,7 +805,7 @@ function refreshShortArticle()
 			}
 			);
 			if(data.selfUserDetail){
-				shortArticleTemplate.find(".shortArticleTemplateSubmit").attr("onclick","commitshortComment("+ json.shortArticle.id +",'" + data.selfUserDetail.username + "')");
+				shortArticleTemplate.find(".shortArticleTemplateSubmit").attr("onclick","commitshortComment("+ json.shortArticle.id +",'" + data.selfUserDetail.username + "','" + data.userDetail.username + "')");
 			}
 			else{
 				shortArticleTemplate.find(".shortArticleTemplateSubmit").attr("onclick","commitshortComment("+ json.shortArticle.id +",'" + data.userDetail.username + "')");
@@ -810,4 +823,75 @@ function refreshShortArticle()
 		}
 	}
 	commitJson(success,error,{},url,"GET");
+}
+
+
+
+function refreshFriendDynamic()
+{
+	var size = $("div[id^='short_Article']").length
+	if (size < 6)
+	{
+		return void(0);
+	}
+
+	var lastShortArticle = $("div[id^='short_Article']")[size - 1];
+	var lastId = lastShortArticle.id.split("_")[2];
+	if (lastId <= 1 || typeof(lastId)=="undefined")
+	{
+		return void(0);
+	}
+
+	var url = "/blog/friendDynamic/?lastShortArticleId=" + lastId;
+	
+	function success(data,textStatus)
+	{
+		$.each(data.shortArticles,function(idx,json){
+			var shortArticleTemplate = $(".shortArticleTemplate").clone();
+			shortArticleTemplate.find("div.social-feed-separated").attr("id","short_Article_" + json.shortArticle.id);
+			shortArticleTemplate.find("div.social-feed-separated > .social-avatar > a").attr("href","/blog/user/" + json.userDetail.username + "/");
+			shortArticleTemplate.find("img.photo-img").attr("src",json.userDetail.head_photo);
+			shortArticleTemplate.find("a.name-a").html(json.userDetail.username);
+			shortArticleTemplate.find("small.text-muted").html(toLocalTimeStr(json.shortArticle.create_time));
+			shortArticleTemplate.find(".social-body").html(json.shortArticle.context);
+			shortArticleTemplate.find("textarea").attr("onblur","shortTextAreaBlur(" + json.shortArticle.id + ")");
+			$.each(json.comments,function(key,value)
+			{
+				var parentCommentId = key;
+				$.each(value,function(inneridx,innerjson)
+				{
+					var shortArticleCommentTemplate = $(".shortArticleCommentTemplate").clone();
+					shortArticleCommentTemplate.find("div.social-comment > a").attr("href","/blog/user/" + innerjson.user.username);
+					shortArticleCommentTemplate.find("div.social-comment > a > img").attr("src", innerjson.user.head_photo); 
+					shortArticleCommentTemplate.find("div.media-body a.comment-User").attr("href","/blog/user/" + innerjson.user.username).html(innerjson.user.username).after(" " + innerjson.comment.context);
+					shortArticleCommentTemplate.find("small.text-muted").html(toLocalTimeStr(innerjson.comment.comment_time));
+					shortArticleCommentTemplate.find("div.media-body a.small").attr("onclick","shortCommentReply(" + json.shortArticle.id + "," + parentCommentId + ",'" + innerjson.user.username+ "')");
+					if(innerjson.comment.id == parentCommentId){
+						shortArticleCommentTemplate.find("div.social-comment").attr("id","shortArticle_comment_" + parentCommentId);
+						shortArticleTemplate.find("div.shortComment-reply").before(shortArticleCommentTemplate.html());
+					}
+					else{
+						
+						shortArticleTemplate.find("div.social-comment#shortArticle_comment_" + parentCommentId).append(shortArticleCommentTemplate.html());
+					}
+					
+				}
+				);
+			}
+			);
+
+			shortArticleTemplate.find(".shortArticleTemplateSubmit").attr("onclick","commitshortComment("+ json.shortArticle.id +",'" + data.userDetail.username + "','" + json.userDetail.username + "')");
+			$(".shortArticleList").append(shortArticleTemplate.html());
+		});
+	}
+	function error(XMLHttpRequest, textStatus, errorThrown)
+	{
+		if (XMLHttpRequest.status == 500) {
+			Message("error","哎呀，服务器出错了");
+		}
+		else{
+			Message("error","获取数据失败");
+		}
+	}
+	commitJson(success,error,{},url,"GET");	
 }

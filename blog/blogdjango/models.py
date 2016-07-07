@@ -84,7 +84,7 @@ class Comment(models.Model):
 	comment_user = models.ForeignKey(UserDetail,blank=True,null=True,on_delete=models.SET_NULL,related_name="comment_from")
 	comment_to_user = models.ForeignKey(UserDetail,blank=True,null=True,on_delete=models.SET_NULL,related_name="comment_to")
 	comment_time = models.DateTimeField(auto_now_add=True,verbose_name=u"评论时间")
-
+	
 	class Meta:
 		db_table = "blog_comment"
 		verbose_name = "博客评论"
@@ -98,6 +98,7 @@ class ShortComment(models.Model):
 	comment_user = models.ForeignKey(UserDetail,blank=True,null=True,on_delete=models.SET_NULL,related_name="short_comment_from")
 	comment_to_user = models.ForeignKey(UserDetail,blank=True,null=True,on_delete=models.SET_NULL,related_name="short_comment_to")
 	comment_time = models.DateTimeField(auto_now_add=True,verbose_name=u"评论时间")
+	
 
 	class Meta:
 		db_table = "short_comment"

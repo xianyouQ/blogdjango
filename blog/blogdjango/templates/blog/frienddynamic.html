@@ -9,7 +9,7 @@
 $(document).ready(function(){
 	$(window).scroll(function () {
 		if ($(document).scrollTop() >= $(document).height() - $(window).height()) {
-						Message("success","到达底部");
+						refreshFriendDynamic();
 			}
 		
 	});
@@ -118,7 +118,7 @@ $(document).ready(function(){
 							<img alt="image" src="{{userDetail.head_photo}}">
 						</a>
 						<div class="media-body">
-							<textarea class="form-control" " placeholder="在这里写评论"></textarea>
+							<textarea class="form-control" placeholder="在这里写评论"></textarea>
 							<input type="hidden" name="parentId" class="shortCommentParentId" value="undefined">
 							<button class="btn btn-primary  btn-xs shortArticleTemplateSubmit" type="button">评论</button>
 						</div>
@@ -173,7 +173,9 @@ $(document).ready(function(){
                                 <a href="/blog/user/{{commentItem.user.username}}/">
                                     {{commentItem.user.username}}
                                 </a>
-									{{commentItem.comment.context}}
+									{% autoescape off %} 
+										{{commentItem.comment.context}}
+									{% endautoescape %}
                                 <br/>
 								<a class="small" onclick="shortCommentReply({{mshortArticle.shortArticle.id}},{{parentId}},'{{commentItem.user.username}}')" >回复</a>
                                 <small class="text-muted tolocaltime">{{commentItem.comment.comment_time}}</small>
@@ -187,7 +189,9 @@ $(document).ready(function(){
 									<a href="/blog/user/{{commentItem.user.username}}/">
 										{{commentItem.user.username}}
 									</a>
-									{{commentItem.comment.context}}
+									{% autoescape off %} 
+										{{commentItem.comment.context}}
+									{% endautoescape %}
 									<br/>
 									<a class="small" onclick="shortCommentReply({{mshortArticle.shortArticle.id}},{{parentId}},'{{commentItem.user.username}}')">回复</a>
 									<small class="text-muted tolocaltime">{{commentItem.comment.comment_time}}</small>
@@ -204,7 +208,7 @@ $(document).ready(function(){
 							<div class="media-body">
 								<textarea class="form-control" onblur="shortTextAreaBlur({{mshortArticle.shortArticle.id}})" placeholder="在这里写评论"></textarea>
 								<input type="hidden" name="parentId" class="shortCommentParentId" value="undefined">
-								<button class="btn btn-primary  btn-xs" onclick="commitshortComment({{mshortArticle.shortArticle.id}},'{{userDetail.username}}')" type="button">评论</button>
+								<button class="btn btn-primary  btn-xs" onclick="commitshortComment({{mshortArticle.shortArticle.id}},'{{userDetail.username}}','{{mshortArticle.userDetail.username}}')" type="button">评论</button>
 							</div>
 						</div>
                     </div>
