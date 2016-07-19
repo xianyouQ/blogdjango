@@ -309,7 +309,7 @@ function commitComment(articleId,username)
 function commitshortComment(shortArticleId,selfusername,username)
 {
 	var placeholder = $("#short_Article_" + shortArticleId + " textarea").attr("placeholder")
-	var content =  text($("#short_Article_" + shortArticleId + " textarea").val());
+	var content = $("#short_Article_" + shortArticleId + " textarea").val();
 	if(content.length == 0)
 		{
 			Message("warning","您尚未输入任何内容");

@@ -93,7 +93,9 @@ $(document).ready(function(){
 	<div class="social-comment">
 		<a href="/blog/index/" class="pull-left">
 			{% if username %}
+				{% if selfUserDetail %}
 			<img alt="image" src="{{selfUserDetail.head_photo}}">
+				{% endif %}
 			{% else %}
 			<img alt="image" src="{{userDetail.head_photo}}">
 			{% endif %}

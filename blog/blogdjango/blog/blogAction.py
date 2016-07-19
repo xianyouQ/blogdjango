@@ -12,7 +12,7 @@ class BlogAction:
 	"""
 	blog操作查询类
 	"""
-	def __init__(self,user):
+	def __init__(self,user=None):
 		self.user = user
 
 	def queryFriendDynamic(self,echpage=6,startNum=sys.maxint):
@@ -420,10 +420,12 @@ class BlogAction:
 			else: 
 				userDetail,access = self.blog_permission_required(username)
 				if access:
-					print "hahaha"
 					Articles = BlogText.objects.filter(userDetail__exact=userDetail).filter(is_publish__exact=True).filter(article_tags__icontains=tag).filter(id__lt=startNum)[0:echpage]
-					selfUserDetail = UserDetail.objects.get(user__exact=self.user)
-					context["selfUserDetail"] = ModelToJson(selfUserDetail)
+					if self.user.is_authenticated():
+						selfUserDetail = UserDetail.objects.get(user__exact=self.user)
+						context["selfUserDetail"] = ModelToJson(selfUserDetail)
+					else:
+						pass
 					context["username"] = username
 				else:
 					context["denied"] = settings.NO_PERMISSON_TO_BLOG_TEMPLATE
@@ -448,6 +450,8 @@ class BlogAction:
 		try:
 			mUserDetail = UserDetail.objects.get(username=username)
 			if mUserDetail.access_confirm:
+				if not self.user.is_authenticated():
+					return mUserDetail,False
 				dbpermission = Friends.objects.get(ask_from_user__user=self.user,asked_user__exact=mUserDetail)
 				if dbpermission.blog_priority:
 					return mUserDetail,True
@@ -503,10 +507,13 @@ class BlogAction:
 			else:
 				mUserDetail,success = self.blog_permission_required(username)
 				if success:
-					selfUserDetail = UserDetail.objects.get(user__exact=self.user)
 					shortArticles = ShortArticle.objects.filter(userDetail__exact=mUserDetail).filter(id__lt=startNum)[0:echpage]
 					context["username"] = username
-					context["selfUserDetail"] = ModelToJson(selfUserDetail)
+					if self.user.is_authenticated():
+						selfUserDetail = UserDetail.objects.get(user__exact=self.user)
+						context["selfUserDetail"] = ModelToJson(selfUserDetail)
+					else:
+						pass
 				else:
 					context["denied"] = settings.NO_PERMISSON_TO_BLOG_TEMPLATE
 					context["username"] = username

@@ -30,7 +30,7 @@ def selfIndex(request):
 	context = mblogAction.queryIndexData()
 	return TemplateResponse(request,"blog/index.html",context)
 
-@account_active_required()
+
 def userIndex(request,username):
 	if username == request.user.username:
 		return HttpResponseRedirect("/blog/index/")
@@ -44,15 +44,23 @@ def userIndex(request,username):
 @account_active_required()
 def Comment(request):
 	mblogAction = BlogAction(request.user)
-	if request.method == 'GET':
-		context = mblogAction.queryActicleComment(request.GET)
-	else:
+	if request.method == 'POST':
 		context = mblogAction.addNewComment(request.POST)
+	else:
+		context["code"] = 405
 	if context.has_key("denied"):
 		return TemplateResponse(request,context["denied"],context)
 	return HttpResponse(json.dumps(context),content_type="application/json",status = context["code"])
 	
 	
+def userComment(request):
+	mblogAction = BlogAction(request.user)
+	context = mblogAction.queryActicleComment(request.GET)
+	if context.has_key("denied"):
+		return TemplateResponse(request,context["denied"],context)
+	return HttpResponse(json.dumps(context),content_type="application/json",status = context["code"])
+	
+
 @csrf_protect
 @account_active_required()
 def shortComment(request):
@@ -106,7 +114,7 @@ def addNewActicle(request):
 		context = mblogAction.queryArticle(tag=request.GET.get("tag-search",""))
 		return TemplateResponse(request,"blog/ArticleEditor.html",context,status = context["code"])
 		
-@account_active_required()
+
 def userActicle(request,username):
 	if username == request.user.username:
 		return HttpResponseRedirect("/blog/article/")
@@ -138,7 +146,7 @@ def shortArticle(request):
 		context = mblogAction.queryShortArticle()
 		return TemplateResponse(request,"blog/shortArticleEditor.html",context,status = context["code"])
 		
-@account_active_required()
+
 def userShortArticle(request,username):
 	if username == request.user.username:
 		return HttpResponseRedirect("/blog/shortArticle/")
