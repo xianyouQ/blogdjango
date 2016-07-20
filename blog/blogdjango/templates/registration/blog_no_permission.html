@@ -57,8 +57,12 @@
         <h3 class="font-bold">Permission Denied</h3>
 
         <div class="error-desc">
-            对不起，您的帐号没有足够的权限查看{{username}}的blog<br/>
+            对不起，对方blog只允许好友查看<br/>
+			{% if user.is_authenticated %}
             你可以通过这个按钮向对方发起好友请求 <br/><a href="#" id="permissionCommit" class="btn btn-primary m-t">好友申请</a>
+			{% else %}
+			请先登录 <br/><a href="/accounts/login/?next={{request.get_full_path}}" class="btn btn-primary m-t">登陆</a>
+			{% endif %}
         </div>
     </div>
 

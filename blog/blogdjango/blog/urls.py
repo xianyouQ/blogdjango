@@ -5,6 +5,7 @@ urlpatterns = [
 	url(r'^friendDynamic/$',views.FriendDymic,name="FriendDymic"),
 	url(r'^index/$',views.selfIndex,name="selfIndex"),
 	url(r'^comment/$',views.Comment),
+	url(r'^querycomment/$',views.userComment),
 	url(r'^shortcomment/$',views.shortComment),
 	url(r'^user/(?P<username>[a-zA-Z0-9]+)/$',views.userIndex),
 	url(r'^user/(?P<username>[a-zA-Z0-9]+)/article/$',views.userActicle),

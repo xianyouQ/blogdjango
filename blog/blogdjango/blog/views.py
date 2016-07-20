@@ -202,8 +202,7 @@ def photoView(request):
 		context = mblogAction.requeryPhoto()
 	return TemplateResponse(request,"blog/photo.html",context,status = context["code"])
 
-	
-@account_active_required()	
+
 def userPhotoView(request,username):
 	if username == request.user.username:
 		return HttpResponseRedirect("/blog/photo/")

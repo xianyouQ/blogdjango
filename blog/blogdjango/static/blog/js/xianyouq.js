@@ -308,6 +308,11 @@ function commitComment(articleId,username)
 
 function commitshortComment(shortArticleId,selfusername,username)
 {
+	if ($.trim(selfusername) == ""||typeof(selfusername)=="undefined")
+	{
+		Message("error","请先登录");
+		return void(0)
+	}
 	var placeholder = $("#short_Article_" + shortArticleId + " textarea").attr("placeholder")
 	var content = $("#short_Article_" + shortArticleId + " textarea").val();
 	if(content.length == 0)
@@ -384,7 +389,7 @@ function queryComments(articleId,username)
 		"articleId":articleId,
 		"username":username
 	};
-	commitJson(queryCommentSuccessHandle,ArticleErrorHandle,json,"/blog/comment/","GET")
+	commitJson(queryCommentSuccessHandle,ArticleErrorHandle,json,"/blog/querycomment/","GET")
 }
 
 function opendetail(ArticleId,username)

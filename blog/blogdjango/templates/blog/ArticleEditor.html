@@ -117,6 +117,8 @@ $(document).ready(function(){
 </div>
 
 <div class="comment-reply-template hidden">
+	{% if username and not selfUserDetail %}
+	{% else %}
 	<div class="social-comment comment-reply">
 		<a href="/blog/index/" class="pull-left">
 			{% if username %}
@@ -131,6 +133,7 @@ $(document).ready(function(){
 			<button class="btn btn-primary  btn-xs" id="commitCommentBtn" type="button">评论</button>
 		</div>
 	</div>
+	{% endif %}
 </div>
 <div class="wrapper wrapper-content  animated fadeInRight article hidden detail-dismiss">
     <div class="row">
