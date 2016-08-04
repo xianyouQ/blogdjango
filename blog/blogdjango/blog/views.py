@@ -21,7 +21,7 @@ def FriendDymic(request):
 		return HttpResponse(json.dumps(context),content_type="application/json",status = context["code"])
 	else:
 		context = mblogAction.queryFriendDynamic()
-	return TemplateResponse(request,"blog/friendDynamic.html",context,status = context["code"])
+	return TemplateResponse(request,"blog/frienddynamic.html",context,status = context["code"])
 	
 
 @account_active_required()
