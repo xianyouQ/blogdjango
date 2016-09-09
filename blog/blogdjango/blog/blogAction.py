@@ -366,10 +366,14 @@ class BlogAction:
 		if not requestContext.get("content","").strip():
 			context["code"] = 404
 			return context
+		if requestContext.get("is_publish",False).lower() == "true":
+			is_public = True
+		else:
+			is_public = False
 		if "articleId" in requestContext:
 			try:
 				updatenum = BlogText.objects.filter(userDetail__user=self.user).filter(id=requestContext["articleId"]). \
-				update(context=requestContext.get("content"),is_publish=requestContext.get("is_publish",False),article_tags=requestContext.get("tags",""),blog_text_title=requestContext.get("title",""))
+				update(context=requestContext.get("content"),is_publish=is_public,article_tags=requestContext.get("tags",""),blog_text_title=requestContext.get("title",""))
 				if updatenum == 0:
 					context["code"] = 400
 				elif updatenum > 1:
@@ -389,7 +393,7 @@ class BlogAction:
 				article = BlogText()
 				article.userDetail = mUserDetail
 				article.context = requestContext["content"]
-				article.is_publish = requestContext.get("is_publish",False)      ######暂存不知道为啥会有问题。。。。。。。。。。。
+				article.is_publish = is_public     ######暂存不知道为啥会有问题。。。。。。。。。。。
 				article.article_tags = requestContext.get("tags","")
 				article.blog_text_title = requestContext.get("title","")
 				article.save()
