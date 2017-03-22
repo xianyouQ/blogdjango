@@ -1,7 +1,7 @@
 # encoding=utf8
 from django.db import models
 from django.contrib.auth.models import User
-import json
+import json 
 
 class UserDetail(models.Model):
 	user = models.OneToOneField(User)

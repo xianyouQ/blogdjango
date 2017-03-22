@@ -794,7 +794,7 @@ function refreshShortArticle(username)
 					shortArticleCommentTemplate.find("div.social-comment > a").attr("href","/blog/user/" + innerjson.user.username);
 					shortArticleCommentTemplate.find("div.social-comment > a > img").attr("src", innerjson.user.head_photo); 
 					shortArticleCommentTemplate.find("div.media-body a.comment-User").attr("href","/blog/user/" + innerjson.user.username).html(innerjson.user.username)
-					.after(" <a class=\"small\" href=\"/blog/user/" + innerjson.toUser.username + "/\">@" + innerjson.toUser.username + "</a>  "+ innerjson.comment.context);
+					.after(innerjson.comment.context);
 					shortArticleCommentTemplate.find("small.text-muted").html(toLocalTimeStr(innerjson.comment.comment_time));
 					shortArticleCommentTemplate.find("div.media-body a.small").attr("onclick","shortCommentReply(" + json.shortArticle.id + "," + parentCommentId + ",'" + innerjson.user.username+ "')");
 					if(innerjson.comment.id == parentCommentId){
@@ -870,7 +870,7 @@ function refreshFriendDynamic()
 					shortArticleCommentTemplate.find("div.social-comment > a").attr("href","/blog/user/" + innerjson.user.username);
 					shortArticleCommentTemplate.find("div.social-comment > a > img").attr("src", innerjson.user.head_photo); 
 					shortArticleCommentTemplate.find("div.media-body a.comment-User").attr("href","/blog/user/" + innerjson.user.username).html(innerjson.user.username)
-					.after(" <a class=\"small\" href=\"/blog/user/" + innerjson.toUser.username + "/\">@" + innerjson.toUser.username + "</a>  "+ innerjson.comment.context);
+					.after(innerjson.comment.context);
 					shortArticleCommentTemplate.find("small.text-muted").html(toLocalTimeStr(innerjson.comment.comment_time));
 					shortArticleCommentTemplate.find("div.media-body a.small").attr("onclick","shortCommentReply(" + json.shortArticle.id + "," + parentCommentId + ",'" + innerjson.user.username+ "')");
 					if(innerjson.comment.id == parentCommentId){

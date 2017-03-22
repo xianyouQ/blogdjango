@@ -11,7 +11,7 @@ from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
 import json
 
-# Create your views here.
+# Create your views here. 
 
 @account_active_required()
 def FriendDymic(request):

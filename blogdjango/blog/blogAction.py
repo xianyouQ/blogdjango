@@ -23,7 +23,7 @@ class BlogAction:
 		try:
 			mUserDetail = UserDetail.objects.get(user__exact=self.user)
 			myFriends = Friends.objects.select_related("asked_user").filter(ask_from_user__exact=mUserDetail)
-			asked_users = [Friend.asked_user for Friend in myFriends]
+			asked_users = (Friend.asked_user for Friend in myFriends)
 			mshortArticles = ShortArticle.objects.select_related("userDetail").filter(userDetail__in=asked_users).filter(id__lt=startNum)[0:echpage]
 			queryShortComments = ShortComment.objects.select_related("comment_user").select_related("comment_to_user").filter(shortarticle__in=list(mshortArticles))
 			context["shortArticles"] = []

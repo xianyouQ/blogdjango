@@ -35,6 +35,5 @@ class adminAction:
 				changenum = User.objects.filter(username__in=usernameList).update(is_active=is_active)
 				context[is_active]=changenum
 			except Exception:
-				traceback.print_exc()
 				context[is_active] = 0
 		return context

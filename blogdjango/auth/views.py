@@ -32,7 +32,6 @@ def userRegister(request):
 			login(request, user)
 			if not settings.OPEN_REGISTER:
 				user.is_active = False
-				print "haha"
 				user.save()
 			user_detail = UserDetail()
 			user_detail.user = user

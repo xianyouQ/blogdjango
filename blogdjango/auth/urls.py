@@ -3,7 +3,7 @@ from django.conf.urls import url,include
 from django.contrib.auth.views import login,logout
 from blogdjango.auth.views import userRegister,password_change
 from blogdjango.auth.forms import MyAuthenticationForm
-
+ 
 urlpatterns = [
     url(r'^login/$', login,{'template_name': 'registration/login.html','authentication_form':MyAuthenticationForm},name='login'),
     url(r'^logout/$', logout,{'template_name': 'registration/login.html'},name='logout'),

@@ -5,7 +5,7 @@ from blogdjango.admin.adminAction import adminAction
 from django.http import HttpResponse
 import json
 # Create your views here.
-
+ 
 @account_admin_required()
 def adminIndex(request):
 	username = request.user.username.split('@')[0]
@@ -16,7 +16,6 @@ def NewAccounts(request):
 	mAdminAction = adminAction()
 	if request.method == 'POST':
 		context = mAdminAction.processConfirmAsk(request.POST)
-		print context
 		return HttpResponse(json.dumps(context),content_type="application/json")
 	else:
 		context = mAdminAction.queryNeedConfirmAccounts()
